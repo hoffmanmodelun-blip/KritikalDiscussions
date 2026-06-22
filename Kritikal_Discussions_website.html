@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  KRITIKAL DISCUSSIONS — custom website (single file)
+  ============================================================================
+
+  HOW TO MAINTAIN THIS SITE (read me):
+
+  1) COLORS  -> Scroll down to ":root" in the <style> block. Every color is a
+     variable in one place. Replace the hex codes under "BRAND COLORS" with
+     your logo's colors and the whole site updates. Nothing else to touch.
+
+  2) PHOTOS  -> Every blank photo slot is marked. Search this file for
+     "IMAGE PLACEHOLDER". Each one tells you exactly what to paste in
+     (just an <img> tag). Until then they render as tidy labeled boxes.
+
+  3) TEXT    -> All copy lives in plain HTML inside the <section class="page">
+     blocks. Find the words on the live site, edit them here, save.
+
+  4) HOSTING -> This is one self-contained file. Easiest free options:
+       - Netlify Drop: drag this file (in a folder) onto app.netlify.com/drop
+       - GitHub Pages: push to a repo, enable Pages, point your domain at it
+     Your existing domain (kritikaldiscussions.com) can be pointed to either.
+
+  5) LOGO    -> The wordmark is text for now. To use your logo image instead,
+     see the "LOGO PLACEHOLDER" note in the <header> below.
+  ============================================================================
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Kritikal Discussions — Progressive debate, open to all</title>
+<meta name="description" content="Kritikal Discussions is a student-run nonprofit making progressive debate accessible to everyone — free resources, lectures, and online camps for debaters nationwide." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&amp;family=Hanken+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet" />
+
+<style>
+  /* ==========================================================================
+     :root — DESIGN TOKENS
+     ========================================================================== */
+  :root{
+    /* ---- BRAND COLORS — derived from the KD logo: teal, off-white, near-black ----
+       This block is the ONLY thing you need to edit to recolor the site. */
+    --brand:        #00736F;   /* primary brand color: buttons, links, accents */
+    --brand-deep:   #00524F;   /* darker shade for hovers / depth             */
+    --brand-tint:   #E3F1EE;   /* very light wash for soft section backgrounds */
+
+    /* ---- Neutrals (clean-minimal "paper + ink"). Tweak if you like. ---- */
+    --bg:        #F5F7F6;      /* page background (cool off-white)   */
+    --bg-alt:    #E9F1EF;      /* alternate section background   */
+    --surface:   #ffffff;      /* cards                          */
+    --ink:       #14201E;      /* primary text                   */
+    --ink-soft:  #4F615E;      /* secondary text                 */
+    --line:      #D7E2DF;      /* hairlines / borders            */
+
+    /* ---- Type ---- */
+    --display: "Fraunces", Georgia, serif;
+    --body: "Hanken Grotesk", system-ui, sans-serif;
+
+    /* ---- Motion ---- */
+    --ease: cubic-bezier(.16, 1, .3, 1);
+
+    /* ---- Layout ---- */
+    --max: 1180px;
+    --pad: clamp(1.25rem, 5vw, 4rem);
+  }
+
+  /* ==========================================================================
+     BASE
+     ========================================================================== */
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth; -webkit-text-size-adjust:100%;}
+  body{
+    font-family:var(--body);
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.65;
+    font-size:1.05rem;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  img{max-width:100%; display:block;}
+  a{color:inherit; text-decoration:none;}
+  ::selection{background:var(--brand); color:#fff;}
+
+  /* faint grain for a premium, non-flat feel */
+  .grain{
+    position:fixed; inset:0; pointer-events:none; z-index:1; opacity:.035;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .wrap{max-width:var(--max); margin:0 auto; padding-inline:var(--pad);}
+
+  /* ==========================================================================
+     TYPOGRAPHY
+     ========================================================================== */
+  h1,h2,h3{font-family:var(--display); font-weight:500; line-height:1.08; letter-spacing:-.01em; color:var(--ink);}
+  .display{font-size:clamp(2.6rem, 6.2vw, 5.1rem); font-weight:500;}
+  .page-title{font-size:clamp(2.2rem, 5vw, 3.6rem);}
+  h2{font-size:clamp(1.7rem, 3.4vw, 2.6rem);}
+  h3{font-size:clamp(1.2rem, 2vw, 1.45rem); letter-spacing:0;}
+  p{color:var(--ink-soft);}
+  .lead{font-size:clamp(1.1rem, 1.6vw, 1.3rem); color:var(--ink-soft); max-width:60ch;}
+
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:.6rem;
+    font-size:.78rem; font-weight:600; letter-spacing:.18em; text-transform:uppercase;
+    color:var(--brand); margin-bottom:1.1rem;
+  }
+  .eyebrow::before{content:""; width:26px; height:1.5px; background:var(--brand);}
+
+  /* ==========================================================================
+     BUTTONS
+     ========================================================================== */
+  .btn{
+    display:inline-flex; align-items:center; gap:.5rem;
+    padding:.9rem 1.5rem; border-radius:100px;
+    font-family:var(--body); font-weight:600; font-size:.96rem;
+    cursor:pointer; border:1px solid transparent;
+    transition:transform .35s var(--ease), background .3s, color .3s, box-shadow .35s, border-color .3s;
+  }
+  .btn .arr{transition:transform .35s var(--ease);}
+  .btn:hover .arr{transform:translateX(4px);}
+  .btn-primary{background:var(--brand); color:#fff;}
+  .btn-primary:hover{background:var(--brand-deep); transform:translateY(-2px); box-shadow:0 14px 30px -12px var(--brand);}
+  .btn-ghost{border-color:var(--ink); color:var(--ink); background:transparent;}
+  .btn-ghost:hover{background:var(--ink); color:var(--bg); transform:translateY(-2px);}
+
+  /* ==========================================================================
+     NAV
+     ========================================================================== */
+  header.nav{
+    position:fixed; top:0; left:0; right:0; z-index:50;
+    transition:background .4s var(--ease), border-color .4s, padding .4s var(--ease);
+    border-bottom:1px solid transparent;
+    padding-block:1.3rem;
+  }
+  header.nav.scrolled{
+    background:rgba(245,247,246,.82);
+    backdrop-filter:saturate(150%) blur(12px);
+    -webkit-backdrop-filter:saturate(150%) blur(12px);
+    border-bottom:1px solid var(--line);
+    padding-block:.85rem;
+  }
+  .nav-inner{display:flex; align-items:center; justify-content:space-between; gap:1rem;}
+  .brand{
+    font-family:var(--display); font-weight:600; font-size:1.22rem; letter-spacing:-.01em;
+    line-height:1; display:flex; align-items:center;
+  }
+  .brand b{color:var(--brand); font-weight:600;}
+
+  .nav-links{display:flex; align-items:center; gap:2rem; list-style:none;}
+  .nav-links a{
+    position:relative; font-size:.95rem; font-weight:500; color:var(--ink); padding-block:.2rem;
+  }
+  .nav-links a::after{
+    content:""; position:absolute; left:0; bottom:-3px; height:1.5px; width:0; background:var(--brand);
+    transition:width .35s var(--ease);
+  }
+  .nav-links a:hover::after, .nav-links a.active::after{width:100%;}
+  .nav-links a.active{color:var(--brand);}
+
+  .nav-social{display:flex; align-items:center; gap:.9rem; margin-left:.5rem;}
+  .nav-social a{display:grid; place-items:center; color:var(--ink-soft); transition:color .3s, transform .3s var(--ease);}
+  .nav-social a:hover{color:var(--brand); transform:translateY(-2px);}
+
+  .hamburger{
+    display:none; width:42px; height:42px; border:1px solid var(--line); border-radius:10px;
+    background:var(--surface); cursor:pointer; position:relative; z-index:60;
+  }
+  .hamburger span{position:absolute; left:11px; right:11px; height:1.6px; background:var(--ink); transition:transform .35s var(--ease), opacity .25s;}
+  .hamburger span:nth-child(1){top:15px;}
+  .hamburger span:nth-child(2){top:20px;}
+  .hamburger span:nth-child(3){top:25px;}
+  .hamburger.open span:nth-child(1){transform:translateY(5px) rotate(45deg);}
+  .hamburger.open span:nth-child(2){opacity:0;}
+  .hamburger.open span:nth-child(3){transform:translateY(-5px) rotate(-45deg);}
+
+  /* ==========================================================================
+     PAGES (in-page "router" with a soft fade)
+     ========================================================================== */
+  main{position:relative; z-index:2;}
+  .page{display:none;}
+  .page.active{display:block; animation:pageIn .55s var(--ease);}
+  @keyframes pageIn{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;}}
+
+  .section{padding-block:clamp(3.5rem, 8vw, 7.5rem);}
+  .section.alt{background:var(--bg-alt);}
+  .section.tint{background:var(--brand-tint);}
+
+  /* ==========================================================================
+     HERO
+     ========================================================================== */
+  .hero{padding-top:clamp(8rem, 16vw, 12rem); padding-bottom:clamp(3rem,6vw,5rem); text-align:center;}
+  .hero .lead{margin:1.4rem auto 0;}
+  .hero-cta{display:flex; gap:.9rem; justify-content:center; flex-wrap:wrap; margin-top:2.2rem;}
+  .hero .ph{margin-top:clamp(3rem,7vw,5.5rem);}
+
+  /* ==========================================================================
+     LAYOUT HELPERS
+     ========================================================================== */
+  .split{display:grid; grid-template-columns:1fr 1fr; gap:clamp(2rem,5vw,4.5rem); align-items:center;}
+  .stack-gap > * + *{margin-top:1.1rem;}
+  .pillars{display:grid; grid-template-columns:repeat(3,1fr); gap:clamp(1.2rem,3vw,2.4rem); margin-top:3rem;}
+  .pillar{padding-top:1.4rem; border-top:2px solid var(--brand);}
+  .pillar .num{font-family:var(--display); font-size:1.05rem; color:var(--brand); letter-spacing:.1em; display:block; margin-bottom:.5rem;}
+  .pillar h3{margin-bottom:.4rem;}
+  .pillar p{font-size:.97rem;}
+
+  .grid-2{display:grid; grid-template-columns:repeat(2,1fr); gap:clamp(1.4rem,3vw,2rem);}
+  .grid-cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:clamp(1.2rem,2.5vw,1.8rem);}
+
+  /* ==========================================================================
+     CARDS
+     ========================================================================== */
+  .card{
+    background:var(--surface); border:1px solid var(--line); border-radius:18px;
+    padding:1.7rem; transition:transform .45s var(--ease), box-shadow .45s, border-color .35s;
+    height:100%;
+  }
+  .card:hover{transform:translateY(-5px); box-shadow:0 24px 50px -28px rgba(8,20,18,.45); border-color:var(--brand);}
+  .card .eyebrow{margin-bottom:.8rem;}
+  .card h3{margin-bottom:.6rem;}
+  .card p{font-size:.98rem; margin-bottom:1.2rem;}
+  .card-link{display:inline-flex; align-items:center; gap:.45rem; font-weight:600; color:var(--brand); cursor:pointer;}
+  .card-link .arr{transition:transform .35s var(--ease);}
+  .card:hover .card-link .arr{transform:translateX(4px);}
+  .program-card{display:flex; flex-direction:column; padding:0; overflow:hidden;}
+  .program-card .ph{border:0; border-radius:0; border-bottom:1px solid var(--line);}
+  .program-card .program-image{
+    width:100%;
+    aspect-ratio:16/9;
+    object-fit:cover;
+    object-position:center;
+    border-bottom:1px solid var(--line);
+  }
+  .program-card .body{padding:1.7rem; display:flex; flex-direction:column; flex:1;}
+  .program-card .body p{flex:1;}
+
+  .story-split{
+    grid-template-columns:minmax(0,1fr) minmax(280px,.86fr);
+  }
+  .story-photo{
+    width:100%;
+    aspect-ratio:4/5;
+    object-fit:cover;
+    object-position:center 42%;
+    border-radius:16px;
+    border:1px solid var(--line);
+    background:var(--surface);
+  }
+
+  /* team */
+  .person{display:flex; flex-direction:column;}
+  .person .ph{margin-bottom:1rem;}
+  .person-photo{
+    width:100%;
+    aspect-ratio:4/5;
+    object-fit:cover;
+    border-radius:16px;
+    border:1px solid var(--line);
+    margin-bottom:1rem;
+    background:var(--surface);
+  }
+  .person .role{font-size:.78rem; letter-spacing:.14em; text-transform:uppercase; color:var(--brand); font-weight:600; margin:.1rem 0 .6rem;}
+  .person h3{margin-bottom:.5rem; font-size:1.25rem;}
+  .person p{font-size:.93rem; line-height:1.6;}
+
+  /* camp tabs + instructor rosters */
+  .camp-switch{
+    display:inline-flex; flex-wrap:wrap; gap:.4rem; padding:.35rem;
+    margin-top:2rem; border:1px solid var(--line); border-radius:100px;
+    background:var(--surface);
+  }
+  .camp-tab{
+    border:0; border-radius:100px; padding:.75rem 1rem;
+    background:transparent; color:var(--ink-soft); font:600 .95rem var(--body);
+    cursor:pointer; transition:background .25s, color .25s, transform .3s var(--ease);
+  }
+  .camp-tab:hover{color:var(--brand); transform:translateY(-1px);}
+  .camp-tab.active{background:var(--brand); color:#fff;}
+  .camp-panel[hidden]{display:none;}
+  .camp-panel{margin-top:3rem;}
+  .camp-intro{
+    display:grid; grid-template-columns:minmax(0,1.25fr) minmax(280px,.75fr);
+    gap:clamp(1.5rem,4vw,3rem); align-items:start;
+  }
+  .camp-summary{
+    background:var(--surface); border:1px solid var(--line); border-radius:18px;
+    padding:1.6rem;
+  }
+  .camp-summary h3{font-size:1.35rem;}
+  .camp-summary p{margin-top:.7rem; font-size:.98rem;}
+  .camp-stat-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:.8rem; margin-top:1.2rem;}
+  .camp-stat{
+    border:1px solid var(--line); border-radius:14px; padding:.9rem;
+    background:color-mix(in srgb, var(--brand-tint) 45%, #fff);
+  }
+  .camp-stat .label{display:block; font-size:.72rem; letter-spacing:.13em; text-transform:uppercase; color:var(--brand); font-weight:700;}
+  .camp-stat strong{display:block; margin-top:.25rem; color:var(--ink); line-height:1.25;}
+  .schedule-card{
+    margin-top:3rem; background:var(--surface); border:1px solid var(--line);
+    border-radius:18px; overflow:hidden;
+  }
+  .schedule-card .schedule-head{padding:1.35rem 1.5rem; border-bottom:1px solid var(--line);}
+  .schedule-card .schedule-head h3{font-size:1.35rem;}
+  .schedule-card .schedule-head p{margin-top:.45rem; font-size:.95rem;}
+  .schedule-table{width:100%; border-collapse:collapse;}
+  .schedule-table th{
+    width:22%; padding:.85rem 1rem; background:var(--brand); color:#fff;
+    text-align:left; font-size:.95rem; font-weight:700; white-space:nowrap;
+  }
+  .schedule-table td{
+    width:28%; padding:.85rem 1rem; color:var(--ink); border-top:1px solid var(--line);
+    font-weight:600;
+  }
+  .schedule-table tr:first-child th,
+  .schedule-table tr:first-child td{border-top:0;}
+  .schedule-note{
+    padding:1rem 1.5rem; border-top:1px solid var(--line);
+    font-size:.95rem; color:var(--ink-soft);
+  }
+  .curriculum-tabs{
+    display:flex; flex-wrap:wrap; gap:.45rem; margin:1.7rem 0 0;
+  }
+  .curriculum-tab{
+    border:1px solid var(--brand); background:var(--brand); color:#fff;
+    padding:.75rem 1.05rem; border-radius:10px 10px 0 0;
+    font:700 .96rem var(--body); cursor:pointer;
+    transition:background .25s, color .25s, transform .3s var(--ease);
+  }
+  .curriculum-tab:hover{transform:translateY(-1px);}
+  .curriculum-tab.active{background:#13B4AF; border-color:#13B4AF;}
+  .curriculum-panel{
+    background:var(--surface); border:1px solid var(--line); border-radius:0 16px 16px 16px;
+    padding:clamp(1.4rem,3vw,2rem); margin-top:-1px;
+  }
+  .curriculum-panel[hidden]{display:none;}
+  .curriculum-panel h3{font-size:1.35rem; margin-bottom:.8rem;}
+  .curriculum-panel p{font-size:1rem; line-height:1.7;}
+  .curriculum-panel p + p{margin-top:1rem;}
+  .section-head{display:flex; align-items:end; justify-content:space-between; gap:1rem; margin:3.5rem 0 1.3rem;}
+  .section-head h2{font-size:clamp(1.55rem,3vw,2.2rem);}
+  .section-head p{max-width:44ch; font-size:.98rem;}
+  .instructor-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:1.2rem;}
+  .instructor-card{
+    background:var(--surface); border:1px solid var(--line); border-radius:18px;
+    overflow:hidden; height:100%; transition:transform .4s var(--ease), border-color .35s, box-shadow .4s;
+  }
+  .instructor-card:hover{transform:translateY(-4px); border-color:var(--brand); box-shadow:0 22px 46px -30px rgba(8,20,18,.5);}
+  .instructor-photo{
+    width:100%;
+    aspect-ratio:4/3;
+    object-fit:cover;
+    object-position:var(--photo-x, center) var(--photo-y, center);
+    border-bottom:1px solid var(--line);
+    background:var(--brand-tint);
+  }
+  .crop-guest-justin{--photo-y:38%;}
+  .crop-sebastian{--photo-y:36%;}
+  .crop-neel{--photo-y:18%;}
+  .crop-chris{--photo-y:26%;}
+  .crop-skanda{--photo-y:18%;}
+  .crop-chupeng{--photo-y:45%;}
+  .crop-faisal{--photo-y:36%;}
+  .crop-conan{--photo-y:36%;}
+  .crop-ruby{--photo-y:42%;}
+  .crop-adam{--photo-y:12%;}
+  .crop-flynn{--photo-y:8%;}
+  .crop-veronica{--photo-y:16%;}
+  .instructor-avatar{
+    width:100%;
+    aspect-ratio:4/3;
+    display:grid; place-items:center;
+    background:linear-gradient(135deg, var(--brand-tint), var(--surface));
+    border-bottom:1px solid var(--line); color:var(--brand);
+    font-family:var(--display); font-size:2.4rem;
+  }
+  .instructor-body{padding:1.35rem;}
+  .instructor-body .role{font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; color:var(--brand); font-weight:700; margin-bottom:.45rem;}
+  .instructor-body h3{font-size:1.18rem; margin-bottom:.55rem;}
+  .instructor-body p{font-size:.93rem; line-height:1.58; margin:0;}
+  .archive-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:1rem;}
+  .archive-card{
+    background:var(--surface); border:1px solid var(--line); border-radius:16px;
+    padding:1.25rem; height:100%;
+  }
+  .archive-card .role{font-size:.7rem; letter-spacing:.14em; text-transform:uppercase; color:var(--brand); font-weight:700; margin-bottom:.35rem;}
+  .archive-card h3{font-size:1.08rem; margin-bottom:.45rem;}
+  .archive-card p{font-size:.92rem; line-height:1.58;}
+
+  /* project */
+  .project-hero-photo{
+    width:100%;
+    aspect-ratio:2/1;
+    object-fit:cover;
+    object-position:center;
+    border-radius:16px;
+    border:1px solid var(--line);
+    margin-top:3rem;
+    background:var(--surface);
+  }
+
+  /* feature list */
+  .features{list-style:none; display:grid; gap:1rem; margin:1.8rem 0;}
+  .features li{display:flex; gap:.9rem; align-items:flex-start; font-size:1.02rem; color:var(--ink);}
+  .features svg{flex:none; margin-top:.25rem; color:var(--brand);}
+
+  /* meta pills */
+  .meta-row{display:flex; flex-wrap:wrap; gap:.7rem; margin:1.4rem 0 0;}
+  .pill{font-size:.85rem; font-weight:600; padding:.45rem .9rem; border-radius:100px; background:var(--surface); border:1px solid var(--line); color:var(--ink);}
+
+  /* ==========================================================================
+     IMAGE PLACEHOLDERS (tidy labeled boxes until you add real photos)
+     ========================================================================== */
+  .ph{
+    position:relative; width:100%;
+    background:
+      linear-gradient(135deg, color-mix(in srgb, var(--bg-alt) 70%, #fff) 0%, var(--surface) 100%);
+    border:1px dashed var(--line); border-radius:16px;
+    display:grid; place-items:center; overflow:hidden;
+    color:var(--ink-soft);
+  }
+  .ph::after{ /* faint diagonal hatching to read clearly as "placeholder" */
+    content:""; position:absolute; inset:0; opacity:.5;
+    background-image:repeating-linear-gradient(45deg, transparent 0 11px, color-mix(in srgb, var(--line) 60%, transparent) 11px 12px);
+  }
+  .ph-tag{
+    position:relative; z-index:1; display:inline-flex; align-items:center; gap:.5rem;
+    font-size:.72rem; letter-spacing:.13em; text-transform:uppercase; font-weight:600;
+    padding:.45rem .8rem; border-radius:100px; background:var(--surface); border:1px solid var(--line);
+  }
+  .ph-hero{aspect-ratio:16/8;}
+  .ph-wide{aspect-ratio:16/7;}
+  .ph-card{aspect-ratio:16/10;}
+  .ph-portrait{aspect-ratio:4/5;}
+  .ph-square{aspect-ratio:1/1;}
+
+  /* ==========================================================================
+     CTA BAND
+     ========================================================================== */
+  .cta-band{background:var(--brand); color:#fff; text-align:center;}
+  .cta-band h2{color:#fff; max-width:18ch; margin:0 auto;}
+  .cta-band p{color:rgba(255,255,255,.78); margin:1rem auto 0; max-width:50ch;}
+  .cta-band .btn-primary{background:#fff; color:var(--brand); margin-top:1.8rem;}
+  .cta-band .btn-primary:hover{background:var(--bg); box-shadow:0 14px 30px -12px rgba(0,0,0,.4);}
+
+  /* ==========================================================================
+     CONTACT
+     ========================================================================== */
+  .contact-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:1.4rem; margin-top:2.5rem;}
+  .contact-card{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:1.6rem; transition:transform .4s var(--ease), border-color .35s;}
+  .contact-card:hover{transform:translateY(-4px); border-color:var(--brand);}
+  .contact-card .label{font-size:.76rem; letter-spacing:.13em; text-transform:uppercase; color:var(--brand); font-weight:600;}
+  .contact-card a{font-weight:600; color:var(--ink); word-break:break-word;}
+  .contact-card a:hover{color:var(--brand);}
+
+  /* ==========================================================================
+     FOOTER
+     ========================================================================== */
+  footer.site{background:var(--ink); color:var(--bg); padding-block:clamp(3rem,6vw,4.5rem); position:relative; z-index:2;}
+  footer.site .wrap{display:grid; grid-template-columns:1.4fr 1fr 1fr; gap:2rem;}
+  footer.site .brand{color:var(--bg); font-size:1.4rem; margin-bottom:.8rem;}
+  footer.site .brand b{color:#6FCBC6;}
+  footer.site p{color:rgba(245,247,246,.6); font-size:.95rem; max-width:34ch;}
+  footer.site h4{font-size:.78rem; letter-spacing:.14em; text-transform:uppercase; color:rgba(245,247,246,.5); margin-bottom:1rem; font-weight:600; font-family:var(--body);}
+  footer.site ul{list-style:none; display:grid; gap:.6rem;}
+  footer.site ul a{color:rgba(245,247,246,.82); font-size:.95rem; cursor:pointer; transition:color .25s;}
+  footer.site ul a:hover{color:#fff;}
+  .foot-social{display:flex; gap:1rem; margin-top:.4rem;}
+  .foot-social a{color:rgba(245,247,246,.7); transition:color .25s, transform .3s var(--ease);}
+  .foot-social a:hover{color:#fff; transform:translateY(-2px);}
+  .foot-bottom{border-top:1px solid rgba(245,247,246,.14); margin-top:2.8rem; padding-top:1.6rem; display:flex; justify-content:space-between; flex-wrap:wrap; gap:.6rem; color:rgba(245,247,246,.5); font-size:.85rem;}
+
+  /* ==========================================================================
+     MOTION — scroll reveal + stagger
+     ========================================================================== */
+  .reveal{opacity:0; transform:translateY(22px); transition:opacity .8s var(--ease), transform .8s var(--ease);}
+  .reveal.in{opacity:1; transform:none;}
+  .d1{transition-delay:.06s;} .d2{transition-delay:.13s;} .d3{transition-delay:.2s;}
+  .d4{transition-delay:.27s;} .d5{transition-delay:.34s;} .d6{transition-delay:.41s;}
+
+  .skip{position:absolute; left:-9999px; top:0; background:var(--brand); color:#fff; padding:.7rem 1rem; z-index:100; border-radius:0 0 8px 0;}
+  .skip:focus{left:0;}
+  :focus-visible{outline:2px solid var(--brand); outline-offset:3px; border-radius:4px;}
+
+  /* ==========================================================================
+     STARTER GUIDE — article index + long-form reading pages
+     ========================================================================== */
+  .article-list{display:grid; gap:1rem; margin-top:3rem;}
+  .article-row{
+    display:flex; align-items:center; gap:1.3rem;
+    background:var(--surface); border:1px solid var(--line); border-radius:16px;
+    padding:1.5rem 1.6rem; cursor:pointer; color:var(--ink);
+    transition:transform .4s var(--ease), box-shadow .45s, border-color .35s;
+  }
+  .article-row:hover{transform:translateY(-4px); border-color:var(--brand); box-shadow:0 22px 46px -30px rgba(8,20,18,.5);}
+  .article-row .idx{font-family:var(--display); font-size:1.5rem; color:var(--brand); line-height:1; flex:none; width:2.2rem; text-align:center;}
+  .article-row .meta{flex:1; min-width:0;}
+  .article-row .kicker{font-size:.73rem; letter-spacing:.14em; text-transform:uppercase; color:var(--brand); font-weight:600;}
+  .article-row h3{margin:.3rem 0 .35rem; font-size:1.3rem;}
+  .article-row .meta p{font-size:.95rem; margin:0; color:var(--ink-soft);}
+  .article-row .go{flex:none; color:var(--brand); transition:transform .35s var(--ease);}
+  .article-row:hover .go{transform:translateX(4px);}
+
+  .more-soon{margin-top:1.5rem; font-size:.96rem; color:var(--ink-soft); font-style:italic; display:flex; align-items:center; gap:.6rem;}
+  .more-soon::before{content:""; width:24px; height:1.5px; background:var(--brand); opacity:.55;}
+
+  .back-link{display:inline-flex; align-items:center; gap:.5rem; cursor:pointer; font-size:.9rem; font-weight:600; color:var(--ink-soft); margin-bottom:1.3rem; transition:color .25s, transform .3s var(--ease);}
+  .back-link:hover{color:var(--brand); transform:translateX(-3px);}
+  .byline{font-family:var(--body); font-weight:600; color:var(--brand); margin-top:.7rem; font-size:1.02rem;}
+
+  /* long-form prose */
+  .prose{max-width:72ch; margin-top:2.4rem;}
+  .prose > * + *{margin-top:1.15rem;}
+  .prose h2{margin-top:2.7rem; font-size:clamp(1.5rem,3vw,2rem);}
+  .prose h3{margin-top:1.9rem; font-size:1.18rem; letter-spacing:0; color:var(--ink);}
+  .prose p{color:var(--ink-soft); line-height:1.75;}
+  .prose strong{color:var(--ink); font-weight:600;}
+  .prose ul, .prose ol{padding-left:1.4rem;}
+  .prose ul{list-style:disc;}
+  .prose ol{list-style:decimal;}
+  .prose li{color:var(--ink-soft); line-height:1.7; margin-top:.45rem;}
+  .prose li::marker{color:var(--brand);}
+  .prose a{color:var(--brand); font-weight:600; text-decoration:underline; text-underline-offset:3px;}
+  .prose a:hover{color:var(--brand-deep);}
+  .prose .eg{border-left:3px solid var(--brand); background:var(--brand-tint); padding:.85rem 1.15rem; border-radius:0 12px 12px 0; margin:1.15rem 0; color:var(--ink); font-style:italic;}
+  .prose .premises{list-style:none; padding:1rem 1.2rem; margin:1.15rem 0; display:grid; gap:.55rem; background:var(--bg-alt); border:1px solid var(--line); border-radius:12px;}
+  .prose .premises li{color:var(--ink); font-size:.96rem; margin:0; padding-left:1.2rem; position:relative; line-height:1.6;}
+  .prose .premises li::before{content:"\203A"; position:absolute; left:0; color:var(--brand); font-weight:700;}
+  .prose .premises li::marker{content:none;}
+  .prose .premises .lbl{color:var(--brand); font-weight:600; font-style:italic;}
+  .prose .eg-card{margin:1.5rem 0;}
+
+  /* ==========================================================================
+     RESPONSIVE
+     ========================================================================== */
+  @media (max-width:860px){
+    .split{grid-template-columns:1fr;}
+    .story-split{grid-template-columns:minmax(0,1fr) minmax(190px,.72fr);}
+    .camp-intro{grid-template-columns:1fr;}
+    .camp-switch{width:100%; border-radius:18px;}
+    .camp-tab{flex:1 1 100%; border-radius:14px;}
+    .camp-stat-grid{grid-template-columns:1fr;}
+    .schedule-card{overflow-x:auto;}
+    .schedule-table{min-width:680px;}
+    .curriculum-tabs{display:grid; grid-template-columns:1fr; gap:.35rem;}
+    .curriculum-tab{border-radius:12px;}
+    .curriculum-panel{border-radius:16px; margin-top:.8rem;}
+    .section-head{display:block;}
+    .section-head p{margin-top:.8rem;}
+    .pillars{grid-template-columns:1fr;}
+    .grid-2{grid-template-columns:1fr;}
+    footer.site .wrap{grid-template-columns:1fr;}
+
+    .hamburger{display:block;}
+    .nav-social{display:none;}
+    .nav-links{
+      position:fixed; inset:0; background:var(--bg); flex-direction:column; justify-content:center;
+      gap:1.6rem; transform:translateY(-102%); transition:transform .5s var(--ease); z-index:55;
+    }
+    .nav-links.open{transform:translateY(0);}
+    .nav-links a{font-size:1.5rem; font-family:var(--display);}
+    .nav-links a::after{display:none;}
+  }
+
+  @media (max-width:640px){
+    .story-split{grid-template-columns:1fr;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important;}
+    html{scroll-behavior:auto;}
+    .reveal{opacity:1; transform:none; transition:none;}
+    .btn,.card,.contact-card{transition:none;}
+  }
+</style>
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a>
+
+<!-- ===========================================================================
+     HEADER / NAV
+     LOGO PLACEHOLDER: to use your logo image instead of the text wordmark,
+     replace the <span class="brand">…</span> below with:
+     <img src="images/logo.svg" alt="Kritikal Discussions" style="height:34px">
+     =========================================================================== -->
+<header class="nav" id="nav">
+  <div class="wrap nav-inner">
+    <a href="#home" data-link="home" aria-label="Kritikal Discussions home">
+      <span class="brand">Kritikal<b>.</b>Discussions</span>
+    </a>
+
+    <ul class="nav-links" id="navlinks">
+      <li><a href="#home" data-link="home">Home</a></li>
+      <li><a href="#team" data-link="team">Our Team</a></li>
+      <li><a href="#camp" data-link="camp">Debate Camp</a></li>
+      <li><a href="#project" data-link="project">Kritikal Project</a></li>
+      <li><a href="#resources" data-link="resources">Resources</a></li>
+      <li><a href="#contact" data-link="contact">Contact</a></li>
+    </ul>
+
+    <div class="nav-social">
+      <a href="https://discord.gg/Fu4x2SBrkt" target="_blank" rel="noopener" aria-label="Discord">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.3 4.5A19 19 0 0 0 15.6 3l-.2.4a14 14 0 0 1 4.1 1.3 13 13 0 0 0-11-.0A14 14 0 0 1 12.6 3.4L12.4 3A19 19 0 0 0 7.7 4.5C4.8 8.8 4 13 4.4 17.1A19 19 0 0 0 10 19l.4-.6a12 12 0 0 1-1.9-.9l.5-.4a13 13 0 0 0 11 0l.5.4a12 12 0 0 1-1.9.9l.4.6a19 19 0 0 0 5.6-1.9c.5-4.8-.8-9-3.7-12.6ZM9.7 14.7c-.9 0-1.7-.8-1.7-1.9s.8-1.9 1.7-1.9 1.7.9 1.7 1.9-.8 1.9-1.7 1.9Zm4.6 0c-.9 0-1.7-.8-1.7-1.9s.8-1.9 1.7-1.9 1.7.9 1.7 1.9-.8 1.9-1.7 1.9Z"/></svg>
+      </a>
+      <a href="https://www.instagram.com/kritikal_discussions" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+      </a>
+      <a href="https://youtube.com/@kritikaldiscussions" target="_blank" rel="noopener" aria-label="YouTube">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M22 8.2a3 3 0 0 0-2.1-2.1C18 5.6 12 5.6 12 5.6s-6 0-7.9.5A3 3 0 0 0 2 8.2 31 31 0 0 0 1.7 12 31 31 0 0 0 2 15.8a3 3 0 0 0 2.1 2.1c1.9.5 7.9.5 7.9.5s6 0 7.9-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 22.3 12 31 31 0 0 0 22 8.2ZM10 15V9l5.2 3Z"/></svg>
+      </a>
+    </div>
+
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- =======================================================================
+       HOME
+       ======================================================================= -->
+  <section class="page active" id="page-home">
+    <div class="hero wrap">
+      <p class="eyebrow reveal" style="justify-content:center;">Free · Online · Nationwide</p>
+      <h1 class="display reveal d1">Progressive debate,<br>open to everyone.</h1>
+      <p class="lead reveal d2">Kritikal Discussions is a student-run nonprofit connecting debaters across the country and opening the door to technical, progressive debate — no matter your school, your circuit, or your background.</p>
+      <div class="hero-cta reveal d3">
+        <a class="btn btn-primary" href="https://forms.gle/HGbQmL6Ejvbfhmrd9" target="_blank" rel="noopener">Join the summer camp <span class="arr">→</span></a>
+        <a class="btn btn-ghost" href="#camp" data-link="camp">Explore our programs</a>
+      </div>
+
+      <!-- IMAGE PLACEHOLDER (home-hero): replace this whole <div class="ph ph-hero">…</div>
+           with  <img src="images/hero.jpg" alt="Kritikal Discussions debaters" style="border-radius:16px"> -->
+      <div class="ph ph-hero reveal d4" role="img" aria-label="Hero photo placeholder">
+        <span class="ph-tag">◳ Hero photo</span>
+      </div>
+    </div>
+
+    <!-- Mission -->
+    <div class="section">
+      <div class="wrap">
+        <p class="eyebrow reveal">Our Mission</p>
+        <h2 class="reveal d1" style="max-width:16ch;">Debate that anyone can break into.</h2>
+        <p class="lead reveal d2" style="margin-top:1.2rem;">Founded by passionate students, we connect debaters nationwide and expand access to progressive debate across Policy, LD, and PF. We provide free resources, lectures, and open forums so that anyone — regardless of experience, circuit, or income — can engage meaningfully, sharpen their critical thinking, and find real success and joy in debate.</p>
+
+        <div class="pillars">
+          <div class="pillar reveal d1">
+            <span class="num">01</span>
+            <h3>Free, always</h3>
+            <p>Every program, resource, and lecture we run is completely free. Cost should never decide who gets to compete.</p>
+          </div>
+          <div class="pillar reveal d2">
+            <span class="num">02</span>
+            <h3>Every level</h3>
+            <p>From first-time novices to varsity national qualifiers, our curriculum meets you exactly where you are.</p>
+          </div>
+          <div class="pillar reveal d3">
+            <span class="num">03</span>
+            <h3>Everywhere</h3>
+            <p>Big school or small, traditional circuit or progressive — we run online so you can join from anywhere.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Programs -->
+    <div class="section alt">
+      <div class="wrap">
+        <p class="eyebrow reveal">Programs</p>
+        <h2 class="reveal d1">Two ways to get started.</h2>
+        <div class="grid-2" style="margin-top:2.5rem;">
+          <article class="card program-card reveal d1">
+            <img class="program-image" src="Main%20Page/Summer%20Camp%20Placeholder.jpg" alt="Philosophy vs. the K summer camp lecture slide" loading="lazy">
+            <div class="body">
+              <h3>Summer Debate Camp</h3>
+              <p>Where champions train future champions. Taught by national champions, free and online, and built for every level from beginner to varsity.</p>
+              <a class="card-link" data-link="camp" href="#camp">Learn about the camp <span class="arr">→</span></a>
+            </div>
+          </article>
+          <article class="card program-card reveal d2">
+            <img class="program-image" src="Kritikal%20Project/Kritikal%20Project%20Hero%20Image.jpg" alt="People discussing business plans in a conference room" loading="lazy">
+            <div class="body">
+              <h3>The Kritikal Project</h3>
+              <p>A free three-day camp for young people building high-impact passion projects in artificial intelligence, politics, and business — ending in a funded pitch competition.</p>
+              <a class="card-link" data-link="project" href="#project">Learn about the project <span class="arr">→</span></a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <!-- Our Story -->
+    <div class="section">
+      <div class="wrap split story-split">
+        <div class="reveal">
+          <p class="eyebrow">Our Story</p>
+          <h2>Built by debaters, for debaters.</h2>
+          <!-- CONTENT PLACEHOLDER: replace the paragraph below with your real founding story. -->
+          <p class="lead" style="margin-top:1.2rem;">As debaters on both local and national circuits, we saw how hard progressive debate was to break into — even as it grew more popular. We started Kritikal Discussions to change that. <em>(Add the rest of your story here.)</em></p>
+          <a class="btn btn-ghost" data-link="team" href="#team" style="margin-top:1.6rem;">Meet the team <span class="arr">→</span></a>
+        </div>
+        <img class="story-photo reveal d2" src="Main%20Page/Story%20Placeholder.jpeg" alt="Kritikal Discussions debaters at the National Speech and Debate Tournament" loading="lazy">
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="section cta-band">
+      <div class="wrap reveal">
+        <h2>More accessible progressive debate and success.</h2>
+        <p>Join our community of debaters, mentors, and volunteers building a more open activity.</p>
+        <a class="btn btn-primary" href="https://forms.gle/Mxymx9nRs9YmaMvC6" target="_blank" rel="noopener">Join us <span class="arr">→</span></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- =======================================================================
+       OUR TEAM
+       ======================================================================= -->
+  <section class="page" id="page-team">
+    <div class="section" style="padding-top:clamp(8rem,15vw,11rem);">
+      <div class="wrap">
+        <p class="eyebrow reveal">Our Team</p>
+        <h1 class="page-title reveal d1">Meet the founders.</h1>
+        <p class="lead reveal d2" style="margin-top:1.2rem;">Kritikal Discussions is run entirely by students who have competed at the highest levels of debate — and want to make that path open to everyone.</p>
+
+        <div class="grid-cards" style="margin-top:3.5rem;">
+          <article class="person reveal d1">
+            <img class="person-photo" src="Founder%20Images/chase.jpg" alt="Chase Hoffman">
+            <p class="role">Co-founder</p>
+            <h3>Chase Hoffman</h3>
+            <p>Chase is from Fort Lauderdale High. He reached semifinals at Blue Key in Novice LD, quarterfinals at Tradition, semifinals at Nova Titan, and quarterfinals at Sunvite, with success at local tournaments and two NSDA Nationals qualifications.</p>
+          </article>
+
+          <article class="person reveal d2">
+            <img class="person-photo" src="Founder%20Images/emma.jpg" alt="Emma Tan">
+            <p class="role">Co-founder</p>
+            <h3>Emma Tan</h3>
+            <p>Emma is an incoming freshman at Princeton University and was debate captain at LHP. She primarily read soft-left affirmatives and critical arguments, and reached elimination rounds at Cypress Tradition, Harvard, Sunvite, and Lexington. Outside of debate, she enjoys baking, reading, and listening to music.</p>
+          </article>
+
+          <article class="person reveal d3">
+            <img class="person-photo" src="Founder%20Images/justin.jpg" alt="Justin Xia">
+            <p class="role">Co-founder</p>
+            <h3>Justin Xia</h3>
+            <p>Justin is a rising senior at American Heritage School in Plantation, Florida. He has reached outrounds at numerous national tournaments including the Barkley Forum, Harvard, Florida Blue Key, and Yale, qualified for and broke at the NSDA national tournament, and earned TOC bids at Harvard, the Tradition, and Blue Key, where he was top speaker. His argument interests include the Nietzsche K, Spark, and tricky philosophy. Outside of debate, he likes to play violin, run track, and read philosophy.</p>
+          </article>
+
+          <article class="person reveal d4">
+            <img class="person-photo" src="Founder%20Images/neel.jpg" alt="Neel Aparanji">
+            <p class="role">Co-founder</p>
+            <h3>Neel Aparanji</h3>
+            <p>Neel is a rising senior. He has qualified to the Tournament of Champions twice—first as a sophomore in PF and then as junior in LD. As a junior, Neel broke at the Tournament of Champions while also earning a top speaker award. He’s advanced to elimination rounds at dozens of national tournaments, including Harvard, Glenbrooks, Apple Valley, Bronx, Lexington, and the Tournament of Champions. His accomplishments include a quarterfinal appearance at the Mid-America Cup and a championship title at NSD Flagship. He primarily reads Ks and philosophical arguments, but has experimented with soft-left plan affs. In his free time, Neel enjoys reading, eating, and playing with his dog.
+</p>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="section alt">
+      <div class="wrap split">
+        <div class="reveal">
+          <p class="eyebrow">Join Us</p>
+          <h2>Want to get involved?</h2>
+          <p class="lead" style="margin-top:1.1rem;">We're always looking for debaters, mentors, and volunteers who believe debate should be open to all. Whether you're an experienced competitor or just getting started, there's a place for you here.</p>
+          <a class="btn btn-primary" href="https://forms.gle/Mxymx9nRs9YmaMvC6" target="_blank" rel="noopener" style="margin-top:1.6rem;">Join us <span class="arr">→</span></a>
+        </div>
+        <!-- IMAGE PLACEHOLDER (join): replace with <img src="images/join.jpg" alt="..."> -->
+        <div class="ph ph-card reveal d2" role="img" aria-label="Photo placeholder"><span class="ph-tag">◳ Photo</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =======================================================================
+       DEBATE CAMP
+       ======================================================================= -->
+  <section class="page" id="page-camp">
+    <div class="section" style="padding-top:clamp(8rem,15vw,11rem);">
+      <div class="wrap">
+        <p class="eyebrow reveal">Debate Camp</p>
+        <h1 class="page-title reveal d1">Summer Debate Camp.</h1>
+        <p class="lead reveal d2" style="margin-top:1.2rem;">Free online instruction, practice, and community for debaters breaking into progressive debate and sharpening national-circuit skills.</p>
+
+        <div class="camp-switch reveal d3" role="tablist" aria-label="Debate camp year">
+          <button class="camp-tab active" id="tab-camp-2026" type="button" role="tab" aria-selected="true" aria-controls="camp-2026" data-camp-tab="2026">2026 Current Camp</button>
+          <button class="camp-tab" id="tab-camp-2025" type="button" role="tab" aria-selected="false" aria-controls="camp-2025" data-camp-tab="2025">2025 Previous Camp</button>
+        </div>
+
+        <div class="camp-panel" id="camp-2026" role="tabpanel" aria-labelledby="tab-camp-2026" data-camp-panel="2026">
+          <div class="camp-intro">
+            <div>
+              <p class="eyebrow">2026 Debate Summer Camp</p>
+              <h2>Free, online, and built for LD and PF.</h2>
+              <p class="lead" style="margin-top:1.1rem;">Kritikal Discussions Summer Camp is a free, week-long online debate program focused on Lincoln-Douglas and Public Forum debate. Running from August 2 to August 6, the camp offers comprehensive instruction and practice opportunities.</p>
+              <p style="margin-top:1rem;">Our mission is to make high-quality debate education accessible to all students, regardless of their educational background or location.</p>
+              <ul class="features">
+                <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Elite instructors with deep national-circuit experience.</li>
+                <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Customized courses for beginners, JV debaters, and varsity competitors.</li>
+                <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Labs, electives, practice rounds, and demonstration debates.</li>
+                <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Completely free and fully online.</li>
+              </ul>
+              <a class="btn btn-primary" href="https://forms.gle/HGbQmL6Ejvbfhmrd9" target="_blank" rel="noopener">Sign up today <span class="arr">→</span></a>
+            </div>
+
+            <aside class="camp-summary">
+              <h3>Current Camp Details</h3>
+              <p>Where champions train future champions, with flexible access for students across regions and circuits.</p>
+              <div class="camp-stat-grid">
+                <div class="camp-stat"><span class="label">Dates</span><strong>August 2-6, 2026</strong></div>
+                <div class="camp-stat"><span class="label">Format</span><strong>Online</strong></div>
+                <div class="camp-stat"><span class="label">Cost</span><strong>Free</strong></div>
+                <div class="camp-stat"><span class="label">Events</span><strong>LD and PF</strong></div>
+              </div>
+            </aside>
+          </div>
+
+          <div class="schedule-card">
+            <div class="schedule-head">
+              <p class="eyebrow">Sample Schedule</p>
+              <h3>A typical camp day.</h3>
+              <p>Each day balances instruction, breaks, electives, practice, and live examples so students can learn and immediately apply what they are working on. *All listed times are Eastern. A final day-by-day schedule will be sent later in July.*</p>
+            </div>
+            <table class="schedule-table" aria-label="2026 debate camp sample schedule">
+              <tbody>
+                <tr>
+                  <th scope="row">11:00 AM - 12:30 PM</th>
+                  <td>Labs</td>
+                  <th scope="row">3:00 PM - 3:30 PM</th>
+                  <td>Break</td>
+                </tr>
+                <tr>
+                  <th scope="row">12:30 PM - 1:30 PM</th>
+                  <td>Lunch Break</td>
+                  <th scope="row">3:30 PM - 5:00 PM</th>
+                  <td>Electives / Demo Debate</td>
+                </tr>
+                <tr>
+                  <th scope="row">1:30 PM - 3:00 PM</th>
+                  <td>Labs</td>
+                  <th scope="row">5:00 PM - 6:00 PM</th>
+                  <td>Practice Rounds</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Why Us</p>
+              <h2>Built for every level.</h2>
+            </div>
+            <p>Students are placed into labs by level and can choose electives that match their interests and goals.</p>
+          </div>
+          <div class="grid-cards">
+            <div class="card"><h3>Elite Instructors</h3><p>Learn from successful national-circuit debaters, including debaters who finaled the TOC, Bronx, Harvard, and Yale, and won TFA and Lexington.</p></div>
+            <div class="card"><h3>Customized Courses</h3><p>Beginner, JV, and varsity debaters all have courses that fit their current skill level and competitive goals.</p></div>
+            <div class="card"><h3>Flexible Access</h3><p>The camp is fully online and free, helping students from all regions and backgrounds participate.</p></div>
+            <div class="card"><h3>Interactive Teaching</h3><p>Labs, electives, practice rounds, and demonstration debates keep students actively engaged.</p></div>
+          </div>
+
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Our Curriculum</p>
+              <h2>Choose a camp component.</h2>
+            </div>
+            <p>Click a topic to see how each part of the camp is designed to build technical skill, confidence, and strategic flexibility.</p>
+          </div>
+          <div class="curriculum-tabs" role="tablist" aria-label="Camp curriculum">
+            <button class="curriculum-tab active" id="tab-curriculum-labs" type="button" role="tab" aria-selected="true" aria-controls="curriculum-labs" data-curriculum-tab="labs">Labs</button>
+            <button class="curriculum-tab" id="tab-curriculum-electives" type="button" role="tab" aria-selected="false" aria-controls="curriculum-electives" data-curriculum-tab="electives">Electives</button>
+            <button class="curriculum-tab" id="tab-curriculum-demos" type="button" role="tab" aria-selected="false" aria-controls="curriculum-demos" data-curriculum-tab="demos">Demo Debates</button>
+            <button class="curriculum-tab" id="tab-curriculum-practice" type="button" role="tab" aria-selected="false" aria-controls="curriculum-practice" data-curriculum-tab="practice">Practice Rounds</button>
+            <button class="curriculum-tab" id="tab-curriculum-tournament" type="button" role="tab" aria-selected="false" aria-controls="curriculum-tournament" data-curriculum-tab="tournament">Camp Tournament</button>
+          </div>
+          <div class="curriculum-panel" id="curriculum-labs" role="tabpanel" aria-labelledby="tab-curriculum-labs" data-curriculum-panel="labs">
+            <h3>Labs</h3>
+            <p>At Kritikal Discussions, labs are the heart of the camp experience. Students are thoughtfully placed into labs based on their experience level, ensuring that each debater receives instruction tailored to their current skill set and growth goals. Whether you're a novice or a varsity debater, you'll join a lab designed to both challenge and support you.</p>
+            <p>Each lab is led by a team of exceptional instructors, many of whom are national champions and top circuit competitors with deep expertise in their specific argument styles. Their diverse backgrounds expose students to a wide variety of strategies, arguments, and course materials.</p>
+          </div>
+          <div class="curriculum-panel" id="curriculum-electives" role="tabpanel" aria-labelledby="tab-curriculum-electives" data-curriculum-panel="electives" hidden>
+            <h3>Electives</h3>
+            <p>Electives let students go deeper on the specific arguments and skills they care about most. These sessions are built for focused exploration: kritik literature, philosophy, theory, soft-left affirmatives, strategic weighing, flowing, evidence comparison, and other technical debate tools.</p>
+            <p>Students can use electives to strengthen a familiar style or try something new in a lower-pressure environment before applying it in practice rounds.</p>
+          </div>
+          <div class="curriculum-panel" id="curriculum-demos" role="tabpanel" aria-labelledby="tab-curriculum-demos" data-curriculum-panel="demos" hidden>
+            <h3>Demo Debates</h3>
+            <p>Demo debates give students a chance to watch experienced debaters model high-level execution in real time. Instructors break down what is happening strategically, explain why certain choices matter, and show how arguments develop across speeches.</p>
+            <p>These sessions are designed to make advanced debate feel less mysterious by turning strong rounds into teachable, step-by-step examples.</p>
+          </div>
+          <div class="curriculum-panel" id="curriculum-practice" role="tabpanel" aria-labelledby="tab-curriculum-practice" data-curriculum-panel="practice" hidden>
+            <h3>Practice Rounds</h3>
+            <p>Practice rounds give students live reps with the material they learn in lab and electives. Debaters can test new arguments, improve speech efficiency, practice adaptation, and receive feedback from instructors and peers.</p>
+            <p>The goal is not just to debate more rounds, but to make every round useful: students leave with concrete adjustments they can bring into future tournaments.</p>
+          </div>
+          <div class="curriculum-panel" id="curriculum-tournament" role="tabpanel" aria-labelledby="tab-curriculum-tournament" data-curriculum-panel="tournament" hidden>
+            <h3>Camp Tournament</h3>
+            <p>The camp tournament gives students a culminating opportunity to apply what they have learned in a competitive setting. It helps debaters practice preparation, round strategy, adaptation, and post-round reflection.</p>
+            <p>Because the tournament comes after instruction and practice, students can enter it with clearer goals and use it as a final benchmark for growth.</p>
+          </div>
+
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Guest Instructors</p>
+              <h2>Featured 2026 speakers.</h2>
+            </div>
+          </div>
+          <div class="instructor-grid">
+            <article class="instructor-card">
+              <img class="instructor-photo crop-guest-justin" src="Camp%202026/Guest%20Instructors/Justin.png" alt="Justin Wen" loading="lazy">
+              <div class="instructor-body">
+                <p class="role">LD Guest Speaker</p>
+                <h3>Justin Wen</h3>
+                <p>Justin Wen debated at Strake Jesuit in Lincoln-Douglas debate for four years. He finaled the Tournament of Champions, won the Texas Forensic Association tournament twice, accumulated 33 bids, and championed or finaled 12 bid tournaments.</p>
+              </div>
+            </article>
+            <article class="instructor-card">
+              <img class="instructor-photo crop-sebastian" src="Camp%202026/Guest%20Instructors/Sebastian.jpg" alt="Sebastian Glos" loading="lazy">
+              <div class="instructor-body">
+                <p class="role">PF Guest Speaker</p>
+                <h3>Sebastian Glos</h3>
+                <p>Sebastian graduated magna cum laude from Florida State University with a degree in Finance and served as President of the FSU Debate Team for two years. He has coached Public Forum at Lake Highland for five years, with students earning dozens of bids and winning tournaments including Marist, Blue Key, Nova, The Tradition, and Sunvite.</p>
+                <p style="margin-top:.8rem;">At the collegiate level, Sebastian competed in NFA Lincoln-Douglas debate, winning the Marshall and Rebel tournaments and reaching elimination rounds at the Gorlok, Washburn, and NFA National Championship. He was named to the All-American Team, received the Student Choice Award, placed top five at the Grand Prix, and earned second seed and third speaker at NFA Nationals after going undefeated in prelims.</p>
+              </div>
+            </article>
+          </div>
+
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">LD Instructors</p>
+              <h2>2026 Instructors.</h2>
+            </div>
+          </div>
+          <div class="instructor-grid">
+            <article class="instructor-card">
+              <img class="instructor-photo crop-neel" src="Founder%20Images/neel.jpg" alt="Neel Aparanji" loading="lazy">
+              <div class="instructor-body"><p class="role">LD Instructor</p><h3>Neel Aparanji</h3><p>Neel is a rising senior and a co-founder of Kritikal Discussions. He has qualified to the Tournament of Champions twice&mdash;first as a sophomore in PF and then as junior in LD. As a junior, Neel broke at the Tournament of Champions while also earning a top speaker award. He has advanced to elimination rounds at dozens of national tournaments, including Harvard, Glenbrooks, Apple Valley, Bronx, Lexington, and the Tournament of Champions. His accomplishments include a quarterfinal appearance at the Mid-America Cup and a championship title at NSD Flagship. He primarily reads Ks and philosophical arguments, but has experimented with soft-left plan affs. In his free time, Neel enjoys reading, eating, and playing with his dog.</p></div>
+            </article>
+            <article class="instructor-card">
+              <img class="instructor-photo crop-chris" src="Camp%202026/Primary%20Instructors/Chris.jpg" alt="Chris Correia" loading="lazy">
+              <div class="instructor-body"><p class="role">LD Instructor</p><h3>Chris Correia</h3><p>Chris is a junior debater who earned two bids and reached elims or speaker awards at several national tournaments, including finals at Blake and quarters at Lexington. He primarily reads critical arguments, particularly arguments involving settler colonialism and anti-Blackness. Outside of debate he likes to read and listen to music.</p></div>
+            </article>
+            <article class="instructor-card">
+              <img class="instructor-photo crop-skanda" src="Camp%202026/Primary%20Instructors/Skanda.jpg" alt="Skanda Gopikannan" loading="lazy">
+              <div class="instructor-body"><p class="role">LD Instructor</p><h3>Skanda Gopikannan</h3><p>Hi! My name's Skanda. I'm currently a junior at Plano West. I qualified to the TOC last year and got to octofinals. I'm excited to be teaching!</p></div>
+            </article>
+            <article class="instructor-card">
+              <img class="instructor-photo crop-chupeng" src="Camp%202026/Primary%20Instructors/Chupeng.jpg" alt="Chupeng Gui" loading="lazy">
+              <div class="instructor-body"><p class="role">LD Instructor</p><h3>Chupeng Gui</h3><p>Chupeng is a rising senior heading into his third year in varsity debate. He mainly reads theory and philosophy arguments. He debates on both the national and local circuit, reaching elims at Harvard, Sunvite, UDDL, Nova Titan, Constellation, and others. Outside of debate, he enjoys playing the saxophone and piano, grinding video games, and doing random things.</p></div>
+            </article>
+            <article class="instructor-card">
+              <img class="instructor-photo crop-faisal" src="Camp%202026/Primary%20Instructors/Faisal.jpg" alt="Faisal Hamzeh" loading="lazy">
+              <div class="instructor-body"><p class="role">LD Instructor</p><h3>Faisal Hamzeh</h3><p>Faisal has three bids, went to the TOC, started 0-2, and won four in a row to break. He has made it to finals at many national tournaments and broken at many national tournaments. His debate interests are mainly philosophy and theory, with growing engagement in the K. Outside of debate, he is a big MCU fan, likes getting food with friends, and is a big fan of music.</p></div>
+            </article>
+            <article class="instructor-card">
+              <div class="instructor-avatar" aria-hidden="true">IL</div>
+              <div class="instructor-body"><p class="role">LD Instructor</p><h3>Izzy Lee</h3><p>Bio coming soon.</p></div>
+            </article>
+            <article class="instructor-card">
+              <img class="instructor-photo crop-conan" src="Camp%202026/Primary%20Instructors/Conan.jpg" alt="Conan Matos" loading="lazy">
+              <div class="instructor-body"><p class="role">LD Instructor</p><h3>Conan Matos</h3><p>Hey, I'm Conan. I'm a rising junior and started circuit debate in my freshman year. I've broken at various national tournaments, including Valley, Blue Key, Sunvite, Harvard, and NCFL, ultimately qualifying to the 2026 TOC. In rounds, I primarily read philosophy, theory, and tricks. In my free time, I go to the gym, play guitar, and work on intense projects like guitar-building, amplifier-building, and coding. I am very excited to work with you all!</p></div>
+            </article>
+            <article class="instructor-card">
+              <img class="instructor-photo crop-ruby" src="Camp%202026/Primary%20Instructors/Ruby.png" alt="Ruby Simon" loading="lazy">
+              <div class="instructor-body"><p class="role">LD Instructor</p><h3>Ruby Simon</h3><p>Ruby Simon is a rising senior at Sehome High School. Next year will be her fourth year competing in LD. She has reached elims of several tournaments, including Yale, Florida Blue Key, Blake, and Harvard, and qualified to the TOC her junior year. Outside of debate, Ruby enjoys hanging out with friends and playing clarinet.</p></div>
+            </article>
+            <article class="instructor-card">
+              <div class="instructor-avatar" aria-hidden="true">JQ</div>
+              <div class="instructor-body"><p class="role">LD Instructor</p><h3>Jacob Quililan</h3><p>Bio coming soon.</p></div>
+            </article>
+            <article class="instructor-card">
+              <img class="instructor-photo crop-adam" src="Camp%202026/Primary%20Instructors/Adam.jpg" alt="Adam Wayne" loading="lazy">
+              <div class="instructor-body"><p class="role">LD Instructor</p><h3>Adam Wayne</h3><p>Adam is a passionate debater with experience competing in Lincoln-Douglas debate. His accomplishments include reaching semifinals at Constellation and double octafinals at Lexington. He enjoys debate because it allows him to explore philosophy, critical thinking, and public speaking while competing against talented students. Outside of debate, he spends time at the gym and enjoys being outdoors.</p></div>
+            </article>
+            <article class="instructor-card">
+              <img class="instructor-photo crop-flynn" src="Camp%202026/Primary%20Instructors/Flynn.png" alt="Flynn Williams" loading="lazy">
+              <div class="instructor-body"><p class="role">LD Instructor</p><h3>Flynn Williams</h3><p>Flynn Williams is a rising senior at Harrison High School in New York, where he has competed in LD debate for three years. He has qualified to the TOC twice, breaking his junior year and accumulating over seven bids. He mostly reads kritiks, theory, and soft-left affs. Aside from debate, Flynn loves math.</p></div>
+            </article>
+            <article class="instructor-card">
+              <div class="instructor-avatar" aria-hidden="true">EW</div>
+              <div class="instructor-body"><p class="role">LD Instructor</p><h3>Ethan Wu</h3><p>Hello! My name is Ethan Wu and I am excited to be working with Kritikal Discussions this summer. Over my debate career, I have obtained five total bids, qualifying to the TOC twice, and reached late elimination rounds in many tournaments. These tournaments include finals of Bronx, quarters of Yale, quarters of Harvard, quarters of TOC Digital 2, and octofinals of Blake. I mainly enjoy reading policy style arguments but like going for theoretical arguments as well. Outside of debate, I love to write, tinker, and play soccer with my friends.</p></div>
+            </article>
+            <article class="instructor-card">
+              <img class="instructor-photo crop-veronica" src="Camp%202026/Primary%20Instructors/Veronica.jpg" alt="Veronica Zhang" loading="lazy">
+              <div class="instructor-body"><p class="role">LD Instructor</p><h3>Veronica Zhang</h3><p>Veronica debates LD at Vestavia Hills. Some of her debate accomplishments include three career bids, reaching outrounds of tournaments like Apple Valley and Emory, as well as numerous speaker awards including second speaker at the Harvard Round Robin. She reads a diverse array of arguments but primarily focuses on the kritik and postmodern authors. Outside of debate she enjoys sewing, painting, and spending time with loved ones. She's excited to work with everyone this summer!</p></div>
+            </article>
+          </div>
+
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">PF Instructors</p>
+              <h2>More info soon.</h2>
+            </div>
+            <p>More information is dropping soon. Sign up to get notified as the Public Forum roster is finalized.</p>
+          </div>
+        </div>
+
+        <div class="camp-panel" id="camp-2025" role="tabpanel" aria-labelledby="tab-camp-2025" data-camp-panel="2025" hidden>
+          <div class="camp-intro">
+            <div>
+              <p class="eyebrow">Previous Camp</p>
+              <h2>2025 Summer Camp.</h2>
+              <p class="lead" style="margin-top:1.1rem;">Where Champions Train Future Champions.</p>
+              <p style="margin-top:1rem;">Kritikal Discussions Summer Camp was a free, week-long online debate program focused on Lincoln-Douglas debate. Running from July 5 to July 9, the camp offered comprehensive instruction and practice opportunities, followed by an optional tournament from July 10 to July 12.</p>
+              <p style="margin-top:1rem;">The mission was to make high-quality debate education accessible to all students, regardless of students' educational background or location.</p>
+            </div>
+
+            <aside class="camp-summary">
+              <h3>2025 Archive</h3>
+              <p>Previous camp information copied over from the 2025 Debate Summer Camp page.</p>
+              <div class="camp-stat-grid">
+                <div class="camp-stat"><span class="label">Dates</span><strong>July 5-9, 2025</strong></div>
+                <div class="camp-stat"><span class="label">Tournament</span><strong>July 10-12</strong></div>
+                <div class="camp-stat"><span class="label">Format</span><strong>Online</strong></div>
+                <div class="camp-stat"><span class="label">Cost</span><strong>Free</strong></div>
+              </div>
+            </aside>
+          </div>
+
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">2025 Program</p>
+              <h2>What the camp offered.</h2>
+            </div>
+          </div>
+          <div class="grid-cards">
+            <div class="card"><h3>Elite Instructors</h3><p>Students learned from national debate champions, including debaters who won the TOC, Harvard, Yale, Princeton, Sunvite, and Ridge.</p></div>
+            <div class="card"><h3>Customized Courses</h3><p>Beginner, JV, and varsity students were placed into labs at their level and could choose electives tailored to their needs.</p></div>
+            <div class="card"><h3>Flexibility & Accessibility</h3><p>The camp was completely free and fully online, allowing students from all regions and backgrounds to participate.</p></div>
+            <div class="card"><h3>Interactive Teaching</h3><p>Labs, electives, practice rounds, and demonstration debates kept students actively engaged and consistently challenged.</p></div>
+          </div>
+
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">2025 Guest Instructors</p>
+              <h2>Archive roster.</h2>
+            </div>
+          </div>
+          <div class="archive-grid">
+            <article class="archive-card"><p class="role">Guest Instructor</p><h3>Spencer Swickle</h3><p>Spencer Swickle debated for five years at American Heritage Broward/Plantation. He won the TOC, Harvard, Yale, Sunvite, the Tradition, and FFL States. He accumulated 20 bids to the TOC. His debate interests include theory, moral philosophy, and postmodernism kritiks. Outside of debate, he enjoys playing video games, basketball, and listening to music. Specializes in philosophy and theory.</p></article>
+            <article class="archive-card"><p class="role">Guest Instructor</p><h3>Harris Layson</h3><p>In debate, Harris mainly read soft-left affirmatives and critical positions, but is also familiar with topicality and policy arguments. He has done policy debate a few tournaments, but mostly competed in LD. During his career, he won seven national tournaments, broke at the TOC twice, won the Florida state championship, and reached late elimination rounds of the NSDA tournament twice. Outside of debate, he enjoys wake surfing, reading, and going to the gym.</p></article>
+          </div>
+
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">2025 Instructors</p>
+              <h2>LD instructor archive.</h2>
+            </div>
+            <p>Listed in alphabetical order by grade level on the original page.</p>
+          </div>
+          <div class="archive-grid">
+            <article class="archive-card"><p class="role">Instructor</p><h3>Chloe Wolf</h3><p>Chloe is a graduate from American Heritage Broward. She broke at numerous national tournaments, won Sunvite, and semifinaled National Speech and Debate Season Opener. She has four total career bids. Her debate interests include philosophy and theory arguments.</p></article>
+            <article class="archive-card"><p class="role">Instructor</p><h3>Salma Gheith</h3><p>Salma is a junior at Horace Greeley High School and debates in LD. She qualified for the TOC in her sophomore and junior years, breaking both times. She has nine total career bids and has won several tournaments and finaled others. She mainly reads kritikal arguments and occasionally some policy. Outside of debate, she loves to read and study history as well as spend time with family and friends.</p></article>
+            <article class="archive-card"><p class="role">Instructor</p><h3>Andy Miani</h3><p>Andy is a rising senior at Horace Greeley High School who specializes in critical and philosophical argumentation. They've advanced to out-rounds at major TOC-qualifying tournaments and have been competing on the LD national circuit since sophomore year. Andy particularly loves postmodernism and identity-based arguments rooted in colonial studies. Outside of debate, they enjoy drawing and ornithology.</p></article>
+            <article class="archive-card"><p class="role">Instructor</p><h3>Evan Lee</h3><p>Evan Lee is a debater from The Lovett School in Atlanta, Georgia. He's peaked number one for his state in Lincoln-Douglas debate. He's particularly interested in the educational value of debate. Outside of school, he enjoys playing golf, eating, and listening to music.</p></article>
+            <article class="archive-card"><p class="role">Instructor</p><h3>Angel Ribo</h3><p>Angel is a rising senior at Plano West High School in Dallas, Texas. He qualified to the TOC and reached bid rounds at national-level tournaments like Emory and Harvard, as well as 17th place at the national tournament. He is mainly experienced with kritikal arguments, but spends a lot of time thinking about philosophy positions, traditional debate, and disadvantages. Outside of debate he likes reading, listening to music, and driving.</p></article>
+            <article class="archive-card"><p class="role">Instructor</p><h3>Emma Sobel</h3><p>Emma is a rising senior at Immaculate Heart in Los Angeles. She qualified to the Tournament of Champions her junior year, reading policy-oriented arguments with a touch of philosophy. She reached late elimination rounds at numerous tournaments, including the Loyola Round Robin, Jack Howe, Damus Hollywood Invitational, CPS, Peninsula Invitational, and Berkeley. Outside of debate she enjoys going out with friends and playing with her dog.</p></article>
+            <article class="archive-card"><p class="role">Instructor</p><h3>Kaitlyn Tapia</h3><p>Kaitlyn is a senior at Coppell and debates in LD, primarily reading identity-based kritikal arguments. She qualified for the TOC her sophomore and junior years. She consistently reaches elimination rounds at national tournaments including semifinals of the Kandi King Round Robin and finals of the TOC Digital Debate Series 2. Outside of debate, Kaitlyn loves reading and playing with her dogs.</p></article>
+            <article class="archive-card"><p class="role">Instructor</p><h3>Emma Tan</h3><p>Emma is a rising senior and the Speech and Debate Captain at LHP. In debate, she primarily read soft-left affirmatives and critical arguments but is also familiar with philosophy and policy positions. She reached elimination rounds at Cypress Tradition, Harvard, Sunvite, and Lexington. She was third speaker at Harvard JV and ninth speaker at Sunvite. Outside of debate, she enjoys baking, reading, and listening to music.</p></article>
+            <article class="archive-card"><p class="role">Instructor</p><h3>Neel Aparanji</h3><p>Neel is a rising junior debating for Lake Highland Prep. He primarily reads the capitalism kritik and soft-left affirmatives, occasionally reading policy and existentialist arguments. As a freshman, Neel qualified for NCFL Nationals in Chicago. In his sophomore year, he TOC-qualified, finaled the Lexington Round Robin, earned multiple speaker awards, and reached elimination rounds at Apple Valley, the National Speech and Debate Season Opener, the New York City Invitational, Lexington, Florida Blue Key, TOC Digital, and Nova Titan. When not debating, Neel enjoys reading, spending time with friends, and playing with his dog.</p></article>
+            <article class="archive-card"><p class="role">Instructor</p><h3>Thatcher Hartman</h3><p>Thatcher is a rising junior who debates for Loyola High School. He reads a wide range of positions, from kritiks such as capitalism and ableism to policy arguments and theory. This year, he reached three bid rounds, was fourth speaker at Golden Desert, placed fifth in California, advanced to elimination rounds at Peninsula, Harvard-Westlake, Golden Desert, and TOC Digital 2 and 3, and qualified for NSDA Nationals. Outside of debate, he enjoys playing pickleball and participating in foster care for dogs at home.</p></article>
+            <article class="archive-card"><p class="role">Instructor</p><h3>Chase Hoffman</h3><p>Chase is from Fort Lauderdale High. He made it to semifinals at Blue Key in Novice LD, quarterfinals at Tradition in LD, semifinals at Nova Titan in LD, quarterfinals at Sunvite in LD, and had success at local tournaments as well as qualifying for NSDA Nationals twice.</p></article>
+            <article class="archive-card"><p class="role">Instructor</p><h3>Taro Porschke</h3><p>Taro is a rising junior debating for Christopher Columbus High School in Miami, Florida. His interests involve policy and theory arguments, with some philosophy-oriented Ks on the side. In freshman year, he broke at FFL Varsity States and finaled a few novice tournaments, winning Stanford in novice. As a sophomore, Taro broke at numerous national-circuit tournaments and went 3-3 at the rest. When not debating, Taro enjoys piano, film and digital photography, video editing, and programming.</p></article>
+            <article class="archive-card"><p class="role">Instructor</p><h3>Jacob Quililan</h3><p>Jacob is a rising junior heading into his second year in varsity debate. He mainly reads policy and K arguments. He actively debates on the national circuit and reached elims at Sunvite. Debate is really important to him and he loves learning new topics.</p></article>
+            <article class="archive-card"><p class="role">Instructor</p><h3>Justin Xia</h3><p>Justin is a rising junior at American Heritage School in Plantation, Florida. His argument interests include the Nietzsche K, meta-theory, spark, and tricky philosophy. He reached outrounds at the Barkley Forum and Florida Blue Key, qualified for and broke at the NSDA national tournament, was the only sophomore at Harvard to reach octofinals, and semifinaled FFL States while earning second speaker. Outside of debate, he enjoys violin, track, and reading philosophy.</p></article>
+            <article class="archive-card"><p class="role">Instructor</p><h3>Conan Matos</h3><p>Conan is in the class of 2028 and has been doing LD debate since the 2022-2023 academic year. He started debate in a small Miami school without huge prep groups or large coaching personnel, learning through practice and watching videos independently. He began high school debate at American Heritage Broward and now specializes in philosophy and theory, though he used to LARP. Outside of debate, he does community service, plays guitar and saxophone, and reads philosophy and political literature.</p></article>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =======================================================================
+       KRITIKAL PROJECT
+       ======================================================================= -->
+  <section class="page" id="page-project">
+    <div class="section" style="padding-top:clamp(8rem,15vw,11rem);">
+      <div class="wrap">
+        <p class="eyebrow reveal">Kritikal Project</p>
+        <h1 class="page-title reveal d1">The Kritikal Project.</h1>
+        <div class="meta-row reveal d2">
+          <span class="pill">📅 August 7–9, 2026</span>
+          <span class="pill">💻 Online</span>
+          <span class="pill">🎓 Ages 14–18</span>
+          <span class="pill">✺ Free</span>
+        </div>
+        <div class="reveal d3" style="margin-top:1.8rem;">
+          <a class="btn btn-primary" href="https://forms.gle/yNyuPDRwgSyoWivZ8" target="_blank" rel="noopener">Apply today <span class="arr">→</span></a>
+        </div>
+
+        <img class="project-hero-photo reveal d4" src="Kritikal%20Project/Kritikal%20Project%20Hero%20Image.jpg" alt="People discussing business plans in a conference room" loading="lazy">
+      </div>
+    </div>
+
+    <div class="section alt">
+      <div class="wrap split">
+        <div class="reveal">
+          <p class="eyebrow">About</p>
+          <h2>Build something you care about.</h2>
+          <div class="stack-gap" style="margin-top:1.2rem;">
+            <p>The Kritikal Project is a free, three-day online camp for young entrepreneurs with a strong interest in building a high-impact passion project around a cause they care about.</p>
+            <p>The curriculum draws on intentional decision-making and reflective problem identification. We invite unusually impressive guest speakers to give talks in three areas of specialty: artificial intelligence, politics, and business.</p>
+            <p>With guidance from our speakers and instructors, you'll build a framework for your passion project by the end of camp. On day three we host a pitch competition — and the winner receives a camp fund toward making their idea real.</p>
+          </div>
+        </div>
+        <div class="reveal d2">
+          <p class="eyebrow">Eligibility</p>
+          <h2>Who should apply.</h2>
+          <p class="lead" style="margin-top:1.2rem;">You're welcome to apply if you're 14 to 18 years old as of August 7, 2026. We're looking for people who are curious, intellectually humble and honest, and willing to challenge their own assumptions.</p>
+          <p style="margin-top:1.2rem; font-style:italic;">More information coming soon.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =======================================================================
+       RESOURCES
+       ======================================================================= -->
+  <section class="page" id="page-resources">
+    <div class="section" style="padding-top:clamp(8rem,15vw,11rem);">
+      <div class="wrap">
+        <p class="eyebrow reveal">Resources</p>
+        <h1 class="page-title reveal d1">Everything you need to start.</h1>
+        <p class="lead reveal d2" style="margin-top:1.2rem;">Free guides and programs to help you get into progressive debate and keep improving — wherever you're starting from.</p>
+
+        <div class="grid-2" style="margin-top:3rem;">
+          <article class="card reveal d1">
+            <p class="eyebrow">Guide</p>
+            <h3>Starter Guide</h3>
+            <p>New to progressive debate? Start here. A plain-English introduction to formats, core arguments, and how to find your footing.</p>
+            <!-- LINK PLACEHOLDER: point this to your Starter Guide page/doc when ready. -->
+            <a class="btn btn-ghost" data-link="guide" href="#guide" rel="noopener">Read the guide <span class="arr">→</span></a>
+          </article>
+          <article class="card reveal d2">
+            <p class="eyebrow">Program</p>
+            <h3>Mentor Program</h3>
+            <p>Get paired with an experienced debater for one-on-one guidance, practice, and feedback as you grow.</p>
+            <!-- LINK PLACEHOLDER: point this to your Mentor Program signup when ready. -->
+            <a class="btn btn-ghost" href="#" rel="noopener">Find a mentor <span class="arr">→</span></a>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =======================================================================
+       STARTER GUIDE — index of articles ("Read the guide" opens this)
+       To add another article: copy one <a class="article-row">…</a> block,
+       bump the number, point its data-link/href at a new article page below.
+       ======================================================================= -->
+  <section class="page" id="page-guide">
+    <div class="section" style="padding-top:clamp(8rem,15vw,11rem);">
+      <div class="wrap">
+        <a class="back-link reveal" data-link="resources" href="#resources">&#8592; All resources</a>
+        <p class="eyebrow reveal">Resources</p>
+        <h1 class="page-title reveal d1">Starter Guide.</h1>
+        <p class="lead reveal d2" style="margin-top:1.2rem;">A growing library of plain-English guides that take you from zero to competing, one concept at a time. Click an article to start reading.</p>
+
+        <div class="article-list">
+          <a class="article-row reveal d1" data-link="guide-argumentation" href="#guide-argumentation">
+            <span class="idx">01</span>
+            <span class="meta">
+              <span class="kicker">Fundamentals &middot; Neel Aparanji</span>
+              <h3>A Guide to Basic Argumentation</h3>
+              <p>The building blocks every debater needs &mdash; claims, warrants, and impacts, the six ways to answer any argument, evidence comparison, and impact calculus.</p>
+            </span>
+            <svg class="go" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+        </div>
+
+        <p class="more-soon reveal d2">More articles coming soon!</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- =======================================================================
+       STARTER GUIDE ARTICLE 01 — A Guide to Basic Argumentation (Neel Aparanji)
+       ======================================================================= -->
+  <section class="page" id="page-guide-argumentation">
+    <div class="section" style="padding-top:clamp(8rem,15vw,11rem);">
+      <div class="wrap">
+        <a class="back-link reveal" data-link="guide" href="#guide">&#8592; Starter Guide</a>
+        <p class="eyebrow reveal">Starter Guide &middot; Fundamentals</p>
+        <h1 class="page-title reveal d1">A Guide to Basic Argumentation</h1>
+        <p class="byline reveal d2">By Neel Aparanji</p>
+
+        <div class="prose">
+          <h2>Overview</h2>
+          <p>In order to compete successfully on both the national and local circuits, debaters must understand the many concepts that are essential for the basis of argument creation and refutation. Luckily, this guide will simplify and make all of these concepts digestible; taking notes and really trying to grasp these core ideas will make your future debate career much more promising.</p>
+
+          <h2>Parts of an Argument</h2>
+          <p>There are three main parts to an argument: the claim, the warrant, and the impact.</p>
+          <p>The <strong>claim</strong> is the argument you want to make, or the idea you are trying to get across. Examples of claims are "Dogs are cute," or "LeBron James is the best basketball player," or "Kritikal Discussions is the best debate organization." Claims alone are not a whole argument, as each of these sentences above contains no analysis or warranting as to why they are true. For example, you may contest that LeBron James is the best basketball player, and while you'd be wrong, there's nothing in the sentence "LeBron James is the best basketball player" that supports that LeBron James is the greatest basketball player.</p>
+          <p>That brings us to the second part of an argument: the <strong>warrant</strong>. The warrant is the reason the claim is true &mdash; the warrant is the "because." One might say that Kritikal Discussions is the best debate organization because they make debate accessible to everyone, everywhere. But, even with this warrant, there's no clear reason as to why we should even care that Kritikal Discussions is so incredibly fabulous, so what's next?</p>
+          <p>What's next is the <strong>impact</strong>; the impact explores the implications, or the "so what?" of an argument. Oftentimes in your English class, your teacher may force you to explain why your essay even matters in the introduction paragraph. That's how you should view the impact. The impact tells the judge why the argument matters. Alluding to our previous example, one might care that Kritikal Discussions is so incredibly important because it would encourage the audience to want to support the organization.</p>
+          <p>Therefore, the full argument, using a claim, warrant, and impact argument structure, would be as follows:</p>
+          <p class="eg">"Kritikal Discussions is the best debate organization (claim) because they make debate accessible to everyone (warrant), meaning that you should support them (impact)!"</p>
+
+          <h2>Responding to an Argument</h2>
+          <p>There are many ways to respond to an argument. Once someone makes a full argument &mdash; claim, warrant, and impact &mdash; you need to know how to respond. There are lots of ways to do this, and good debaters know the most strategic ways to respond to all sorts of arguments. Because Kritikal Discussions being the greatest debate organization is simply a truism, let's use a more contestable claim:</p>
+          <p class="eg">"LeBron James is the greatest basketball player of all time."</p>
+
+          <h3>1 &middot; Question the uniqueness (non-uniques)</h3>
+          <p>The first way you can respond to an argument is by questioning the uniqueness of an argument. These sorts of refutations are known as <strong>non-uniques</strong>, since they nullify the uniqueness of the argument. For example, a counterargument in this debate topic would be:</p>
+          <p class="eg">"Longevity isn't unique to LeBron &mdash; Kareem played 20 seasons too. Just lasting a long time doesn't make you the GOAT."</p>
+          <p>This argument uses a counterexample to effectively illustrate how non-unique LeBron's record is. For a more debate-relevant scenario, consider a negative economic contention on the living wage topic.</p>
+          <p class="eg">"Increasing the minimum wage would cause inflation."</p>
+          <p>Responding to the uniqueness of the argument would look something like this:</p>
+          <p class="eg">"Inflation is already high &mdash; increasing the minimum wage would only send a slight ripple."</p>
+          <p>This weakens their impact by saying it inevitably happens in both worlds, regardless of a minimum wage increase.</p>
+
+          <h3>2 &middot; Turn the argument</h3>
+          <p>The second way you can respond to an argument is by turning the argument. <strong>Turns</strong> answer the scenario the argument presumes. Turns are great because they are offensive &mdash; instead of just pointing out why your opponent is wrong, it generates a new reason as to why you're right. It's like an interception in football.</p>
+          <p>There are three main types of turns:</p>
+          <p><strong>1 &mdash; The Link Turn.</strong> These arguments contest whether the result of a scenario will really happen. For example, consider an argument isolated into the following premises:</p>
+          <ul class="premises">
+            <li>The economy is on the brink of collapse right now <span class="lbl">(Uniqueness)</span></li>
+            <li>Requiring a $25 minimum wage for workers pushes us off the brink and causes extreme inflation <span class="lbl">(Link)</span></li>
+            <li>Extreme inflation causes geopolitical instability throughout the world <span class="lbl">(Impact)</span></li>
+          </ul>
+          <p>The link turn would contest the link. It would say, "Well, actually, increasing the minimum wage would benefit the economy, not harm it!"</p>
+          <p><strong>2 &mdash; The Impact Turn.</strong> The impact turn is probably the funniest way to answer an argument. Consider the same premises:</p>
+          <ul class="premises">
+            <li>The economy is on the brink of collapse right now <span class="lbl">(Uniqueness)</span></li>
+            <li>Requiring a $25 minimum wage for workers pushes us off the brink and causes extreme inflation <span class="lbl">(Link)</span></li>
+            <li>Extreme inflation causes geopolitical instability throughout the world <span class="lbl">(Impact)</span></li>
+          </ul>
+          <p>The impact turn flips geopolitical instability. The impact turn would say, "Well, geopolitical instability is actually really good!" It's silly, but in technical debate rounds where your ability to matter skillfully matters more than the truth, many debaters win by reading these types of arguments! In fact, one of the cofounders of this institution &mdash; Justin Xia &mdash; loves spark, an argument that essentially says "nuclear war is preferable to our current state of affairs!"</p>
+          <p><strong>3 &mdash; The Straight Turn.</strong> The straight turn is a link turn coupled with a uniqueness turn. Consider the same argument yet again:</p>
+          <ul class="premises">
+            <li>The economy is on the brink of collapse right now <span class="lbl">(Uniqueness)</span></li>
+            <li>Requiring a $25 minimum wage for workers pushes us off the brink and causes extreme inflation <span class="lbl">(Link)</span></li>
+            <li>Extreme inflation causes geopolitical instability throughout the world <span class="lbl">(Impact)</span></li>
+          </ul>
+          <p>A straight turn would say that the economy is actually doing really badly right now (uniqueness turn), and that requiring a $25 minimum wage for workers can solve that by fixing the economy! Now, the reason this is better than a link turn alone is because it creates a necessity. If the economy were on the brink, there would be no real urgency to fix the economy in the first place, assuming that a $25 wage would fix the economy. But, if our economy is collapsing right now (straight turn), then there is an urgent necessity for a minimum wage increase. This type of framing is called <strong>try or die</strong> framing, arguing that if we don't try, we will die!</p>
+
+          <h3>3 &middot; De-link the warrant from the claim</h3>
+          <p>The third way you can respond to an argument is by de-linking the warrant and the claim. With LeBron, it can look like this:</p>
+          <p class="eg">"Sure, LeBron has high stats &mdash; but that doesn't mean he's the greatest. Stats don't capture leadership or clutch performance."</p>
+          <p>With the minimum wage example:</p>
+          <ul class="premises">
+            <li>The economy is on the brink of collapse right now <span class="lbl">(Uniqueness)</span></li>
+            <li>Requiring a $25 minimum wage for workers pushes us off the brink and causes extreme inflation <span class="lbl">(Link)</span></li>
+            <li>Extreme inflation causes geopolitical instability throughout the world <span class="lbl">(Impact)</span></li>
+          </ul>
+          <p>A de-link can look like this:</p>
+          <p class="eg">"Raising the minimum wage actually has no effect on the economy &mdash; alternative causes like tariffs and business confidence matter much more."</p>
+
+          <h3>4 &middot; Use evidence</h3>
+          <p>The fourth way you can respond to an argument is by using evidence &mdash; obviously. These bring in sources to counter your claim. Oftentimes in debate, a lot of the turns and no-links will rely on evidence anyway. Those claims about the minimum wage in the previous examples? You can use evidence to back those claims up &mdash; in fact, you should. For the LeBron James example, it would look like this:</p>
+          <p class="eg">"A 2023 ESPN player poll ranked Michael Jordan as the GOAT by a wide margin. Even NBA players disagree with your LeBron argument."</p>
+
+          <h3>5 &middot; Refute the impact</h3>
+          <p>The fifth way you can respond to an argument is by refuting the impact, or arguing that there is no impact to their argument. You agree that the claim and warrant are true, but say it doesn't matter.</p>
+          <p class="eg">"Okay, maybe LeBron has better stats &mdash; but being the greatest isn't about stats alone. It's about rings, legacy, and impact on the game."</p>
+          <p>With the minimum wage example:</p>
+          <ul class="premises">
+            <li>The economy is on the brink of collapse right now <span class="lbl">(Uniqueness)</span></li>
+            <li>Requiring a $25 minimum wage for workers pushes us off the brink and causes extreme inflation <span class="lbl">(Link)</span></li>
+            <li>Extreme inflation causes geopolitical instability throughout the world <span class="lbl">(Impact)</span></li>
+          </ul>
+          <p>You could say that geopolitical instability doesn't matter. You could say that it has always existed, and nothing world-ending has come from it.</p>
+
+          <h3>6 &middot; Change the framework</h3>
+          <p>The sixth way you could answer an argument is by changing the framework, or the standards used to evaluate the argument in the first place.</p>
+          <p class="eg">"The debate shouldn't be about individual stats &mdash; it should be about team success and cultural impact. Under that framework, Jordan wins."</p>
+          <p>Mastering these 6 types of response strategies will make you a better, more effective, and flexible debater. Remember, all of these types of refutations are compatible with each other (except for the link/straight turn with an impact turn, see Vancouver's explanation) and should be used in coordination with each other in order to maximize efficiency and persuasiveness.</p>
+
+          <h2>Evidence Comparison</h2>
+          <p>Evidence comparison is a uniquely powerful tool &mdash; in fact, in policy debates, it can be used as a tiebreaker when both sides make competing claims with pieces of evidence that directly contradict each other. There are multiple ways in which you can compare evidence, but for you, I have ranked them below:</p>
+          <ol>
+            <li>Author credentials</li>
+            <li>Journal / publisher bias</li>
+            <li>Publishing method</li>
+            <li>Tone</li>
+            <li>Length</li>
+          </ol>
+          <p>First, <strong>author credentials</strong>. Easily the best way to compare evidence. All you have to do is consider how qualified the authors are to make suggestions on a specific topic. For example, consider two authors: one a Ph.D in political science and international affairs, and the other a Ph.D in mathematics. Who would you trust more when it comes to US-China relations? Probably the former.</p>
+          <p>Second, <strong>journal / publisher bias</strong>. Was the article published on Fox, CNN, or the Heritage Foundation? The problem with using this kind of comparison is that it assumes that citing articles that are center-leaning is the best and most accurate way to go, but this is oftentimes not the case. Because of this, you need to consider why that bias facilitates a faulty argument implication. For example, if oil companies started funding a website dedicated to climate denial, then you can probably tell why they deny climate change &mdash; they have direct financial incentives to do so.</p>
+          <p>Third, the <strong>publishing method</strong>. Is it a think tank, study, report, book, or blog? You can compare the validity of different publishing methods for your evidence comparison &mdash; blog articles are generally less trustworthy than peer-reviewed journals.</p>
+          <p>Fourth, <strong>tone</strong>. Is the tone objective or fear-mongering? Is it hyperbolic? You can pay attention to the objectivity of your evidence and compare it to your opponent's evidence. This type of evidence comparison specifically works when you are comparing two short articles, since there is less variance in tone and more specificity in claims.</p>
+          <p>Lastly, <strong>length</strong>. This is probably the worst way to do evidence comparison, simply because "length" doesn't necessarily mean an article is better than another, but sometimes in debates, you should make it seem that way. For example, if an article you "cut" (more on this in the card cutting section) was longer than your opponent's, then the judge should prefer it because it accounts for more variables and the author has thought about the issue more. Generally, only do this if you have no other route to winning the evidence battle, and your evidence is just trash.</p>
+
+          <h2>Impact Calculus</h2>
+          <p>Impact calculus in debate is extremely important and can win you rounds. In fact, if you and your opponent are at a stalemate where both sides seem to be winning their scenario will happen; better impact calculus convinces the judge that your world matters more.</p>
+          <p>But first, what is impact calculus? Impact calculus is just a system of frameworks to think about why your impact should be prioritized over the other team's &mdash; it's how the judge understands whether nuclear war is worse than climate change, or if economic collapse is worse than racial inequality. Here are the main frameworks in which you can do impact calculus:</p>
+          <ul>
+            <li><strong>Timeframe</strong> &mdash; When does the impact happen? Impacts that happen sooner are more urgent. Think about it like this: if someone is going to stub their toe tomorrow vs. break their leg in 40 years, the toe stub is more immediate, even if it's less severe. So if your opponent says "extinction in 100 years" and you say "nuclear war in 5," you win the timeframe.</li>
+            <li><strong>Prerequisite</strong> &mdash; Timeframe is great when used in tandem with a prerequisite weighing argument. Does your impact prevent theirs from even occurring? This is a great move in policy debates. If you win that your impact comes before theirs and makes it impossible for theirs to happen, then it's game over for them. It's like saying, "You can't have a functioning democracy if climate change floods the entire country first."</li>
+            <li><strong>Magnitude</strong> &mdash; How badly does the impact affect each person? Does it kill them? Or does it just place them in an unfortunate situation?</li>
+            <li><strong>Probability</strong> &mdash; How likely is the impact to occur? This is where people usually get cooked. If your impact is nuclear war but you don't explain why it's likely, and your opponent has a smaller but super probable impact (like a 0.1% drop in GDP backed by 5 studies), the judge might prefer their impact. The best impact calculus compares magnitude and probability &mdash; e.g., "Our impact may be smaller, but it's guaranteed to happen."</li>
+            <li><strong>Reversibility</strong> &mdash; Can the impact be undone? If your opponent says "economic decline," but you say "mass extinction," you can argue that economic problems are reversible with new policies, but extinction is forever. Framing your impact as irreversible makes it scarier and harder to ignore.</li>
+            <li><strong>Scope</strong> &mdash; How big is the impact? This is the classic "how many people die" question. A global recession is worse than a regional one. A war that kills millions outweighs a protest that disrupts traffic. Obviously, magnitude isn't everything, but it's one of the most intuitive ways to frame your impact as more important.</li>
+          </ul>
+          <p>But now, what if you and your opponent both did impact calc, just using two different frameworks? Let's pretend you argued nuclear war outweighs on reversibility when compared to climate change, and your opponent said climate change outweighs nuclear war on scope. What now? Well, it's time for <strong>meta-weighing</strong>. Meta-weighing is when you determine which framework should be prioritized; should we prioritize reversibility or scope? Magnitude or probability?</p>
+
+          <h2>Cutting Cards</h2>
+          <p>For information on how to cut cards, I highly recommend watching <a href="https://www.youtube.com/watch?v=rzVnPccyK4k" target="_blank" rel="noopener">this video</a>.</p>
+          <p>Just remember:</p>
+          <ul>
+            <li>When giving a speech, you only read the tag, the author's last name and date, and the highlighted parts of the card.</li>
+            <li>Citations should be in MLA format.</li>
+            <li>You can't paste in parts of a paragraph in a card (that violates NSDA evidence ethics); you need to copy entire paragraphs at a time.</li>
+          </ul>
+          <p>Make sure to cut cards in a way that makes the claim and basic reasoning that you want in the first speech you give. For example, if you're giving a speech on why Trump strikes draw Iran to retaliate causing WW3, you only need the basic reasoning that says that Iran will retaliate. Detailed extrapolations are good and necessary in the 2NR or 2AR on the intricacies of Iran's governance and response to attack, but you should keep that for the rebuttal. Leaving it in the constructive leads to inefficient time and word economy as cards become "painted" or have too many highlights and you make less arguments overall.</p>
+          <p>Here's an example of a card (this may look different than the one in the video; both ways of cutting cards are fine, this is just more standard and more of a stylistic choice):</p>
+          <div class="ph ph-wide eg-card" role="img" aria-label="Example card placeholder"><span class="ph-tag">&#9655; Example card &mdash; coming soon</span></div>
+
+          <h2>Conclusion</h2>
+          <p>Mastering these basics of argumentation is the foundation for success in any form of debate. If you're just starting out, remember: debate isn't just about sounding smart &mdash; it's about thinking critically, communicating clearly, and persuading effectively. Hopefully, this comprehensive guide will help you win some rounds, and good luck!</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- =======================================================================
+       CONTACT
+       ======================================================================= -->
+  <section class="page" id="page-contact">
+    <div class="section" style="padding-top:clamp(8rem,15vw,11rem);">
+      <div class="wrap">
+        <p class="eyebrow reveal">Contact</p>
+        <h1 class="page-title reveal d1">Get in touch.</h1>
+        <p class="lead reveal d2" style="margin-top:1.2rem;">Questions about a program, want to volunteer, or just want to say hi? Reach us through any of the channels below — our Discord is the fastest way to talk to the team.</p>
+
+        <div class="contact-grid">
+          <div class="contact-card reveal d1">
+            <p class="label">Discord</p>
+            <h3 style="margin:.5rem 0;">Join the server</h3>
+            <a href="https://discord.gg/Fu4x2SBrkt" target="_blank" rel="noopener">discord.gg/Fu4x2SBrkt</a>
+          </div>
+          <div class="contact-card reveal d2">
+            <p class="label">Email</p>
+            <h3 style="margin:.5rem 0;">Send a message</h3>
+            <!-- CONTACT PLACEHOLDER: swap in your real email address below. -->
+            <a href="mailto:hello@kritikaldiscussions.com">hello@kritikaldiscussions.com</a>
+          </div>
+          <div class="contact-card reveal d3">
+            <p class="label">Instagram</p>
+            <h3 style="margin:.5rem 0;">Follow along</h3>
+            <a href="https://www.instagram.com/kritikal_discussions" target="_blank" rel="noopener">@kritikal_discussions</a>
+          </div>
+          <div class="contact-card reveal d4">
+            <p class="label">YouTube</p>
+            <h3 style="margin:.5rem 0;">Watch & learn</h3>
+            <a href="https://youtube.com/@kritikaldiscussions" target="_blank" rel="noopener">@kritikaldiscussions</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ===========================================================================
+     FOOTER
+     =========================================================================== -->
+<footer class="site">
+  <div class="wrap">
+    <div>
+      <div class="brand">Kritikal<b>.</b>Discussions</div>
+      <p>A student-run nonprofit making progressive debate accessible to everyone, everywhere.</p>
+      <div class="foot-social">
+        <a href="https://discord.gg/Fu4x2SBrkt" target="_blank" rel="noopener" aria-label="Discord"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M20.3 4.5A19 19 0 0 0 15.6 3l-.2.4a14 14 0 0 1 4.1 1.3 13 13 0 0 0-11-.0A14 14 0 0 1 12.6 3.4L12.4 3A19 19 0 0 0 7.7 4.5C4.8 8.8 4 13 4.4 17.1A19 19 0 0 0 10 19l.4-.6a12 12 0 0 1-1.9-.9l.5-.4a13 13 0 0 0 11 0l.5.4a12 12 0 0 1-1.9.9l.4.6a19 19 0 0 0 5.6-1.9c.5-4.8-.8-9-3.7-12.6ZM9.7 14.7c-.9 0-1.7-.8-1.7-1.9s.8-1.9 1.7-1.9 1.7.9 1.7 1.9-.8 1.9-1.7 1.9Zm4.6 0c-.9 0-1.7-.8-1.7-1.9s.8-1.9 1.7-1.9 1.7.9 1.7 1.9-.8 1.9-1.7 1.9Z"/></svg></a>
+        <a href="https://www.instagram.com/kritikal_discussions" target="_blank" rel="noopener" aria-label="Instagram"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>
+        <a href="https://youtube.com/@kritikaldiscussions" target="_blank" rel="noopener" aria-label="YouTube"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M22 8.2a3 3 0 0 0-2.1-2.1C18 5.6 12 5.6 12 5.6s-6 0-7.9.5A3 3 0 0 0 2 8.2 31 31 0 0 0 1.7 12 31 31 0 0 0 2 15.8a3 3 0 0 0 2.1 2.1c1.9.5 7.9.5 7.9.5s6 0 7.9-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 22.3 12 31 31 0 0 0 22 8.2ZM10 15V9l5.2 3Z"/></svg></a>
+      </div>
+    </div>
+    <div>
+      <h4>Explore</h4>
+      <ul>
+        <li><a data-link="home">Home</a></li>
+        <li><a data-link="team">Our Team</a></li>
+        <li><a data-link="camp">Debate Camp</a></li>
+        <li><a data-link="project">Kritikal Project</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Get involved</h4>
+      <ul>
+        <li><a data-link="resources">Resources</a></li>
+        <li><a data-link="contact">Contact</a></li>
+        <li><a href="https://forms.gle/Mxymx9nRs9YmaMvC6" target="_blank" rel="noopener">Join us</a></li>
+        <li><a href="https://forms.gle/HGbQmL6Ejvbfhmrd9" target="_blank" rel="noopener">Summer camp</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="wrap foot-bottom">
+    <span>© <span id="year"></span> Kritikal Discussions. All rights reserved.</span>
+    <span>Built with care for accessible debate.</span>
+  </div>
+</footer>
+
+<script>
+  /* ==========================================================================
+     PAGE ROUTER — fades between "pages" without reloading
+     ========================================================================== */
+  const nav = document.getElementById('nav');
+  const navlinks = document.getElementById('navlinks');
+  const hamburger = document.getElementById('hamburger');
+  let revealObserver;
+
+  function setReveals(pageEl){
+    // reset + (re)observe reveal elements on the now-visible page so the
+    // entrance animation replays each time you navigate to it
+    if (revealObserver) revealObserver.disconnect();
+    const items = pageEl.querySelectorAll('.reveal');
+    items.forEach(el => el.classList.remove('in'));
+    revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting){ e.target.classList.add('in'); revealObserver.unobserve(e.target); } });
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+    items.forEach(el => revealObserver.observe(el));
+  }
+
+  function go(name){
+    const target = document.getElementById('page-' + name);
+    if (!target) return;
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    target.classList.add('active');
+
+    // active nav state
+    const navName = name.startsWith('guide') ? 'resources' : name;
+    document.querySelectorAll('#navlinks a').forEach(a =>
+      a.classList.toggle('active', a.dataset.link === navName));
+
+    history.replaceState(null, '', '#' + name);
+    window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
+    setReveals(target);
+
+    // close mobile menu
+    navlinks.classList.remove('open');
+    hamburger.classList.remove('open');
+    hamburger.setAttribute('aria-expanded', 'false');
+  }
+
+  // intercept every internal link with a data-link attribute
+  document.addEventListener('click', (e) => {
+    const link = e.target.closest('[data-link]');
+    if (link){ e.preventDefault(); go(link.dataset.link); }
+  });
+
+  function showCampTab(year){
+    document.querySelectorAll('[data-camp-tab]').forEach(tab => {
+      const active = tab.dataset.campTab === year;
+      tab.classList.toggle('active', active);
+      tab.setAttribute('aria-selected', String(active));
+    });
+    document.querySelectorAll('[data-camp-panel]').forEach(panel => {
+      panel.hidden = panel.dataset.campPanel !== year;
+    });
+  }
+
+  document.addEventListener('click', (e) => {
+    const tab = e.target.closest('[data-camp-tab]');
+    if (!tab) return;
+    e.preventDefault();
+    showCampTab(tab.dataset.campTab);
+  });
+
+  function showCurriculumTab(name){
+    document.querySelectorAll('[data-curriculum-tab]').forEach(tab => {
+      const active = tab.dataset.curriculumTab === name;
+      tab.classList.toggle('active', active);
+      tab.setAttribute('aria-selected', String(active));
+    });
+    document.querySelectorAll('[data-curriculum-panel]').forEach(panel => {
+      panel.hidden = panel.dataset.curriculumPanel !== name;
+    });
+  }
+
+  document.addEventListener('click', (e) => {
+    const tab = e.target.closest('[data-curriculum-tab]');
+    if (!tab) return;
+    e.preventDefault();
+    showCurriculumTab(tab.dataset.curriculumTab);
+  });
+
+  // mobile menu toggle
+  hamburger.addEventListener('click', () => {
+    const open = navlinks.classList.toggle('open');
+    hamburger.classList.toggle('open', open);
+    hamburger.setAttribute('aria-expanded', String(open));
+  });
+
+  // nav background on scroll
+  const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 12);
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  // year + initial page from URL hash
+  document.getElementById('year').textContent = new Date().getFullYear();
+  const initial = (location.hash || '#home').slice(1);
+  go(document.getElementById('page-' + initial) ? initial : 'home');
+</script>
+</body>
+</html>
