@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Domain setup — pointing kritikaldiscussions.com to the site</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --brand:#00736F;--brand-deep:#00524F;--tint:#E3F1EE;--bg:#F5F7F6;--surface:#fff;
+    --ink:#14201E;--soft:#4F615E;--line:#D7E2DF;--display:"Fraunces",Georgia,serif;--body:"Hanken Grotesk",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:var(--body);background:var(--bg);color:var(--ink);line-height:1.65;}
+  .wrap{max-width:760px;margin:0 auto;padding:clamp(1.5rem,5vw,3.5rem) clamp(1.1rem,5vw,2rem) 4rem;}
+  header.top{text-align:center;margin-bottom:2.2rem;}
+  .eyebrow{font-size:.78rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--brand);}
+  h1{font-family:var(--display);font-weight:600;font-size:clamp(1.8rem,5vw,2.5rem);line-height:1.1;margin:.5rem 0;}
+  .sub{color:var(--soft);max-width:54ch;margin:0 auto;}
+  .callout{display:flex;gap:.7rem;align-items:flex-start;background:var(--tint);border:1px solid #b9ddd6;border-radius:14px;padding:1rem 1.1rem;margin:1.6rem 0 2rem;font-size:.95rem;color:var(--brand-deep);}
+  .callout svg{width:22px;height:22px;flex:none;color:var(--brand);margin-top:.1rem;}
+  section.step{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:clamp(1.2rem,4vw,1.7rem);margin-bottom:1.1rem;}
+  .step-head{display:flex;align-items:center;gap:.8rem;margin-bottom:.6rem;}
+  .badge{flex:none;width:32px;height:32px;border-radius:50%;background:var(--brand);color:#fff;font-weight:700;display:grid;place-items:center;}
+  .step h2{font-family:var(--display);font-weight:600;font-size:1.2rem;}
+  .step p{color:var(--soft);font-size:.97rem;}
+  .step p + p{margin-top:.5rem;}
+  ul.fine{margin:.6rem 0 0;padding-left:0;list-style:none;display:grid;gap:.5rem;}
+  ul.fine li{display:flex;gap:.6rem;align-items:flex-start;font-size:.95rem;color:var(--ink);}
+  ul.fine li::before{content:"";flex:none;width:7px;height:7px;border-radius:50%;background:var(--brand);margin-top:.55rem;}
+  strong{color:var(--ink);}
+  .chip{display:inline-block;font-weight:600;font-size:.84rem;background:var(--tint);color:var(--brand-deep);border-radius:8px;padding:.08rem .45rem;font-family:var(--body);}
+  code{background:#10211f;color:#e7f3f1;border-radius:6px;padding:.08rem .42rem;font-size:.86em;}
+  table.dns{width:100%;border-collapse:collapse;margin:.9rem 0 .3rem;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:.92rem;}
+  table.dns th{background:var(--brand);color:#fff;text-align:left;padding:.6rem .8rem;font-weight:700;}
+  table.dns td{padding:.55rem .8rem;border-top:1px solid var(--line);font-family:var(--body);}
+  table.dns td code{background:#f0f5f4;color:var(--ink);font-weight:600;}
+  table.dns tr:nth-child(even) td{background:#fafcfb;}
+  .placeholder{background:#fdf3ec;color:#7a3d12;border-radius:6px;padding:.08rem .4rem;font-weight:700;}
+  .note{font-size:.9rem;color:var(--soft);background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:.85rem 1rem;margin-top:.7rem;}
+  .note.warn{background:#fdf3ec;border-color:#f0d6c2;color:#7a3d12;}
+  .trouble{border:1px solid var(--line);background:var(--surface);border-radius:18px;padding:clamp(1.2rem,4vw,1.7rem);margin-top:2rem;}
+  .trouble h2{font-family:var(--display);font-weight:600;font-size:1.2rem;margin-bottom:.7rem;}
+  .trouble dt{font-weight:700;font-size:.95rem;margin-top:.8rem;}
+  .trouble dd{margin:.2rem 0 0;color:var(--soft);font-size:.93rem;}
+  a{color:var(--brand);font-weight:600;}
+  footer{text-align:center;color:var(--soft);font-size:.85rem;margin-top:2.4rem;}
+  @media print{body{background:#fff;}section.step,.trouble{break-inside:avoid;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <p class="eyebrow">Kritikal Discussions</p>
+    <h1>Pointing the domain to the website</h1>
+    <p class="sub">A one-time, roughly 10-minute setup in Squarespace. After this you're done for good — you won't need to touch it again, and you're not involved in updating the site.</p>
+  </header>
+
+  <div class="callout">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+    <span><strong>What this does:</strong> the site itself is hosted for free on GitHub. All you're doing is telling Squarespace that <span class="chip">kritikaldiscussions.com</span> should send visitors to GitHub's servers. You're only changing the records that point the website — email and everything else stays untouched.</span>
+  </div>
+
+  <section class="step">
+    <div class="step-head"><div class="badge">1</div><h2>The one value you'll need</h2></div>
+    <p>You'll use this GitHub address in Step 4 — it's already filled in for you below:</p>
+    <p style="margin-top:.5rem;"><code>jxia2027-cloud.github.io</code></p>
+    <p>That's where the website is hosted. The records you add simply send visitors there instead of to the old site.</p>
+  </section>
+
+  <section class="step">
+    <div class="step-head"><div class="badge">2</div><h2>Open the domain's DNS settings</h2></div>
+    <ul class="fine">
+      <li>Go to <a href="https://account.squarespace.com/domains" target="_blank" rel="noopener">account.squarespace.com/domains</a> and sign in.</li>
+      <li>Click <span class="chip">kritikaldiscussions.com</span>.</li>
+      <li>Open <strong>DNS</strong> (sometimes labelled <strong>DNS Settings</strong>).</li>
+    </ul>
+    <div class="note warn">If Squarespace says DNS can't be edited because the domain is “connected to a Squarespace site,” disconnect it from that site first (it should just be a registered domain, not attached to a Squarespace website).</div>
+  </section>
+
+  <section class="step">
+    <div class="step-head"><div class="badge">3</div><h2>Remove the records pointing to the OLD site</h2></div>
+    <p>The domain currently sends visitors to the old Google Sites page, so those records have to go first — otherwise they override the new ones. In the DNS list, delete anything pointing the <strong>website</strong> elsewhere:</p>
+    <ul class="fine">
+      <li><strong>Delete</strong> any <code>CNAME</code> on host <code>www</code> whose value is <code>ghs.googlehosted.com</code> — that's the old Google Sites record.</li>
+      <li><strong>Delete</strong> any existing <code>A</code> records on host <code>@</code>, plus any <strong>domain forwarding / redirect</strong> set on the root domain that sends it to the old site.</li>
+      <li><strong>Keep</strong> the <em>Squarespace Domain Connect</em> record and any <em>email / security</em> records (MX or TXT, or anything labelled email) — those are unrelated to the website and shouldn't be touched.</li>
+    </ul>
+    <div class="note warn">If Squarespace shows a “forwarding” toggle that sends the domain to the old site, turn it off — a forward overrides the records you add below.</div>
+  </section>
+
+  <section class="step">
+    <div class="step-head"><div class="badge">4</div><h2>Add the new records</h2></div>
+    <p>Click <strong>Add Record</strong> and create these five. The four A records all use host <code>@</code>; the CNAME uses host <code>www</code>.</p>
+    <table class="dns">
+      <thead><tr><th>Type</th><th>Host</th><th>Value / Data</th></tr></thead>
+      <tbody>
+        <tr><td>A</td><td><code>@</code></td><td><code>185.199.108.153</code></td></tr>
+        <tr><td>A</td><td><code>@</code></td><td><code>185.199.109.153</code></td></tr>
+        <tr><td>A</td><td><code>@</code></td><td><code>185.199.110.153</code></td></tr>
+        <tr><td>A</td><td><code>@</code></td><td><code>185.199.111.153</code></td></tr>
+        <tr><td>CNAME</td><td><code>www</code></td><td><code>jxia2027-cloud.github.io</code></td></tr>
+      </tbody>
+    </table>
+    <div class="note">Leave TTL at the default (e.g. 4 hours) if asked. IPv6 “AAAA” records are optional and can be skipped — the four A records above are all that's needed.</div>
+  </section>
+
+  <section class="step">
+    <div class="step-head"><div class="badge">5</div><h2>Save, then tell Justin</h2></div>
+    <p>Save your changes. That's everything on the Squarespace side.</p>
+    <p>Let Justin know it's done. On GitHub he'll press <strong>Check again</strong>, and once it verifies he'll switch on HTTPS. DNS changes usually take effect within an hour, but can take up to 24–48 hours to reach everyone.</p>
+  </section>
+
+  <div class="trouble">
+    <h2>If it's not working after a few hours</h2>
+    <dl>
+      <dt>Still seeing a Squarespace parking page</dt>
+      <dd>A leftover default Squarespace A record or www CNAME is still there. Go back to DNS settings and remove it.</dd>
+      <dt>Want to check progress</dt>
+      <dd>Visit <a href="https://www.whatsmydns.net" target="_blank" rel="noopener">whatsmydns.net</a>, enter <span class="chip">kritikaldiscussions.com</span>, choose <strong>A</strong>, and look for the four <code>185.199.x.153</code> addresses appearing around the world.</dd>
+      <dt>Site loads but shows a “not secure” warning</dt>
+      <dd>That clears once Justin ticks <strong>Enforce HTTPS</strong> on GitHub (it can take a day for that option to become available — normal).</dd>
+      <dt>Worried about email</dt>
+      <dd>As long as you kept the email/security records in Step 3, nothing about email changed.</dd>
+    </dl>
+  </div>
+
+  <footer>Thanks for setting this up — it's a one-time job, and then it just works.</footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>How to edit the Kritikal Discussions site</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --brand:#00736F;--brand-deep:#00524F;--tint:#E3F1EE;--bg:#F5F7F6;--surface:#fff;
+    --ink:#14201E;--soft:#4F615E;--line:#D7E2DF;--display:"Fraunces",Georgia,serif;--body:"Hanken Grotesk",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:var(--body);background:var(--bg);color:var(--ink);line-height:1.65;}
+  .wrap{max-width:760px;margin:0 auto;padding:clamp(1.5rem,5vw,3.5rem) clamp(1.1rem,5vw,2rem) 4rem;}
+  header.top{text-align:center;margin-bottom:2.4rem;}
+  .eyebrow{font-size:.78rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--brand);}
+  h1{font-family:var(--display);font-weight:600;font-size:clamp(1.9rem,5vw,2.7rem);line-height:1.08;margin:.5rem 0;}
+  .sub{color:var(--soft);max-width:48ch;margin:0 auto;}
+  .reassure{display:flex;gap:.7rem;align-items:flex-start;background:var(--tint);border:1px solid #b9ddd6;border-radius:14px;padding:1rem 1.1rem;margin:1.8rem 0 2.4rem;font-size:.95rem;color:var(--brand-deep);}
+  .reassure svg{width:22px;height:22px;flex:none;color:var(--brand);margin-top:.1rem;}
+  .loop{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;margin-bottom:2.6rem;}
+  .loop .l{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:.9rem .7rem;text-align:center;}
+  .loop .l .n{font-family:var(--display);color:var(--brand);font-size:1.3rem;}
+  .loop .l .t{font-weight:600;font-size:.86rem;margin-top:.2rem;}
+  .loop .l .d{font-size:.76rem;color:var(--soft);margin-top:.15rem;}
+  section.step{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:clamp(1.2rem,4vw,1.8rem);margin-bottom:1.2rem;}
+  .step-head{display:flex;align-items:center;gap:.8rem;margin-bottom:.7rem;}
+  .badge{flex:none;width:34px;height:34px;border-radius:50%;background:var(--brand);color:#fff;font-weight:700;display:grid;place-items:center;font-size:1rem;}
+  .step h2{font-family:var(--display);font-weight:600;font-size:1.25rem;}
+  .step p{color:var(--soft);font-size:.97rem;}
+  .step p + p{margin-top:.6rem;}
+  ol.fine,ul.fine{margin:.7rem 0 0 0;padding-left:0;list-style:none;display:grid;gap:.55rem;}
+  ol.fine li,ul.fine li{display:flex;gap:.6rem;align-items:flex-start;font-size:.95rem;color:var(--ink);}
+  ol.fine{counter-reset:f;}
+  ol.fine li::before{counter-increment:f;content:counter(f);flex:none;width:22px;height:22px;border-radius:50%;background:var(--tint);color:var(--brand-deep);font-weight:700;font-size:.78rem;display:grid;place-items:center;margin-top:.05rem;}
+  ul.fine li::before{content:"";flex:none;width:7px;height:7px;border-radius:50%;background:var(--brand);margin-top:.55rem;}
+  strong{color:var(--ink);}
+  .chip{display:inline-block;font-weight:600;font-size:.82rem;background:var(--tint);color:var(--brand-deep);border-radius:8px;padding:.1rem .45rem;}
+  .rules{background:var(--ink);color:#fff;border-radius:18px;padding:clamp(1.3rem,4vw,1.9rem);margin:2.2rem 0 1.2rem;}
+  .rules h2{font-family:var(--display);font-weight:600;font-size:1.3rem;margin-bottom:.9rem;}
+  .rules ul{list-style:none;display:grid;gap:.7rem;}
+  .rules li{display:flex;gap:.7rem;align-items:flex-start;font-size:.96rem;color:rgba(245,247,246,.92);}
+  .rules strong{color:#fff;}
+  .rules svg{width:19px;height:19px;flex:none;color:#6FCBC6;margin-top:.15rem;}
+  .panic{border:1px solid #f0d6c2;background:#fdf3ec;border-radius:16px;padding:1.2rem 1.3rem;}
+  .panic h2{font-family:var(--display);font-weight:600;font-size:1.2rem;color:#7a3d12;margin-bottom:.5rem;}
+  .panic p{color:#7a3d12;font-size:.95rem;}
+  .panic p + p{margin-top:.5rem;}
+  a{color:var(--brand);font-weight:600;}
+  footer{text-align:center;color:var(--soft);font-size:.85rem;margin-top:2.5rem;}
+  @media (max-width:560px){.loop{grid-template-columns:repeat(2,1fr);}}
+  @media print{body{background:#fff;}section.step,.rules,.panic,.loop .l{break-inside:avoid;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <p class="eyebrow">Kritikal Discussions</p>
+    <h1>Editing the website</h1>
+    <p class="sub">A plain-English guide to updating the site while Justin is away — no coding, just clicking.</p>
+  </header>
+
+  <div class="reassure">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg>
+    <span><strong>You cannot permanently break the site.</strong> Every change has an Undo button, and once a change is online, GitHub automatically keeps every earlier version — so the site can always be restored to how it looked before.</span>
+  </div>
+
+  <div class="loop">
+    <div class="l"><div class="n">1</div><div class="t">Get</div><div class="d">the current file</div></div>
+    <div class="l"><div class="n">2</div><div class="t">Edit</div><div class="d">in the editor</div></div>
+    <div class="l"><div class="n">3</div><div class="t">Publish</div><div class="d">your changes</div></div>
+    <div class="l"><div class="n">4</div><div class="t">Check</div><div class="d">the live site</div></div>
+  </div>
+
+  <section class="step">
+    <div class="step-head"><div class="badge">1</div><h2>Get the current version of the site</h2></div>
+    <p>Always start from the newest file so you don't overwrite someone else's recent change.</p>
+    <ol class="fine">
+      <li>Open the website's GitHub page (Justin will share the exact link).</li>
+      <li>Click the file named <span class="chip">index.html</span>.</li>
+      <li>Click the <strong>Download raw file</strong> button (a download icon near the top-right of the file).</li>
+      <li>It saves <span class="chip">index.html</span> to your computer — usually in Downloads.</li>
+    </ol>
+  </section>
+
+  <section class="step">
+    <div class="step-head"><div class="badge">2</div><h2>Open the editor and load the file</h2></div>
+    <ol class="fine">
+      <li>Double-click <span class="chip">Kritikal-Editor.html</span> — it opens in your web browser.</li>
+      <li>Drag the <span class="chip">index.html</span> you just downloaded onto the box that says “Drop your index.html here” (or click the box to choose it).</li>
+      <li>The site appears. Use the dropdown at the top to jump to any page, and click <strong>Edit</strong> to start changing things.</li>
+    </ol>
+    <p>In <strong>Preview</strong> mode the site behaves like a normal visitor's would. In <strong>Edit</strong> mode, anything you click becomes changeable, and a bar at the bottom always tells you what's selected.</p>
+  </section>
+
+  <section class="step">
+    <div class="step-head"><div class="badge">3</div><h2>Make your changes</h2></div>
+    <ul class="fine">
+      <li><strong>Text:</strong> click any heading or paragraph and type. Click elsewhere when done.</li>
+      <li><strong>Photos:</strong> click a photo, then <strong>Replace photo</strong> in the bottom bar, and pick an image from your computer. Large photos are shrunk automatically.</li>
+      <li><strong>Links &amp; buttons:</strong> click one, then <strong>Edit link</strong> to change where it points (a Google Form, Instagram, an email, etc.).</li>
+      <li><strong>Add or remove a person / instructor / card:</strong> click one, then use <strong>Add another</strong> (makes a matching copy you can edit), <strong>Remove</strong>, or the up/down arrows to reorder.</li>
+      <li><strong>Made a mistake?</strong> Press the <strong>Undo</strong> arrow at the top. (Need a reminder of any step? Click the <strong>?</strong> button in the editor.)</li>
+    </ul>
+  </section>
+
+  <section class="step">
+    <div class="step-head"><div class="badge">4</div><h2>Publish so it goes live</h2></div>
+    <p>Click the green <strong>Publish changes</strong> button, then follow whichever applies:</p>
+    <ol class="fine">
+      <li>Click <strong>Download index.html</strong> — this saves your updated site.</li>
+      <li>Back on the GitHub page, click <strong>Add file → Upload files</strong> (or open <span class="chip">index.html</span> and click the pencil ✎).</li>
+      <li>Drop in the file you just downloaded and click <strong>Commit changes</strong>.</li>
+      <li>Wait about a minute, then open <a href="https://kritikaldiscussions.com" target="_blank" rel="noopener">kritikaldiscussions.com</a> to see it live.</li>
+    </ol>
+    <p><em>If your editor shows a “Publish to the live site” button, you can click that instead and skip the upload — it does it all in one step.</em></p>
+  </section>
+
+  <div class="rules">
+    <h2>Three golden rules</h2>
+    <ul>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg><span><strong>One person edits at a time.</strong> Give the team a heads-up before you start, so two people don't publish over each other.</span></li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg><span><strong>Always download the latest file first</strong> (Step 1) before editing. Don't reuse an old file from last week.</span></li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m20 6-11 11-5-5"/></svg><span><strong>Keep changes small and check the live site</strong> after publishing. If it looks right, you're done.</span></li>
+    </ul>
+  </div>
+
+  <div class="panic">
+    <h2>If something looks wrong on the live site</h2>
+    <p>Don't worry — nothing is lost. On the website's GitHub page, open the <strong>commit history</strong> (the clock/“History” link). Each entry is a saved version. Open a good earlier one and use <strong>Revert</strong>, or copy that version's <span class="chip">index.html</span> and re-upload it as in Step 4.</p>
+    <p>If you're unsure, it's completely fine to leave it and let Justin sort it out when he's back. The site keeps running either way.</p>
+  </div>
+
+  <footer>Made for the Kritikal Discussions team. Keep this guide with the editor file.</footer>
+
+</div>
+</body>
+</html>
