@@ -1,0 +1,9 @@
+#!/bin/sh
+set -eu
+
+branch="$(git branch --show-current)"
+
+if [ "$branch" = "publish/hoffman-main" ]; then
+  echo "Auto-pushing ${branch} to hoffman/main..."
+  git push hoffman "${branch}:main"
+fi
