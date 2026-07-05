@@ -534,6 +534,20 @@
   .prose .premises li::marker{content:none;}
   .prose .premises .lbl{color:var(--brand); font-weight:600; font-style:italic;}
   .prose .eg-card{margin:1.5rem 0;}
+  .card-cut{
+    background:#fff; border:1px solid var(--line); border-radius:14px;
+    padding:clamp(1rem,3vw,1.45rem); box-shadow:0 18px 42px -30px rgba(8,20,18,.45);
+    overflow-wrap:anywhere;
+  }
+  .prose .card-cut p{color:#080b0a; font-family:Arial, Helvetica, sans-serif;}
+  .card-cut .card-tag{
+    font-size:clamp(1.18rem,2.4vw,1.55rem); line-height:1.32; font-weight:800; margin:0 0 .85rem;
+  }
+  .card-cut .card-cite{font-size:.98rem; line-height:1.42; margin:0 0 1.15rem;}
+  .card-cut .card-cite strong{font-size:1.08rem; font-weight:800;}
+  .card-cut .card-text{font-size:.95rem; line-height:1.52; margin:0;}
+  .card-cut .card-u{text-decoration:underline; text-decoration-thickness:2px; text-underline-offset:2px; font-weight:700;}
+  .card-cut mark{background:#19f20a; color:#050807; padding:0 .12em; font-weight:800;}
 
   /* ==========================================================================
      RESPONSIVE
@@ -1310,7 +1324,11 @@
           </ul>
           <p>Make sure to cut cards in a way that makes the claim and basic reasoning that you want in the first speech you give. For example, if you're giving a speech on why Trump strikes draw Iran to retaliate causing WW3, you only need the basic reasoning that says that Iran will retaliate. Detailed extrapolations are good and necessary in the 2NR or 2AR on the intricacies of Iran's governance and response to attack, but you should keep that for the rebuttal. Leaving it in the constructive leads to inefficient time and word economy as cards become "painted" or have too many highlights and you make less arguments overall.</p>
           <p>Here's an example of a card (this may look different than the one in the video; both ways of cutting cards are fine, this is just more standard and more of a stylistic choice):</p>
-          <div class="ph ph-wide eg-card" role="img" aria-label="Example card placeholder"><span class="ph-tag">&#9655; Example card &mdash; coming soon</span></div>
+          <article class="card-cut eg-card" aria-label="Example cut card">
+            <p class="card-tag">People with disabilities suffer from <span class="card-u">disproportionally high</span> homelessness rates.</p>
+            <p class="card-cite"><strong>Erin Vinoski 19</strong> [Thomas, Erin Vinoski. "Homelessness among Individuals with Disabilities: Influential Factors and Scalable Solutions - NACCHO." <em>Www.naccho.org</em>, 14 June 2019, www.naccho.org/blog/articles/homelessness-among-individuals-with-disabilities-influential-factors-and-scalable-solutions.] LHP NA</p>
+            <p class="card-text">People experiencing homelessness <span class="card-u">lack sustainable access to housing</span> and instead <span class="card-u">turn to emergency shelters, transitional housing, or places not meant for overnight residence.</span> In the United States on a single night <span class="card-u">in January 2018, 552,830 people experienced homelessness; between 2.5 and 3.5 million people experience homelessness over the course of any given year.</span> Housing is an important determinant of health, and those who experience homelessness are at greater risk for health challenges. <mark>People with disabilities are disproportionately likely to experience homelessness.</mark> <span class="card-u">Point-in-time counts</span> (i.e., counts of the people in a community experiencing homelessness on a single night) suggest that nearly <mark>one quarter of individuals experiencing homelessness have a disability,</mark> including physical, intellectual, and developmental disabilities, as well as mental health and/or substance abuse disorders. Social-Ecological Factors Influencing Homelessness among People with Disabilities Societal Level: Federal policies, such as those regulating wages and supplemental security income (SSI), influence homelessness among people with disabilities. For example, <span class="card-u">many people with disabilities work for subminimum wage, contributing to higher poverty and homelessness rates. Other federal policies limit the amount of income and assets people receiving SSI can have, making it difficult for them to prepare financially for a crisis</span> (e.g., death of an older caregiver). Community Level: Many shelters are inaccessible to people with disabilities, which has been the subject of recent litigation in several major cities, including Chicago and New York City. When denied access to shelters, nearly seven in 10 people with disabilities who experience homelessness stay in dangerous locations (e.g., on sidewalks or under bridges), directly affecting their health outcomes. Shelter staff also may be inadequately trained to work with people with disabilities. <span class="card-u"><mark>This</mark> issue particularly <mark>affects</mark> people <mark>whose disabilities are</mark> often "<mark>invisible,</mark>" such as people with autism.</span> Front-line staff may not be equipped to provide reasonable and necessary accommodations to these populations, such as alternatives to pat-downs and accommodations for other sensory needs. Interpersonal Level: <span class="card-u">People with disabilities <mark>experience housing, health care, employment, and wage discrimination,</mark> preventing or making it difficult for them to secure sustainable housing and income necessary to meet their basic needs.</span></p>
+          </article>
 
           <h2>Conclusion</h2>
           <p>Mastering these basics of argumentation is the foundation for success in any form of debate. If you're just starting out, remember: debate isn't just about sounding smart &mdash; it's about thinking critically, communicating clearly, and persuading effectively. Hopefully, this comprehensive guide will help you win some rounds, and good luck!</p>
