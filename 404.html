@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Redirecting — Kritikal Discussions</title>
+<meta name="robots" content="noindex, follow">
+<link rel="icon" type="image/png" sizes="48x48" href="/Site%20Assets/favicon-48.png">
+<script>
+  const routes = {
+    'resources': 'resources',
+    'starter-guide': 'starter-guide',
+    'guide': 'guide',
+    'resources/starter-guide': 'starter-guide',
+    'guide-argumentation': 'guide-argumentation',
+    'basic-argumentation': 'basic-argumentation',
+    'a-guide-to-basic-argumentation': 'a-guide-to-basic-argumentation',
+    'argumentation-guide': 'guide-argumentation',
+    'resources/basic-argumentation': 'basic-argumentation',
+    'camp': 'camp',
+    'debate-camp': 'camp',
+    'summer-camp': 'camp-2026',
+    'summer-debate-camp': 'camp-2026',
+    '2026-debate-camp': 'camp-2026',
+    '2026-debate-summer-camp': 'camp-2026',
+    '2026-summer-camp': 'camp-2026',
+    'debate-camp/2026': 'camp-2026',
+    '2025-debate-camp': 'camp-2025',
+    '2025-debate-summer-camp': 'camp-2025',
+    '2025-summer-camp': 'camp-2025',
+    'debate-camp/2025': 'camp-2025',
+    'project': 'project',
+    'kritikal-project': 'project',
+    'team': 'team',
+    'our-team': 'team',
+    'founders': 'team',
+    'contact': 'contact',
+    'contact-us': 'contact'
+  };
+  const path = location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
+  location.replace('/#' + (routes[path] || 'home'));
+</script>
+</head>
+<body>
+<p>Redirecting to <a href="/">Kritikal Discussions</a>.</p>
+</body>
+</html>

@@ -1456,14 +1456,29 @@
     items.forEach(el => revealObserver.observe(el));
   }
 
+  const routeAliases = {
+    'starter-guide': { page: 'guide', nav: 'resources' },
+    'basic-argumentation': { page: 'guide-argumentation', nav: 'resources' },
+    'a-guide-to-basic-argumentation': { page: 'guide-argumentation', nav: 'resources' },
+    'camp-2026': { page: 'camp', nav: 'camp', campTab: '2026' },
+    'camp-2025': { page: 'camp', nav: 'camp', campTab: '2025' }
+  };
+
+  function resolveRoute(name){
+    return routeAliases[name] || { page: name };
+  }
+
   function go(name){
-    const target = document.getElementById('page-' + name);
-    if (!target) return;
+    const route = resolveRoute(name);
+    const target = document.getElementById('page-' + route.page);
+    if (!target) return false;
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     target.classList.add('active');
 
+    if (route.campTab) showCampTab(route.campTab);
+
     // active nav state
-    const navName = name.startsWith('guide') ? 'resources' : name;
+    const navName = route.nav || (route.page.startsWith('guide') ? 'resources' : route.page);
     document.querySelectorAll('#navlinks a').forEach(a =>
       a.classList.toggle('active', a.dataset.link === navName));
 
@@ -1475,6 +1490,7 @@
     navlinks.classList.remove('open');
     hamburger.classList.remove('open');
     hamburger.setAttribute('aria-expanded', 'false');
+    return true;
   }
 
   // intercept every internal link with a data-link attribute
@@ -1534,7 +1550,7 @@
   // year + initial page from URL hash
   document.getElementById('year').textContent = new Date().getFullYear();
   const initial = (location.hash || '#home').slice(1);
-  go(document.getElementById('page-' + initial) ? initial : 'home');
+  if (!go(initial)) go('home');
 </script>
 
 
