@@ -37,8 +37,35 @@
     'contact': 'contact',
     'contact-us': 'contact'
   };
-  const path = location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
-  location.replace('/#' + (routes[path] || 'home'));
+
+  function normalizePath(path){
+    try { path = decodeURIComponent(path); } catch (e) {}
+    return path
+      .replace(/^\/+|\/+$/g, '')
+      .toLowerCase()
+      .replace(/\.(html?|php|aspx?)$/g, '')
+      .replace(/[^a-z0-9/]+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
+  }
+
+  function inferRoute(path){
+    if (routes[path]) return routes[path];
+    const flat = path.replace(/\//g, '-');
+    if (flat.includes('2025') && flat.includes('camp')) return 'camp-2025';
+    if (flat.includes('2026') && flat.includes('camp')) return 'camp-2026';
+    if (flat.includes('starter') && flat.includes('guide')) return 'starter-guide';
+    if (flat.includes('argumentation') || (flat.includes('basic') && flat.includes('argument'))) return 'guide-argumentation';
+    if (flat.includes('resource')) return 'resources';
+    if (flat.includes('project')) return 'project';
+    if (flat.includes('founder') || flat.includes('team')) return 'team';
+    if (flat.includes('contact')) return 'contact';
+    if (flat.includes('camp')) return 'camp';
+    return 'home';
+  }
+
+  const path = normalizePath(location.pathname);
+  location.replace('/#' + inferRoute(path));
 </script>
 </head>
 <body>
