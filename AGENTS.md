@@ -30,6 +30,7 @@ Keep the window between pull and push as short as possible; a co-founder may pub
 - Preserve the router, the scroll-reveal animation classes (`reveal`, `in`, `d1`–`d6`), and the CSS custom properties in the `:root` block. Do not restructure or reformat the file.
 - Do not split `index.html` into multiple files, and do not extract the CSS or JS.
 - Photos are either files in the image folders (`Founder Images/`, `Camp 2026/`, `Kritikal Project/`, `Main Page/`) or base64 data URIs embedded directly in `index.html`. Both are valid — do not "clean up" data URIs into files, or vice versa.
+- Put new image assets in the appropriate asset folder, such as `Site Assets/`, `Founder Images/`, `Camp 2026/`, `Kritikal Project/`, or `Main Page/`. Do not leave generated or uploaded images in the repository root unless a hosting requirement truly needs it.
 - Image folder names contain spaces and capital letters. Match them exactly; GitHub Pages is case-sensitive.
 - `CNAME` maps the custom domain. Never modify or delete it.
 
