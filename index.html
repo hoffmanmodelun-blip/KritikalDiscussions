@@ -22,8 +22,8 @@
        - GitHub Pages: push to a repo, enable Pages, point your domain at it
      Your existing domain (kritikaldiscussions.com) can be pointed to either.
 
-  5) LOGO    -> The wordmark is text for now. To use your logo image instead,
-     see the "LOGO PLACEHOLDER" note in the <header> below.
+  5) LOGO    -> The header brand uses the KD logo image plus the text wordmark.
+     The image is stored at Site Assets/kd-logo.jpg.
   ============================================================================
 -->
 <html lang="en"><head>
@@ -165,7 +165,11 @@
   .nav-inner{display:flex; align-items:center; justify-content:space-between; gap:1rem;}
   .brand{
     font-family:var(--display); font-weight:600; font-size:1.22rem; letter-spacing:-.01em;
-    line-height:1; display:flex; align-items:center;
+    line-height:1; display:inline-flex; align-items:center; gap:.55rem;
+  }
+  .brand-logo{
+    width:34px; height:34px; flex:none; border-radius:8px; object-fit:cover;
+    border:1px solid color-mix(in srgb, var(--brand) 28%, var(--line));
   }
   .brand b{color:var(--brand); font-weight:600;}
 
@@ -592,6 +596,8 @@
 
     .hamburger{display:block;}
     .nav-social{display:none;}
+    .brand{font-size:clamp(1rem,4.2vw,1.18rem); gap:.45rem;}
+    .brand-logo{width:30px; height:30px; border-radius:7px;}
     body.menu-open{overflow:hidden;}
     .nav-links{
       position:fixed; inset:0; min-height:100vh; min-height:100dvh;
@@ -623,14 +629,15 @@
 
 <!-- ===========================================================================
      HEADER / NAV
-     LOGO PLACEHOLDER: to use your logo image instead of the text wordmark,
-     replace the <span class="brand">…</span> below with:
-     <img src="images/logo.svg" alt="Kritikal Discussions" style="height:34px">
+     The brand mark uses the original logo image plus the text wordmark.
      =========================================================================== -->
 <header class="nav scrolled" id="nav">
   <div class="wrap nav-inner">
     <a href="#home" data-link="home" aria-label="Kritikal Discussions home">
-      <span class="brand">Kritikal<b>.</b>Discussions</span>
+      <span class="brand">
+        <img class="brand-logo" src="Site%20Assets/kd-logo.jpg" alt="" aria-hidden="true">
+        <span>Kritikal<b>.</b>Discussions</span>
+      </span>
     </a>
 
     <ul class="nav-links" id="navlinks">
