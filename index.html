@@ -219,6 +219,8 @@
      LAYOUT HELPERS
      ========================================================================== */
   .split{display:grid; grid-template-columns:1fr 1fr; gap:clamp(2rem,5vw,4.5rem); align-items:center;}
+  .split.no-live-visual{grid-template-columns:minmax(0,760px);}
+  .program-grid.single-program{grid-template-columns:minmax(0,560px);}
   .stack-gap > * + *{margin-top:1.1rem;}
   .pillars{display:grid; grid-template-columns:repeat(3,1fr); gap:clamp(1.2rem,3vw,2.4rem); margin-top:3rem;}
   .pillar{padding-top:1.4rem; border-top:2px solid var(--brand);}
@@ -630,7 +632,9 @@
       <li><a href="#home" data-link="home" class="">Home</a></li>
       <li><a href="#team" data-link="team">Our Team</a></li>
       <li><a href="#camp" data-link="camp" class="active">Debate Camp</a></li>
+      <!-- SHELVED NAV ITEM: Kritikal Project is temporarily hidden; restore this link when the page is active again.
       <li><a href="#project" data-link="project">Kritikal Project</a></li>
+      -->
       <li><a href="#resources" data-link="resources">Resources</a></li>
       <li><a href="#contact" data-link="contact">Contact</a></li>
     </ul>
@@ -668,9 +672,9 @@
         <a class="btn btn-ghost" href="#camp" data-link="camp">Explore our programs</a>
       </div>
 
-      <!-- IMAGE PLACEHOLDER (home-hero): replace this whole <div class="ph ph-hero">…</div>
-           with  <img src="images/hero.jpg" alt="Kritikal Discussions debaters" style="border-radius:16px"> -->
-      <div class="ph ph-hero reveal d4" role="img" aria-label="Hero photo placeholder">
+      <!-- HIDDEN PLACEHOLDER (home-hero): intentionally not shown on the live site right now.
+           To restore, remove the hidden attribute and replace with a real hero image. -->
+      <div class="ph ph-hero reveal d4" role="img" aria-label="Hero photo placeholder" hidden>
         <span class="ph-tag">◳ Hero photo</span>
       </div>
     </div>
@@ -705,9 +709,9 @@
     <!-- Programs -->
     <div class="section alt">
       <div class="wrap">
-        <p class="eyebrow reveal">Programs</p>
-        <h2 class="reveal d1">Two ways to get started.</h2>
-        <div class="grid-2" style="margin-top:2.5rem;">
+        <p class="eyebrow reveal">Featured Program</p>
+        <h2 class="reveal d1">Start with our debate camp.</h2>
+        <div class="grid-2 program-grid single-program" style="margin-top:2.5rem;">
           <article class="card program-card reveal d1">
             <img class="program-image" src="Main%20Page/Summer%20Camp%20Placeholder.jpg" alt="Philosophy vs. the K summer camp lecture slide" loading="lazy">
             <div class="body">
@@ -716,7 +720,9 @@
               <a class="card-link" data-link="camp" href="#camp">Learn about the camp <span class="arr">→</span></a>
             </div>
           </article>
-          <article class="card program-card reveal d2">
+          <!-- SHELVED PROGRAM CARD: Kritikal Project is temporarily hidden from the homepage.
+               Remove hidden when the project page is ready to go live again. -->
+          <article class="card program-card reveal d2" hidden>
             <img class="program-image" src="Kritikal%20Project/Kritikal%20Project%20Hero%20Image.jpg" alt="People discussing business plans in a conference room" loading="lazy">
             <div class="body">
               <h3>The Kritikal Project</h3>
@@ -796,15 +802,16 @@
     </div>
 
     <div class="section alt">
-      <div class="wrap split">
+      <div class="wrap split no-live-visual">
         <div class="reveal">
           <p class="eyebrow">Join Us</p>
           <h2>Want to get involved?</h2>
           <p class="lead" style="margin-top:1.1rem;">We're always looking for debaters, mentors, and volunteers who believe debate should be open to all. Whether you're an experienced competitor or just getting started, there's a place for you here.</p>
           <a class="btn btn-primary" href="https://forms.gle/Mxymx9nRs9YmaMvC6" target="_blank" rel="noopener" style="margin-top:1.6rem;">Join us <span class="arr">→</span></a>
         </div>
-        <!-- IMAGE PLACEHOLDER (join): replace with <img src="images/join.jpg" alt="..."> -->
-        <div class="ph ph-card reveal d2" role="img" aria-label="Photo placeholder"><span class="ph-tag">◳ Photo</span></div>
+        <!-- HIDDEN PLACEHOLDER (join): intentionally not shown on the live site right now.
+             To restore, remove hidden and replace with a real image. -->
+        <div class="ph ph-card reveal d2" role="img" aria-label="Photo placeholder" hidden><span class="ph-tag">◳ Photo</span></div>
       </div>
     </div>
   </section>
@@ -1110,9 +1117,11 @@
   </section>
 
   <!-- =======================================================================
-       KRITIKAL PROJECT
+       KRITIKAL PROJECT — SHELVED
+       This section is intentionally kept in the code but hidden from navigation
+       and route access until the project is ready to relaunch.
        ======================================================================= -->
-  <section class="page" id="page-project">
+  <section class="page" id="page-project" data-shelved="true">
     <div class="section" style="padding-top:clamp(8rem,15vw,11rem);">
       <div class="wrap">
         <p class="eyebrow reveal">Kritikal Project</p>
@@ -1416,7 +1425,9 @@
         <li><a data-link="home">Home</a></li>
         <li><a data-link="team">Our Team</a></li>
         <li><a data-link="camp">Debate Camp</a></li>
+        <!-- SHELVED FOOTER LINK: Kritikal Project is temporarily hidden.
         <li><a data-link="project">Kritikal Project</a></li>
+        -->
       </ul>
     </div>
     <div>
@@ -1456,6 +1467,8 @@
     items.forEach(el => revealObserver.observe(el));
   }
 
+  const shelvedRoutes = new Set(['project']);
+
   const routeAliases = {
     'starter-guide': { page: 'guide', nav: 'resources' },
     'basic-argumentation': { page: 'guide-argumentation', nav: 'resources' },
@@ -1476,6 +1489,7 @@
 
   function go(name){
     const route = resolveRoute(name);
+    if (shelvedRoutes.has(route.page)) return false;
     const target = document.getElementById('page-' + route.page);
     if (!target) return false;
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));

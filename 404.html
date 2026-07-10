@@ -29,8 +29,6 @@
     '2025-debate-summer-camp': 'camp-2025',
     '2025-summer-camp': 'camp-2025',
     'debate-camp/2025': 'camp-2025',
-    'project': 'project',
-    'kritikal-project': 'project',
     'team': 'team',
     'our-team': 'team',
     'founders': 'team',
@@ -57,7 +55,6 @@
     if (flat.includes('starter') && flat.includes('guide')) return 'starter-guide';
     if (flat.includes('argumentation') || (flat.includes('basic') && flat.includes('argument'))) return 'guide-argumentation';
     if (flat.includes('resource')) return 'resources';
-    if (flat.includes('project')) return 'project';
     if (flat.includes('founder') || flat.includes('team')) return 'team';
     if (flat.includes('contact')) return 'contact';
     if (flat.includes('camp')) return 'camp';
