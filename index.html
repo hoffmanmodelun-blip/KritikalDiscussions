@@ -592,11 +592,15 @@
 
     .hamburger{display:block;}
     .nav-social{display:none;}
+    body.menu-open{overflow:hidden;}
     .nav-links{
-      position:fixed; inset:0; background:var(--bg); flex-direction:column; justify-content:center;
-      gap:1.6rem; transform:translateY(-102%); transition:transform .5s var(--ease); z-index:55;
+      position:fixed; inset:0; min-height:100vh; min-height:100dvh;
+      background:var(--bg); flex-direction:column; justify-content:center;
+      gap:1.6rem; opacity:0; visibility:hidden; pointer-events:none;
+      transform:translateY(-10px); transition:opacity .25s var(--ease), visibility .25s, transform .35s var(--ease);
+      z-index:55;
     }
-    .nav-links.open{transform:translateY(0);}
+    .nav-links.open{opacity:1; visibility:visible; pointer-events:auto; transform:translateY(0);}
     .nav-links a{font-size:1.5rem; font-family:var(--display);}
     .nav-links a::after{display:none;}
   }
@@ -1508,9 +1512,7 @@
     setReveals(target);
 
     // close mobile menu
-    navlinks.classList.remove('open');
-    hamburger.classList.remove('open');
-    hamburger.setAttribute('aria-expanded', 'false');
+    setMobileMenu(false);
     return true;
   }
 
@@ -1556,11 +1558,16 @@
     showCurriculumTab(tab.dataset.curriculumTab);
   });
 
+  function setMobileMenu(open){
+    navlinks.classList.toggle('open', open);
+    hamburger.classList.toggle('open', open);
+    document.body.classList.toggle('menu-open', open);
+    hamburger.setAttribute('aria-expanded', String(open));
+  }
+
   // mobile menu toggle
   hamburger.addEventListener('click', () => {
-    const open = navlinks.classList.toggle('open');
-    hamburger.classList.toggle('open', open);
-    hamburger.setAttribute('aria-expanded', String(open));
+    setMobileMenu(!navlinks.classList.contains('open'));
   });
 
   // nav background on scroll
