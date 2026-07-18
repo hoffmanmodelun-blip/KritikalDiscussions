@@ -638,7 +638,8 @@ async function loadLatestSite(){
   const btn=$("#loadLatestBtn"),old=btn.textContent;
   btn.disabled=true;btn.textContent="Loading latest website…";
   try{
-    const api="https://api.github.com/repos/hoffmanmodelun-blip/KritikalDiscussions/contents/index.html?ref=main";
+    const repoApi="https://api.github.com/repos/hoffmanmodelun-blip/KritikalDiscussions";
+    const api=repoApi+"/contents/index.html?ref=main&ts="+Date.now();
     const headers={"Accept":"application/vnd.github+json"};
     if(state.gh.token)headers.Authorization="Bearer "+state.gh.token;
     const res=await fetch(api,{headers,cache:"no-store"});
@@ -646,7 +647,19 @@ async function loadLatestSite(){
     const file=await res.json();
     let html="";
     if(file.content) html=b64DecodeUnicode(file.content.replace(/\s/g,""));
-    else if(file.download_url){const raw=await fetch(file.download_url,{cache:"no-store"});if(raw.ok)html=await raw.text();}
+    else if(file.sha){
+      const blobRes=await fetch(repoApi+"/git/blobs/"+encodeURIComponent(file.sha)+"?ts="+Date.now(),{headers,cache:"no-store"});
+      if(blobRes.ok){
+        const blob=await blobRes.json();
+        if(blob.content)html=b64DecodeUnicode(blob.content.replace(/\s/g,""));
+      }
+    }
+    if(!html&&file.download_url){
+      const rawUrl=new URL(file.download_url);
+      rawUrl.searchParams.set("version",file.sha||String(Date.now()));
+      const raw=await fetch(rawUrl.toString(),{cache:"reload"});
+      if(raw.ok)html=await raw.text();
+    }
     if(!html||!/<html/i.test(html))throw new Error("GitHub did not return the website file");
     state.sourceSha=file.sha;bootSite(html);
   }catch(_){
@@ -740,7 +753,7 @@ function afterBoot(iframe){
   $("#tools").style.display = "flex";
   $("#ctxbar").style.display = "flex";
   setMode("preview");
-  toast("Site loaded. Click Edit to start.", "ok");
+  toast(state.sourceSha ? "Latest website loaded (version "+state.sourceSha.slice(0,8)+")." : "Site loaded. Click Edit to start.", "ok");
 }
 
 function rememberTabState(){
