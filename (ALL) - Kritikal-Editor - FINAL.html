@@ -247,12 +247,12 @@
       </div>
       <div class="field">
         <label>File to update in the repo</label>
-        <div class="help">The exact name of your site's file on GitHub. Publishing overwrites <em>this</em> file, so it must match precisely (this is what stops a duplicate file from being created). Default: <code>Kritikal_Discussions_website.html</code>.</div>
-        <input type="text" id="setFile" placeholder="Kritikal_Discussions_website.html" />
+        <div class="help">The exact name of your site's file on GitHub. Publishing overwrites <em>this</em> file, so it must match precisely (this is what stops a duplicate file from being created). Default: <code>index.html</code>.</div>
+        <input type="text" id="setFile" placeholder="index.html" />
       </div>
       <div class="field">
         <label>Access token (kept only in this browser)</label>
-        <div class="help">Since this repository belongs to a teammate and you're a collaborator, use a <strong>classic</strong> token with the <strong>repo</strong> scope (a fine-grained token only reaches repos you own yourself). Alternatively, the repo's owner can create a fine-grained token with Contents: write and share it. Stored only in this browser; sent only to GitHub.</div>
+        <div class="help">Use your own GitHub token with access only to this repository and <strong>Contents: read and write</strong>. Paste it once on each trusted device; it stays in local browser storage and is sent only to GitHub. Never share a token or place one inside this editor file.</div>
         <input type="password" id="setToken" placeholder="github_pat_…" />
       </div>
     </div>
@@ -404,7 +404,7 @@ const state = {
   undo: [],              // snapshots of <body> innerHTML
   tabState: [],          // remembered hidden/active states to restore on export
   baseUrl: "https://kritikaldiscussions.com/",
-  gh: { owner:"hoffmanmodelun-blip", repo:"KritikalDiscussions", branch:"main", token:"", path:"Kritikal_Discussions_website.html" }
+  gh: { owner:"hoffmanmodelun-blip", repo:"KritikalDiscussions", branch:"main", token:"", path:"index.html" }
 };
 
 /* tiny neutral placeholder used for cloned photos awaiting replacement */
@@ -1279,7 +1279,7 @@ $("#saveSettings").addEventListener("click", ()=>{
   state.gh.owner = $("#setOwner").value.trim();
   state.gh.repo = $("#setRepo").value.trim();
   state.gh.branch = $("#setBranch").value.trim() || "main";
-  state.gh.path = $("#setFile").value.trim() || "Kritikal_Discussions_website.html";
+  state.gh.path = $("#setFile").value.trim() || "index.html";
   state.gh.token = $("#setToken").value.trim();
   persist();
   close("settingsModal");
@@ -1290,7 +1290,7 @@ $("#saveSettings").addEventListener("click", ()=>{
     if(b && state.baseUrl) b.setAttribute("href", state.baseUrl);
   }
 });
-const CONFIG_VERSION = 2; // bump to re-pin the default publish target
+const CONFIG_VERSION = 3; // bump to re-pin the default publish target
 function loadSettings(){
   try{
     const raw = localStorage.getItem("kd-editor-settings");
