@@ -33,7 +33,7 @@
   .logo b{color:var(--brand);}
   .logo .tag{font-family:var(--body);font-weight:600;font-size:.62rem;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-soft);border:1px solid var(--line);border-radius:100px;padding:.18rem .5rem;background:var(--surface);}
   .spacer{flex:1;}
-  .tb-group{display:flex;align-items:center;gap:.45rem;}
+  .tb-group{display:flex;align-items:center;gap:.45rem;min-width:0;}
   select.page-jump{
     font:600 .86rem var(--body);color:var(--ink);background:var(--surface);
     border:1px solid var(--line);border-radius:10px;padding:.45rem .7rem;max-width:190px;
@@ -105,7 +105,7 @@
   .field{margin-bottom:1rem;}
   .field label{display:block;font-weight:600;font-size:.85rem;margin-bottom:.35rem;}
   .field .help{font-size:.8rem;color:var(--ink-soft);margin-bottom:.4rem;}
-  .field input,.field textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:.6rem .75rem;font:500 .92rem var(--body);color:var(--ink);}
+  .field input,.field textarea,.field select{width:100%;border:1px solid var(--line);border-radius:10px;padding:.6rem .75rem;font:500 .92rem var(--body);color:var(--ink);background:var(--surface);}
   .field textarea{min-height:80px;resize:vertical;}
   .x{border:0;background:transparent;color:var(--ink-soft);font-size:1.4rem;line-height:1;padding:.2rem;border-radius:8px;}
   .x:hover{background:var(--bg);color:var(--ink);}
@@ -118,6 +118,18 @@
   .help-list{display:grid;gap:.9rem;}
   .help-list h3{font-size:.98rem;display:flex;gap:.5rem;align-items:center;}
   .help-list p{font-size:.9rem;color:var(--ink-soft);margin-top:.2rem;}
+  .modal.wide{max-width:780px;}
+  .tool-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:.75rem;}
+  .tool-card{border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:1rem;text-align:left;min-height:112px;transition:border-color .2s,transform .2s,box-shadow .2s;}
+  .tool-card:hover{border-color:var(--brand);transform:translateY(-2px);box-shadow:var(--shadow);}
+  .tool-card svg{width:24px;height:24px;color:var(--brand);margin-bottom:.55rem;}
+  .tool-card strong{display:block;font-size:.94rem;color:var(--ink);}
+  .tool-card span{display:block;font-size:.78rem;color:var(--ink-soft);line-height:1.45;margin-top:.2rem;white-space:normal;}
+  .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 1rem;}
+  .section-label{font-size:.72rem;letter-spacing:.13em;text-transform:uppercase;color:var(--brand);font-weight:700;margin:0 0 .7rem;}
+  .divider{height:1px;background:var(--line);margin:1.15rem 0;}
+  .check-row{display:flex;align-items:center;gap:.55rem;font-size:.88rem;color:var(--ink);}
+  .check-row input{width:18px;height:18px;accent-color:var(--brand);}
   kbd{background:var(--bg);border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:.05rem .4rem;font:600 .82rem var(--body);}
 
   /* ---------- TOAST ---------- */
@@ -129,9 +141,20 @@
   .toast svg{width:17px;height:17px;flex:none;}
 
   @media (max-width:720px){
-    .logo .tag{display:none;}
+    .logo{display:none;}
+    .spacer{display:none;}
     .tb-label{display:none;}
+    .publish-label{display:none;}
     select.page-jump{max-width:130px;}
+    .form-grid{grid-template-columns:1fr;}
+    .topbar{gap:.35rem;padding-inline:.5rem;}
+    .tb-group{gap:.25rem;flex:1;overflow-x:auto;scrollbar-width:none;}
+    .tb-group::-webkit-scrollbar{display:none;}
+    .btn{padding:.5rem .58rem;}
+    .logo{font-size:.9rem;}
+    .ctxbar{display:block;overflow-x:auto;max-height:112px;}
+    .ctx-what{margin-bottom:.4rem;}
+    .ctx-actions{display:flex;flex-wrap:nowrap !important;margin-left:0;width:max-content;}
   }
 </style>
 </head>
@@ -157,6 +180,21 @@
       </button>
     </div>
 
+    <button class="btn ghost" id="insertBtn" title="Insert a designed section">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+      <span class="tb-label">Insert</span>
+    </button>
+
+    <button class="btn ghost" id="designBtn" title="Animations and design">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3 1.8 4.2L18 9l-4.2 1.8L12 15l-1.8-4.2L6 9l4.2-1.8Z"/><path d="m19 15 .9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9Z"/></svg>
+      <span class="tb-label">Design</span>
+    </button>
+
+    <button class="btn ghost" id="pagesBtn" title="Add and manage pages">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/></svg>
+      <span class="tb-label">Pages</span>
+    </button>
+
     <button class="btn ghost icon" id="undoBtn" title="Undo last change" disabled>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7v6h6"/><path d="M3 13a9 9 0 1 0 3-7l-3 3"/></svg>
     </button>
@@ -171,7 +209,7 @@
 
     <button class="btn primary" id="publishBtn">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
-      Publish changes
+      <span class="publish-label">Publish changes</span>
     </button>
   </div>
 </header>
@@ -185,6 +223,8 @@
     <div class="welcome-card">
       <h1>Edit the Kritikal Discussions site</h1>
       <p>Open your website file below. You'll be able to change text, swap photos, fix links, and add or remove people — all by clicking, no code.</p>
+
+      <button class="btn primary" id="loadLatestBtn" type="button" style="margin-top:1.35rem;padding:.75rem 1.1rem;">Open the latest live website</button>
 
       <div class="drop" id="drop" tabindex="0" role="button" aria-label="Choose your website file">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M5 20h14"/></svg>
@@ -218,6 +258,80 @@
 
 <!-- hidden inputs -->
 <input type="file" id="imgInput" accept="image/*" style="display:none;">
+
+<!-- ============ INSERT MODAL ============ -->
+<div class="overlay hide" id="insertModal">
+  <div class="modal wide">
+    <div class="head"><h2>Insert a section</h2><button class="x" data-close="insertModal">&times;</button></div>
+    <div class="body">
+      <p class="note" style="margin-bottom:1rem;">Choose a layout. It will be added to the bottom of the page you are viewing, ready for you to replace its text and photos.</p>
+      <div class="tool-grid">
+        <button class="tool-card" data-insert-template="text" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h12M4 18h14"/></svg><strong>Text introduction</strong><span>Eyebrow, heading, and lead paragraph.</span></button>
+        <button class="tool-card" data-insert-template="split" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M12 4v16"/></svg><strong>Text + photo</strong><span>Two-column story or program feature.</span></button>
+        <button class="tool-card" data-insert-template="cards" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="5" height="14" rx="1"/><rect x="10" y="5" width="5" height="14" rx="1"/><rect x="17" y="5" width="4" height="14" rx="1"/></svg><strong>Three cards</strong><span>Programs, services, topics, or people.</span></button>
+        <button class="tool-card" data-insert-template="stats" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 20V10M12 20V4M19 20v-7"/></svg><strong>Impact statistics</strong><span>Three large facts with supporting labels.</span></button>
+        <button class="tool-card" data-insert-template="gallery" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="m3 16 5-5 4 4 3-3 6 6"/></svg><strong>Photo gallery</strong><span>Three consistent image slots with captions.</span></button>
+        <button class="tool-card" data-insert-template="faq" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.7 2.7 0 1 1 4.2 2.3c-1 .6-1.7 1.1-1.7 2.2M12 17h.01"/></svg><strong>FAQ</strong><span>Expandable questions and answers.</span></button>
+        <button class="tool-card" data-insert-template="timeline" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3v18M6 7h11M6 12h8M6 17h11"/><circle cx="6" cy="7" r="1"/><circle cx="6" cy="12" r="1"/><circle cx="6" cy="17" r="1"/></svg><strong>Timeline</strong><span>Milestones, schedule, or project process.</span></button>
+        <button class="tool-card" data-insert-template="cta" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg><strong>Call to action</strong><span>Bold closing message and primary button.</span></button>
+      </div>
+    </div>
+    <div class="foot"><button class="btn ghost" data-close="insertModal">Cancel</button></div>
+  </div>
+</div>
+
+<!-- ============ DESIGN MODAL ============ -->
+<div class="overlay hide" id="designModal">
+  <div class="modal wide">
+    <div class="head"><h2>Design and animation</h2><button class="x" data-close="designModal">&times;</button></div>
+    <div class="body">
+      <div class="note" id="designTargetLabel" style="margin-bottom:1rem;"></div>
+      <div class="form-grid">
+        <div class="field"><label>Apply to</label><select id="designScope"><option value="element">Selected element</option><option value="item">Card or block</option><option value="section">Whole section</option><option value="page">Whole page</option></select></div>
+        <div class="field"><label>Entrance animation</label><select id="motionPreset"><option value="none">None</option><option value="fade-up">Fade up</option><option value="fade">Fade</option><option value="slide-left">Slide from left</option><option value="slide-right">Slide from right</option><option value="zoom">Gentle zoom</option><option value="pop">Pop in</option><option value="blur">Focus in</option></select></div>
+        <div class="field"><label>Delay</label><select id="motionDelay"><option value="0">No delay</option><option value="100">0.1 seconds</option><option value="200">0.2 seconds</option><option value="300">0.3 seconds</option><option value="450">0.45 seconds</option><option value="600">0.6 seconds</option><option value="800">0.8 seconds</option></select></div>
+        <div class="field"><label>Speed</label><select id="motionSpeed"><option value="450">Fast</option><option value="800">Normal</option><option value="1200">Slow</option></select></div>
+        <div class="field"><label>Text alignment</label><select id="designAlign"><option value="">Keep current</option><option value="left">Left</option><option value="center">Center</option><option value="right">Right</option></select></div>
+        <div class="field"><label>Text size</label><select id="designTextSize"><option value="keep">Keep current</option><option value="standard">Standard</option><option value="lead">Lead</option><option value="small">Small</option><option value="display">Display</option></select></div>
+        <div class="field"><label>Text color</label><select id="designTextColor"><option value="keep">Keep current</option><option value="ink">Dark ink</option><option value="soft">Soft gray</option><option value="brand">Brand teal</option><option value="white">White</option></select></div>
+        <div class="field"><label>Section background</label><select id="designBackground"><option value="keep">Keep current</option><option value="default">Paper</option><option value="alt">Soft gray</option><option value="tint">Teal tint</option><option value="brand">Brand teal</option></select></div>
+        <div class="field"><label>Visibility</label><select id="designVisibility"><option value="show">Shown on site</option><option value="hide">Hidden but kept in editor</option></select></div>
+        <div class="field"><label>Page transition</label><select id="pageTransition"><option value="default">Soft rise</option><option value="fade">Fade</option><option value="slide">Slide in</option><option value="zoom">Gentle zoom</option><option value="none">None</option></select></div>
+      </div>
+      <div class="note">Animations respect visitors who prefer reduced motion. Hidden content remains faintly visible while editing so it can always be restored.</div>
+    </div>
+    <div class="foot"><button class="btn ghost" id="previewMotion" type="button">Preview animation</button><button class="btn ghost" data-close="designModal">Cancel</button><button class="btn primary" id="applyDesign" type="button">Apply design</button></div>
+  </div>
+</div>
+
+<!-- ============ PAGES MODAL ============ -->
+<div class="overlay hide" id="pagesModal">
+  <div class="modal wide">
+    <div class="head"><h2>Pages</h2><button class="x" data-close="pagesModal">&times;</button></div>
+    <div class="body">
+      <p class="section-label">Current page</p>
+      <div class="form-grid">
+        <div class="field"><label>Page name</label><input type="text" id="currentPageTitle" /></div>
+        <div class="field"><label>URL name</label><input type="text" id="currentPageSlug" /><div class="help">Lowercase words and hyphens, such as <code>mentor-program</code>.</div></div>
+      </div>
+      <label class="check-row"><input type="checkbox" id="currentPageInNav" /> Show this page in the header and footer menus</label>
+      <div style="display:flex;gap:.55rem;flex-wrap:wrap;margin-top:1rem;"><button class="btn primary" id="savePageSettings" type="button">Save page settings</button><button class="btn danger" id="deletePage" type="button">Delete created page</button></div>
+      <div class="divider"></div>
+      <p class="section-label">Create a page</p>
+      <div class="form-grid">
+        <div class="field"><label>New page name</label><input type="text" id="newPageTitle" placeholder="Mentor Program" /></div>
+        <div class="field"><label>URL name</label><input type="text" id="newPageSlug" placeholder="mentor-program" /></div>
+      </div>
+      <label class="check-row"><input type="checkbox" id="newPageInNav" checked /> Add the new page to the header and footer menus</label>
+      <div class="tool-grid" style="margin-top:1rem;">
+        <button class="tool-card" data-new-page="blank" type="button"><strong>Blank page</strong><span>Hero and an empty content section.</span></button>
+        <button class="tool-card" data-new-page="project" type="button"><strong>Project page</strong><span>Hero, details, impact cards, gallery, and call to action.</span></button>
+      </div>
+      <div class="note" style="margin-top:1rem;">New pages work immediately through the site's hash navigation. Google-friendly folder URLs still require a developer to add a small redirect file later.</div>
+    </div>
+    <div class="foot"><button class="btn ghost" data-close="pagesModal">Close</button></div>
+  </div>
+</div>
 
 <!-- ============ SETTINGS MODAL ============ -->
 <div class="overlay hide" id="settingsModal">
@@ -371,7 +485,19 @@
           <p>Press the <strong>Undo</strong> arrow in the top bar. And once published, the site keeps every old version on GitHub, so it can always be restored.</p>
         </div>
         <div>
-          <h3>8 · Publish</h3>
+          <h3>8 · Insert designed sections</h3>
+          <p>Use <strong>Insert</strong> for ready-made text, photo, card, statistics, gallery, FAQ, timeline, and call-to-action layouts. They automatically match the website.</p>
+        </div>
+        <div>
+          <h3>9 · Animate and style</h3>
+          <p>Select something and open <strong>Design</strong>. Choose an entrance effect, timing, alignment, background, visibility, or page transition. Use Preview animation to test it.</p>
+        </div>
+        <div>
+          <h3>10 · Create and manage pages</h3>
+          <p>Use <strong>Pages</strong> to create a blank or complete project page, rename it, change its URL name, or show and hide it in the menus. Pages made by the editor can also be deleted safely.</p>
+        </div>
+        <div>
+          <h3>11 · Publish</h3>
           <p>Click the green <strong>Publish changes</strong> button and follow the steps. Your changes go live in about a minute.</p>
         </div>
       </div>
@@ -395,11 +521,14 @@ const $$ = (s,r=document)=>Array.from(r.querySelectorAll(s));
 
 const state = {
   prefix: "",            // doctype + leading comment captured from source
+  sourceHtml: "",        // exact source used to start this editing session
+  sourceSha: null,        // GitHub version when loaded through the latest button
   loaded: false,
   mode: "preview",       // 'preview' | 'edit'
   doc: null,             // iframe document
   win: null,             // iframe window
   selected: null,        // currently selected element (in iframe)
+  designTarget: null,    // element currently being styled
   activeEditable: null,  // element currently contentEditable
   undo: [],              // snapshots of <body> innerHTML
   tabState: [],          // remembered hidden/active states to restore on export
@@ -411,6 +540,50 @@ const state = {
 const PLACEHOLDER_IMG =
  "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(
  "<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400'><rect width='100%' height='100%' fill='%23E9F1EF'/><text x='50%' y='50%' fill='%23889d99' font-family='sans-serif' font-size='22' text-anchor='middle' dominant-baseline='middle'>Click to add photo</text></svg>");
+
+const MOTION_CLASSES = ["kd-motion-fade-up","kd-motion-fade","kd-motion-slide-left","kd-motion-slide-right","kd-motion-zoom","kd-motion-pop","kd-motion-blur"];
+const PAGE_TRANSITION_CLASSES = ["kd-page-fade","kd-page-slide","kd-page-zoom","kd-page-none"];
+const TEXT_SIZE_CLASSES = ["kd-text-lead","kd-text-small","kd-text-display"];
+const TEXT_COLOR_CLASSES = ["kd-color-ink","kd-color-soft","kd-color-brand","kd-color-white"];
+const SITE_BUILDER_CSS = `
+  .reveal.kd-motion{transition-duration:var(--kd-duration,.8s);transition-delay:var(--kd-delay,0ms);}
+  .reveal.kd-motion-fade{transform:none;}
+  .reveal.kd-motion-slide-left{transform:translateX(-42px);}
+  .reveal.kd-motion-slide-right{transform:translateX(42px);}
+  .reveal.kd-motion-zoom{transform:scale(.94);}
+  .reveal.kd-motion-pop{transform:translateY(16px) scale(.9);}
+  .reveal.kd-motion-blur{transform:translateY(10px);filter:blur(8px);}
+  .reveal.in.kd-motion{opacity:1;transform:none;}
+  .reveal.in.kd-motion-blur{filter:none;}
+  .page.active.kd-page-fade{animation:kdPageFade .55s var(--ease);}
+  .page.active.kd-page-slide{animation:kdPageSlide .6s var(--ease);}
+  .page.active.kd-page-zoom{animation:kdPageZoom .55s var(--ease);}
+  .page.active.kd-page-none{animation:none;}
+  .kd-site-hidden{display:none !important;}
+  .kd-faq{display:grid;gap:.75rem;margin-top:2rem;}
+  .kd-faq details{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:1rem 1.15rem;}
+  .kd-faq summary{cursor:pointer;font-weight:600;color:var(--ink);}
+  .kd-faq details p{margin-top:.7rem;}
+  .kd-gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:2rem;}
+  .kd-gallery figure{margin:0;}
+  .kd-gallery figcaption{font-size:.88rem;color:var(--ink-soft);margin-top:.55rem;}
+  .kd-builder-photo{width:100%;aspect-ratio:16/10;object-fit:cover;display:block;border-radius:8px;border:1px solid var(--line);}
+  .kd-builder-photo.kd-builder-portrait{aspect-ratio:4/5;}
+  .kd-builder-photo.kd-builder-wide{aspect-ratio:16/7;}
+  .kd-timeline{display:grid;gap:1.1rem;margin-top:2rem;border-left:2px solid var(--brand);padding-left:1.35rem;}
+  .kd-timeline article{position:relative;}
+  .kd-timeline article::before{content:"";position:absolute;width:10px;height:10px;border-radius:50%;background:var(--brand);left:-1.7rem;top:.42rem;}
+  .kd-stat-value{font-family:var(--display);font-size:clamp(2rem,4vw,3.2rem);line-height:1;color:var(--brand);margin-bottom:.55rem;}
+  .kd-text-lead{font-size:1.25rem !important;line-height:1.65;}
+  .kd-text-small{font-size:.9rem !important;}
+  .kd-text-display{font-family:var(--display);font-size:clamp(2.6rem,6vw,5rem) !important;line-height:1.08;}
+  .kd-color-ink{color:var(--ink) !important;}.kd-color-soft{color:var(--ink-soft) !important;}.kd-color-brand{color:var(--brand) !important;}.kd-color-white{color:#fff !important;}
+  @keyframes kdPageFade{from{opacity:0}to{opacity:1}}
+  @keyframes kdPageSlide{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:none}}
+  @keyframes kdPageZoom{from{opacity:0;transform:scale(.975)}to{opacity:1;transform:none}}
+  @media(max-width:760px){.kd-gallery{grid-template-columns:1fr;}}
+  @media(prefers-reduced-motion:reduce){.reveal.kd-motion,.page.active[class*="kd-page-"]{animation:none !important;transition:none !important;filter:none !important;transform:none !important;}}
+`;
 
 /* ---- selectors describing the site's structure ---- */
 const BLOCK_SEL = "h1,h2,h3,h4,h5,p,li,td,th,blockquote,figcaption,.eyebrow,.role,.label,.kicker,.num,.byline,.pill,.brand";
@@ -444,13 +617,14 @@ drop.addEventListener("drop", e=>{
 });
 $("#urlBtn").addEventListener("click", loadFromUrl);
 $("#urlInput").addEventListener("keydown", e=>{ if(e.key==="Enter") loadFromUrl(); });
+$("#loadLatestBtn").addEventListener("click", loadLatestSite);
 
 function readFile(file){
   if(!/\.html?$/i.test(file.name) && file.type!=="text/html"){
     toast("That doesn't look like an .html file.", "err"); return;
   }
   const r = new FileReader();
-  r.onload = ()=> bootSite(r.result);
+  r.onload = ()=>{state.sourceSha=null;bootSite(r.result);};
   r.onerror = ()=> toast("Couldn't read that file.", "err");
   r.readAsText(file);
 }
@@ -458,6 +632,31 @@ function readFile(file){
 async function loadFromUrl(){
   const url = $("#urlInput").value.trim();
   if(!url){ toast("Paste a link first.", "err"); return; }
+  return loadSiteUrl(url);
+}
+async function loadLatestSite(){
+  const btn=$("#loadLatestBtn"),old=btn.textContent;
+  btn.disabled=true;btn.textContent="Loading latest website…";
+  try{
+    const api="https://api.github.com/repos/hoffmanmodelun-blip/KritikalDiscussions/contents/index.html?ref=main";
+    const headers={"Accept":"application/vnd.github+json"};
+    if(state.gh.token)headers.Authorization="Bearer "+state.gh.token;
+    const res=await fetch(api,{headers,cache:"no-store"});
+    if(!res.ok)throw new Error(String(res.status));
+    const file=await res.json();
+    let html="";
+    if(file.content) html=b64DecodeUnicode(file.content.replace(/\s/g,""));
+    else if(file.download_url){const raw=await fetch(file.download_url,{cache:"no-store"});if(raw.ok)html=await raw.text();}
+    if(!html||!/<html/i.test(html))throw new Error("GitHub did not return the website file");
+    state.sourceSha=file.sha;bootSite(html);
+  }catch(_){
+    state.sourceSha=null;
+    await loadSiteUrl("https://raw.githubusercontent.com/hoffmanmodelun-blip/KritikalDiscussions/main/index.html?ts="+Date.now());
+  }
+  finally{btn.disabled=false;btn.textContent=old;}
+}
+async function loadSiteUrl(url){
+  state.sourceSha=null;
   try{
     const res = await fetch(url, {mode:"cors"});
     if(!res.ok) throw new Error(res.status);
@@ -466,6 +665,7 @@ async function loadFromUrl(){
     bootSite(txt);
   }catch(err){
     toast("Couldn't load from that link (the site may block it). Try downloading the file and dropping it in instead.", "err");
+    return false;
   }
 }
 
@@ -481,6 +681,7 @@ function injectIntoHead(srcHtml, tags){
   return tags + srcHtml;
 }
 function bootSite(html){
+  state.sourceHtml=String(html);
   // capture everything before <html> (doctype + the maintenance comment)
   const m = html.search(/<html[\s>]/i);
   state.prefix = m > 0 ? html.slice(0, m) : "<!DOCTYPE html>\n";
@@ -494,7 +695,8 @@ function bootSite(html){
     "body.kd-edit [data-kd-text]{cursor:text;}"+
     "body.kd-edit [data-kd-text]:hover{outline:2px dashed rgba(0,115,111,.45);outline-offset:2px;border-radius:3px;}"+
     "body.kd-edit [data-kd-img]:hover,body.kd-edit [data-kd-ctrl]:hover{outline:2px dashed rgba(0,115,111,.7);outline-offset:2px;cursor:pointer;border-radius:6px;}"+
-    "body.kd-edit .reveal{opacity:1 !important;transform:none !important;}"+
+    "body.kd-edit:not(.kd-playing) .reveal{opacity:1 !important;transform:none !important;filter:none !important;}"+
+    "body.kd-edit .kd-site-hidden{display:block !important;opacity:.42 !important;outline:2px dashed #B4541E !important;outline-offset:3px;}"+
     "body.kd-edit [data-camp-panel][hidden],body.kd-edit [data-curriculum-panel][hidden]{display:block !important;outline:1px dashed var(--line);outline-offset:6px;}"+
     ".kd-sel{outline:3px solid #00736F !important;outline-offset:2px;border-radius:4px;}"+
     "[contenteditable=true]{outline:3px solid #00736F !important;outline-offset:2px;background:rgba(0,115,111,.04);}"+
@@ -571,6 +773,81 @@ function tagEditables(){
   });
 }
 
+function ensureSiteBuilderStyles(){
+  let style = state.doc.getElementById("kd-site-builder-styles");
+  if(!style){
+    style = state.doc.createElement("style");
+    style.id = "kd-site-builder-styles";
+    style.textContent = SITE_BUILDER_CSS;
+    state.doc.head.appendChild(style);
+  }
+  return style;
+}
+function currentPage(){
+  return $("section.page.active", state.doc) || state.doc.getElementById("page-"+$("#pageJump").value) || $("section.page", state.doc);
+}
+function sectionOf(el){ return el && el.closest ? el.closest(".section") : null; }
+function createSiteNode(html){
+  const t = state.doc.createElement("template");
+  t.innerHTML = html.trim();
+  return t.content.firstElementChild;
+}
+
+/* ============================ INSERT SECTIONS ============================ */
+const SECTION_TEMPLATES = {
+  text: `<div class="section"><div class="wrap"><p class="eyebrow reveal">New section</p><h2 class="reveal d1">A clear, compelling heading.</h2><p class="lead reveal d2" style="margin-top:1.2rem;">Add the important details here. Keep this opening focused so visitors quickly understand the idea.</p></div></div>`,
+  split: `<div class="section alt"><div class="wrap split"><div class="reveal"><p class="eyebrow">Featured story</p><h2>Tell the story behind the work.</h2><p class="lead" style="margin-top:1.1rem;">Use this area for a project, announcement, person, or program. Replace the photo and edit every line directly.</p><a class="btn btn-primary" href="#" style="margin-top:1.4rem;">Learn more <span class="arr">→</span></a></div><div class="ph ph-card reveal d2" role="img" aria-label="Photo placeholder"><span class="ph-tag">Photo</span></div></div></div>`,
+  cards: `<div class="section"><div class="wrap"><p class="eyebrow reveal">Highlights</p><h2 class="reveal d1">Three things to know.</h2><div class="grid-cards" style="margin-top:2.2rem;"><article class="card reveal d1"><h3>First idea</h3><p>Explain the first program, benefit, or topic.</p><a class="card-link" href="#">Learn more <span class="arr">→</span></a></article><article class="card reveal d2"><h3>Second idea</h3><p>Explain the second program, benefit, or topic.</p><a class="card-link" href="#">Learn more <span class="arr">→</span></a></article><article class="card reveal d3"><h3>Third idea</h3><p>Explain the third program, benefit, or topic.</p><a class="card-link" href="#">Learn more <span class="arr">→</span></a></article></div></div></div>`,
+  stats: `<div class="section tint"><div class="wrap"><p class="eyebrow reveal">Our impact</p><h2 class="reveal d1">Progress you can measure.</h2><div class="grid-cards" style="margin-top:2.2rem;"><div class="card reveal d1"><p class="kd-stat-value">100+</p><h3>Students reached</h3><p>Add a short explanation of this number.</p></div><div class="card reveal d2"><p class="kd-stat-value">12</p><h3>States represented</h3><p>Add a short explanation of this number.</p></div><div class="card reveal d3"><p class="kd-stat-value">$0</p><h3>Cost to students</h3><p>Add a short explanation of this number.</p></div></div></div></div>`,
+  gallery: `<div class="section"><div class="wrap"><p class="eyebrow reveal">Gallery</p><h2 class="reveal d1">See the work in action.</h2><div class="kd-gallery"><figure class="reveal d1"><div class="ph ph-card" role="img" aria-label="Photo placeholder"><span class="ph-tag">Photo</span></div><figcaption>Photo caption</figcaption></figure><figure class="reveal d2"><div class="ph ph-card" role="img" aria-label="Photo placeholder"><span class="ph-tag">Photo</span></div><figcaption>Photo caption</figcaption></figure><figure class="reveal d3"><div class="ph ph-card" role="img" aria-label="Photo placeholder"><span class="ph-tag">Photo</span></div><figcaption>Photo caption</figcaption></figure></div></div></div>`,
+  faq: `<div class="section alt"><div class="wrap"><p class="eyebrow reveal">Questions</p><h2 class="reveal d1">Frequently asked questions.</h2><div class="kd-faq reveal d2"><details open><summary>Who is this for?</summary><p>Add a concise answer here.</p></details><details><summary>How does it work?</summary><p>Add a concise answer here.</p></details><details><summary>How can I participate?</summary><p>Add a concise answer here.</p></details></div></div></div>`,
+  timeline: `<div class="section"><div class="wrap"><p class="eyebrow reveal">Timeline</p><h2 class="reveal d1">How the project unfolds.</h2><div class="kd-timeline reveal d2"><article><p class="role">Step 1</p><h3>Start here</h3><p>Describe the first milestone or activity.</p></article><article><p class="role">Step 2</p><h3>Build momentum</h3><p>Describe the next milestone or activity.</p></article><article><p class="role">Step 3</p><h3>Share the result</h3><p>Describe the final milestone or activity.</p></article></div></div></div>`,
+  cta: `<div class="section cta-band"><div class="wrap reveal"><h2>Ready to get involved?</h2><p>Give visitors one clear reason to take the next step.</p><a class="btn btn-primary" href="#">Take action <span class="arr">→</span></a></div></div>`
+};
+
+function insertSectionTemplate(type){
+  const page = currentPage();
+  const html = SECTION_TEMPLATES[type];
+  if(!page || !html) return;
+  snapshot();
+  ensureSiteBuilderStyles();
+  const section = createSiteNode(html);
+  page.appendChild(section);
+  retagWithin(section);
+  close("insertModal");
+  setMode("edit");
+  const focus = section.querySelector("h2") || section;
+  selectElement(focus);
+  section.scrollIntoView({behavior:"smooth",block:"start"});
+  toast("Section added. Click its text, photos, and buttons to customize it.", "ok");
+}
+$$('[data-insert-template]').forEach(b=>b.addEventListener("click", ()=>insertSectionTemplate(b.dataset.insertTemplate)));
+$("#insertBtn").addEventListener("click", ()=>{ if(state.loaded) open("insertModal"); });
+
+function moveSection(section, dir){
+  if(!section) return;
+  const sibling = dir < 0 ? section.previousElementSibling : section.nextElementSibling;
+  if(!sibling || !sibling.classList.contains("section")){ toast("That section is already at the edge of the page."); return; }
+  snapshot();
+  if(dir < 0) section.parentNode.insertBefore(section, sibling);
+  else section.parentNode.insertBefore(sibling, section);
+  section.scrollIntoView({behavior:"smooth",block:"start"});
+}
+function duplicateSection(section){
+  if(!section) return;
+  snapshot();
+  const clone = section.cloneNode(true);
+  clone.querySelectorAll("[id]").forEach(n=>n.removeAttribute("id"));
+  section.after(clone);
+  retagWithin(clone);
+  clone.scrollIntoView({behavior:"smooth",block:"start"});
+  toast("Section duplicated.", "ok");
+}
+function removeSection(section){
+  if(!section || !confirm("Remove this whole section? You can press Undo if it was a mistake.")) return;
+  snapshot(); section.remove(); clearSelection(); toast("Section removed.", "ok");
+}
+
 /* ============================ PAGE NAV ============================ */
 function pageName(sec){
   const id = sec.id.replace(/^page-/, "");
@@ -594,7 +871,13 @@ function buildPageJump(){
 }
 function gotoPage(name){
   try{
-    if(typeof state.win.go === "function"){ state.win.go(name); }
+    if(typeof state.win.go === "function"){
+      const moved=state.win.go(name);
+      if(moved===false){
+        $$(".page", state.doc).forEach(p=>p.classList.remove("active"));
+        const t=state.doc.getElementById("page-"+name);if(t)t.classList.add("active");
+      }
+    }
     else {
       $$(".page", state.doc).forEach(p=>p.classList.remove("active"));
       const t = state.doc.getElementById("page-"+name); if(t) t.classList.add("active");
@@ -607,6 +890,183 @@ function gotoPage(name){
   if(state.mode==="edit") state.doc.body.classList.add("kd-edit");
   clearSelection();
 }
+
+/* ============================ PAGE MANAGER ============================ */
+function slugify(value){
+  return String(value||"").toLowerCase().trim().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"");
+}
+function pageTitle(page){
+  const h = page && page.querySelector("h1,.page-title");
+  return h ? h.textContent.trim().replace(/[.]+$/,"") : "Untitled page";
+}
+function menuLinksFor(slug){
+  return $$('[data-link="'+CSS.escape(slug)+'"]', state.doc).filter(a=>a.closest("#navlinks,footer.site"));
+}
+function setPageInMenus(page, enabled, label){
+  const slug = page.id.replace(/^page-/,"");
+  menuLinksFor(slug).forEach(a=>{ const li=a.closest("li"); if(li) li.remove(); else a.remove(); });
+  page.dataset.kdNavLabel = label;
+  if(!enabled) return;
+  const nav = state.doc.getElementById("navlinks");
+  if(nav){
+    const li=state.doc.createElement("li"), a=state.doc.createElement("a");
+    a.href="#"+slug; a.dataset.link=slug; a.textContent=label; li.appendChild(a); nav.appendChild(li);
+  }
+  const footerList = $("footer.site .wrap > div:nth-child(2) ul", state.doc);
+  if(footerList){
+    const li=state.doc.createElement("li"), a=state.doc.createElement("a");
+    a.href="#"+slug; a.dataset.link=slug; a.textContent=label; li.appendChild(a); footerList.appendChild(li);
+  }
+  tagEditables();
+}
+function openPagesManager(){
+  const page=currentPage(); if(!page) return;
+  const slug=page.id.replace(/^page-/,"");
+  $("#currentPageTitle").value=pageTitle(page);
+  $("#currentPageSlug").value=slug;
+  $("#currentPageSlug").disabled=slug==="home";
+  $("#currentPageInNav").checked=menuLinksFor(slug).length>0;
+  $("#deletePage").disabled=page.dataset.kdCreated!=="true";
+  $("#newPageTitle").value=""; $("#newPageSlug").value="";
+  open("pagesModal");
+}
+$("#pagesBtn").addEventListener("click", ()=>{ if(state.loaded) openPagesManager(); });
+$("#newPageTitle").addEventListener("input", ()=>{ if(!$("#newPageSlug").dataset.edited) $("#newPageSlug").value=slugify($("#newPageTitle").value); });
+$("#newPageSlug").addEventListener("input", ()=>$("#newPageSlug").dataset.edited="true");
+
+$("#savePageSettings").addEventListener("click", ()=>{
+  const page=currentPage(); if(!page) return;
+  const oldSlug=page.id.replace(/^page-/,"");
+  const title=$("#currentPageTitle").value.trim()||pageTitle(page);
+  const newSlug=oldSlug==="home"?"home":(slugify($("#currentPageSlug").value)||oldSlug);
+  const collision=state.doc.getElementById("page-"+newSlug);
+  if(collision && collision!==page){ toast("That URL name is already used by another page.","err"); return; }
+  snapshot();
+  const heading=page.querySelector("h1,.page-title"); if(heading) heading.textContent=title;
+  if(newSlug!==oldSlug){
+    page.id="page-"+newSlug;
+    $$('[data-link="'+CSS.escape(oldSlug)+'"]',state.doc).forEach(a=>{a.dataset.link=newSlug;a.setAttribute("href","#"+newSlug);});
+  }
+  setPageInMenus(page,$("#currentPageInNav").checked,title);
+  buildPageJump(); $("#pageJump").value=newSlug;
+  close("pagesModal"); toast("Page settings saved.","ok");
+});
+
+function newPageMarkup(kind,title,slug){
+  const hero=`<div class="section" style="padding-top:clamp(8rem,15vw,11rem);"><div class="wrap"><p class="eyebrow reveal">New page</p><h1 class="page-title reveal d1">${escapeHtml(title)}.</h1><p class="lead reveal d2" style="margin-top:1.2rem;">Add a concise introduction for this page.</p></div></div>`;
+  if(kind==="project") return `<section class="page" id="page-${slug}" data-kd-created="true">${hero}<div class="section alt"><div class="wrap split"><div class="reveal"><p class="eyebrow">About the project</p><h2>What are you building?</h2><p class="lead" style="margin-top:1.1rem;">Explain the problem, the idea, and who it serves.</p><a class="btn btn-primary" href="#" style="margin-top:1.4rem;">Get involved <span class="arr">→</span></a></div><div class="ph ph-card reveal d2" role="img" aria-label="Project photo placeholder"><span class="ph-tag">Project photo</span></div></div></div>${SECTION_TEMPLATES.stats}${SECTION_TEMPLATES.gallery}${SECTION_TEMPLATES.cta}</section>`;
+  return `<section class="page" id="page-${slug}" data-kd-created="true">${hero}<div class="section alt"><div class="wrap"><p class="eyebrow reveal">Overview</p><h2 class="reveal d1">Start building this page.</h2><p class="lead reveal d2" style="margin-top:1.2rem;">Use Insert to add cards, photos, statistics, FAQs, timelines, and calls to action.</p></div></div></section>`;
+}
+function addPage(kind){
+  const title=$("#newPageTitle").value.trim();
+  const slug=slugify($("#newPageSlug").value||title);
+  if(!title||!slug){ toast("Add a page name first.","err"); return; }
+  if(state.doc.getElementById("page-"+slug)){ toast("That URL name is already used.","err"); return; }
+  snapshot(); ensureSiteBuilderStyles();
+  const page=createSiteNode(newPageMarkup(kind,title,slug));
+  const main=state.doc.querySelector("main"); main.appendChild(page);
+  retagWithin(page);
+  setPageInMenus(page,$("#newPageInNav").checked,title);
+  buildPageJump(); close("pagesModal"); gotoPage(slug); setMode("edit");
+  toast(title+" page created.","ok");
+}
+$$('[data-new-page]').forEach(b=>b.addEventListener("click",()=>addPage(b.dataset.newPage)));
+$("#deletePage").addEventListener("click",()=>{
+  const page=currentPage(); if(!page||page.dataset.kdCreated!=="true") return;
+  const slug=page.id.replace(/^page-/,"");
+  if(!confirm("Delete the created page ‘"+pageTitle(page)+"’? You can press Undo until you publish.")) return;
+  snapshot(); menuLinksFor(slug).forEach(a=>{const li=a.closest("li");if(li)li.remove();else a.remove();}); page.remove();
+  close("pagesModal"); buildPageJump(); gotoPage("home"); toast("Created page deleted.","ok");
+});
+
+/* ============================ DESIGN + MOTION ============================ */
+function motionName(el){
+  const found=MOTION_CLASSES.find(c=>el.classList.contains(c));
+  return found?found.replace("kd-motion-",""):"none";
+}
+function motionTargetFor(target){ return target.matches("section.page")?(target.querySelector(".section")||target):target; }
+function pageTransitionName(page){
+  const found=PAGE_TRANSITION_CLASSES.find(c=>page.classList.contains(c));
+  return found?found.replace("kd-page-",""):"default";
+}
+function classChoice(el,classes,prefix,fallback){const found=classes.find(c=>el.classList.contains(c));return found?found.replace(prefix,""):fallback;}
+function resolveDesignTarget(scope){
+  const base=state.selected||currentPage();
+  if(scope==="page") return base.closest(".page")||currentPage();
+  if(scope==="section") return sectionOf(base)||currentPage();
+  if(scope==="item") return repeatableItem(base)||sectionOf(base)||base;
+  return base;
+}
+function openDesign(){
+  if(!state.loaded) return;
+  const selected=state.selected;
+  $("#designScope").value=selected?"element":"page";
+  state.designTarget=resolveDesignTarget($("#designScope").value);
+  syncDesignForm(); open("designModal");
+}
+function syncDesignForm(){
+  const target=resolveDesignTarget($("#designScope").value); state.designTarget=target;
+  const motionTarget=motionTargetFor(target);
+  const page=target.closest(".page")||currentPage();
+  $("#designTargetLabel").innerHTML="Editing <strong>"+escapeHtml(describe(target))+"</strong> on “"+escapeHtml(pageTitle(page))+".”";
+  $("#motionPreset").value=motionName(motionTarget);
+  $("#motionDelay").value=String(parseInt(motionTarget.style.getPropertyValue("--kd-delay"),10)||0);
+  $("#motionSpeed").value=String(parseInt(motionTarget.style.getPropertyValue("--kd-duration"),10)||800);
+  $("#designAlign").value=target.style.textAlign||"";
+  $("#designTextSize").value=classChoice(target,TEXT_SIZE_CLASSES,"kd-text-","keep");
+  $("#designTextColor").value=classChoice(target,TEXT_COLOR_CLASSES,"kd-color-","keep");
+  const section=target.classList.contains("section")?target:sectionOf(target);
+  $("#designBackground").value=!section?"keep":section.classList.contains("cta-band")?"brand":section.classList.contains("tint")?"tint":section.classList.contains("alt")?"alt":"default";
+  $("#designVisibility").value=target.classList.contains("kd-site-hidden")?"hide":"show";
+  $("#pageTransition").value=pageTransitionName(page);
+}
+$("#designScope").addEventListener("change",syncDesignForm);
+$("#designBtn").addEventListener("click",openDesign);
+
+function applyDesignSettings(closeAfter=true){
+  const target=resolveDesignTarget($("#designScope").value); if(!target)return null;
+  const motionTarget=motionTargetFor(target);
+  snapshot(); ensureSiteBuilderStyles();
+  const preset=$("#motionPreset").value;
+  MOTION_CLASSES.forEach(c=>motionTarget.classList.remove(c));
+  if(preset!=="none"){
+    if(!motionTarget.classList.contains("reveal")){motionTarget.classList.add("reveal");motionTarget.dataset.kdMotionReveal="true";}
+    motionTarget.classList.add("kd-motion","kd-motion-"+preset);
+    motionTarget.style.setProperty("--kd-delay",$("#motionDelay").value+"ms");
+    motionTarget.style.setProperty("--kd-duration",$("#motionSpeed").value+"ms");
+  }else{
+    motionTarget.classList.remove("kd-motion");
+    motionTarget.style.removeProperty("--kd-delay");motionTarget.style.removeProperty("--kd-duration");
+    if(motionTarget.dataset.kdMotionReveal==="true"){motionTarget.classList.remove("reveal","in");delete motionTarget.dataset.kdMotionReveal;}
+  }
+  const align=$("#designAlign").value;if(align)target.style.textAlign=align;
+  const textSize=$("#designTextSize").value;
+  if(textSize!=="keep"){TEXT_SIZE_CLASSES.forEach(c=>target.classList.remove(c));if(textSize!=="standard")target.classList.add("kd-text-"+textSize);}
+  const textColor=$("#designTextColor").value;
+  if(textColor!=="keep"){TEXT_COLOR_CLASSES.forEach(c=>target.classList.remove(c));target.classList.add("kd-color-"+textColor);}
+  target.classList.toggle("kd-site-hidden",$("#designVisibility").value==="hide");
+  const section=target.classList.contains("section")?target:sectionOf(target);
+  const bg=$("#designBackground").value;
+  if(section&&bg!=="keep"){
+    section.classList.remove("alt","tint","cta-band");
+    if(bg==="alt"||bg==="tint")section.classList.add(bg);
+    if(bg==="brand")section.classList.add("cta-band");
+  }
+  const page=target.closest(".page")||currentPage();
+  PAGE_TRANSITION_CLASSES.forEach(c=>page.classList.remove(c));
+  const transition=$("#pageTransition").value;if(transition!=="default")page.classList.add("kd-page-"+transition);
+  if(closeAfter){close("designModal");toast("Design applied.","ok");}
+  return motionTarget;
+}
+$("#applyDesign").addEventListener("click",()=>applyDesignSettings(true));
+$("#previewMotion").addEventListener("click",()=>{
+  const target=applyDesignSettings(false);if(!target)return;
+  close("designModal");target.classList.remove("in");state.doc.body.classList.add("kd-playing");
+  target.scrollIntoView({behavior:"smooth",block:"center"});
+  state.win.requestAnimationFrame(()=>state.win.requestAnimationFrame(()=>target.classList.add("in")));
+  setTimeout(()=>state.doc.body.classList.remove("kd-playing"),1900);
+});
+function toggleVisibility(target){snapshot();ensureSiteBuilderStyles();target.classList.toggle("kd-site-hidden");setCtxFor(target);toast(target.classList.contains("kd-site-hidden")?"Hidden on the live site.":"Shown on the live site.","ok");}
 
 /* ============================ MODE ============================ */
 $("#modePreview").addEventListener("click", ()=>setMode("preview"));
@@ -705,6 +1165,15 @@ function sanitizeInline(el){
     });
   });
 }
+function formatInline(command){
+  const el=state.activeEditable||state.selected;
+  if(!el||!el.matches("[data-kd-text]"))return;
+  if(state.activeEditable!==el){
+    snapshot();state._editStartHTML=el.outerHTML;el.setAttribute("contenteditable","true");el.focus();state.activeEditable=el;
+    const range=state.doc.createRange();range.selectNodeContents(el);const selection=state.win.getSelection();selection.removeAllRanges();selection.addRange(range);
+  }
+  try{state.doc.execCommand(command,false,null);el.focus();}catch(_){toast("That text format is not available in this browser.","err");}
+}
 
 /* ---- SELECTION + CONTEXT BAR ---- */
 function selectElement(el, quiet){
@@ -726,6 +1195,9 @@ function setCtxHint(html){
   $("#ctxText").style.display = "";
 }
 function describe(el){
+  if(el.matches("section.page")) return "Page";
+  if(el.matches(".section")) return "Section";
+  if(el.matches(REPEATABLE_SEL.join(","))) return itemLabel(el).replace(/^./,c=>c.toUpperCase());
   if(el.matches("img")) return "Photo";
   if(el.matches(".ph,.instructor-avatar")) return "Empty photo slot";
   if(el.matches("a,button")) return el.matches("[data-link]") ? "Menu link" : "Link / button";
@@ -751,6 +1223,11 @@ function setCtxFor(el){
   else if(el.matches("[data-kd-ctrl]")){
     addAction("Edit link", iconLink(), ()=> openLink(el));
   }
+  if(el.matches("[data-kd-text]")){
+    addAction("Bold", "<strong aria-hidden='true'>B</strong>", ()=>formatInline("bold"));
+    addAction("Italic", "<em aria-hidden='true'>I</em>", ()=>formatInline("italic"));
+    addAction("Underline", "<u aria-hidden='true'>U</u>", ()=>formatInline("underline"));
+  }
 
   // structural actions for repeatable items
   const item = repeatableItem(el);
@@ -760,6 +1237,16 @@ function setCtxFor(el){
     addAction("Move up", iconUp(), ()=> moveItem(item,-1));
     addAction("Move down", iconDown(), ()=> moveItem(item,1));
     addAction("Remove "+noun, iconTrash(), ()=> removeItem(item), "danger");
+  }
+
+  addAction("Design", iconDesign(), ()=>{ state.selected=el; openDesign(); });
+  addAction(el.classList.contains("kd-site-hidden")?"Show":"Hide", iconEye(), ()=>toggleVisibility(el));
+  const section=sectionOf(el);
+  if(section){
+    addAction("Section up", iconUp(), ()=>moveSection(section,-1));
+    addAction("Section down", iconDown(), ()=>moveSection(section,1));
+    addAction("Duplicate section", iconCopy(), ()=>duplicateSection(section));
+    addAction("Remove section", iconTrash(), ()=>removeSection(section), "danger");
   }
 }
 function addAction(label, icon, fn, kind){
@@ -848,11 +1335,15 @@ $("#imgInput").addEventListener("change", async e=>{
 function openImagePicker(el){ imgTarget = el; $("#imgInput").click(); }
 function applyImage(el, dataUrl, fileName){
   snapshot();
+  ensureSiteBuilderStyles();
   let img = el;
   if(!el.matches("img")){
     // convert a placeholder box / avatar into a real <img>, matching sibling photos when possible
     img = state.doc.createElement("img");
     let modelClass = el.matches(".instructor-avatar") ? "instructor-photo" : "";
+    if(!modelClass&&el.matches(".ph-card"))modelClass="kd-builder-photo";
+    if(!modelClass&&el.matches(".ph-portrait"))modelClass="kd-builder-photo kd-builder-portrait";
+    if(!modelClass&&el.matches(".ph-wide,.ph-hero"))modelClass="kd-builder-photo kd-builder-wide";
     if(!modelClass){
       const group = el.closest(".instructor-grid,.grid-cards,.grid-2,.archive-grid");
       const model = group && group.querySelector("img");
@@ -1159,6 +1650,17 @@ function validate(html){
   if(!/<script/i.test(html)) issues.push("the site's script appears to be missing");
   const pages = (html.match(/id="page-[^"]+"/g)||[]).length;
   if(pages < 5) issues.push("some pages may be missing");
+  try{
+    const doc=new DOMParser().parseFromString(html,"text/html");
+    const ids=new Map();
+    $$('[id]',doc).forEach(el=>ids.set(el.id,(ids.get(el.id)||0)+1));
+    const duplicates=Array.from(ids).filter(([,count])=>count>1).map(([id])=>id);
+    if(duplicates.length) issues.push("duplicate element IDs: "+duplicates.slice(0,4).join(", "));
+    const missing=[];
+    $$('[data-link]',doc).forEach(link=>{const name=link.dataset.link;if(name&&!doc.getElementById("page-"+name)&&!missing.includes(name))missing.push(name);});
+    if(missing.length) issues.push("menu links point to missing pages: "+missing.slice(0,4).join(", "));
+    $$('section.page',doc).forEach(page=>{if(!page.querySelector('h1')&&!page.dataset.shelved)issues.push((page.id||"a page")+" has no main heading");});
+  }catch(_){ issues.push("the final HTML could not be fully checked"); }
   return issues;
 }
 
@@ -1241,25 +1743,45 @@ async function ghPublish(html, btn){
     // get current sha (file should already exist)
     let sha = undefined;
     const getRes = await fetch(api+"?ref="+encodeURIComponent(branch||"main"), {headers});
-    if(getRes.ok){ const j = await getRes.json(); sha = j.sha; }
+    if(getRes.ok){
+      const j = await getRes.json(); sha = j.sha;
+      const expectedSha=state.sourceSha||(state.sourceHtml?await gitBlobSha(state.sourceHtml):null);
+      const sourceChanged=expectedSha&&expectedSha!==sha;
+      if(sourceChanged){const conflict=new Error("The live site changed after this editing session began.");conflict.code="STALE_SOURCE";throw conflict;}
+    }
     const content = b64EncodeUnicode(html);
     const putRes = await fetch(api, {
       method:"PUT", headers:{...headers,"Content-Type":"application/json"},
       body: JSON.stringify({ message:"Update site via editor", content, branch:branch||"main", sha })
     });
-    if(!putRes.ok){ const t = await putRes.text(); throw new Error(putRes.status+" "+t.slice(0,120)); }
+    if(!putRes.ok){ const t = await putRes.text(); const failure=new Error(putRes.status+" "+t.slice(0,120));failure.code=putRes.status===409?"STALE_SOURCE":"PUBLISH_FAILED";throw failure; }
+    const published=await putRes.json();
+    state.sourceHtml=html;state.sourceSha=published.content&&published.content.sha?published.content.sha:null;
     btn.textContent = "Published ✓";
     $("#publishBody").innerHTML = "<div class='note ok'><strong>Done!</strong> The change is live in about a minute. You can close this window.</div>";
     toast("Published to the live site.", "ok");
   }catch(err){
     btn.disabled = false; btn.textContent = old;
-    $("#publishBody").insertAdjacentHTML("afterbegin",
-      "<div class='note warn' style='margin-bottom:1rem;'><strong>One-click publish didn't go through.</strong> No problem — use <em>Download "+ghFileName()+"</em> and the upload steps below instead. (Technical detail: "+escapeHtml(String(err.message))+")</div>");
-    toast("Couldn't auto-publish — use the download method.", "err");
+    if(err.code==="STALE_SOURCE"){
+      $("#publishBody").insertAdjacentHTML("afterbegin","<div class='note warn' style='margin-bottom:1rem;'><strong>Someone else published newer changes.</strong> Nothing was overwritten. Download this version as a backup, then reopen the latest website and reapply your edits before publishing.</div>");
+      toast("Newer GitHub changes detected — publishing stopped safely.","err");
+    }else{
+      $("#publishBody").insertAdjacentHTML("afterbegin","<div class='note warn' style='margin-bottom:1rem;'><strong>One-click publish didn't go through.</strong> Your work is still here. Download a backup and try again later. (Technical detail: "+escapeHtml(String(err.message))+")</div>");
+      toast("Couldn't auto-publish — your edits are still safe.", "err");
+    }
   }
 }
 function b64EncodeUnicode(str){
   return btoa(unescape(encodeURIComponent(str)));
+}
+function b64DecodeUnicode(str){
+  return decodeURIComponent(escape(atob(str)));
+}
+async function gitBlobSha(str){
+  const body=new TextEncoder().encode(str),header=new TextEncoder().encode("blob "+body.length+"\0"),all=new Uint8Array(header.length+body.length);
+  all.set(header);all.set(body,header.length);
+  const digest=await crypto.subtle.digest("SHA-1",all);
+  return Array.from(new Uint8Array(digest),b=>b.toString(16).padStart(2,"0")).join("");
 }
 function escapeHtml(s){ return s.replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c])); }
 
@@ -1336,6 +1858,9 @@ function iconPlus(){return "<svg viewBox='0 0 24 24' fill='none' stroke='current
 function iconTrash(){return "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><path d='M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14'/></svg>";}
 function iconUp(){return "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><path d='m6 15 6-6 6 6'/></svg>";}
 function iconDown(){return "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><path d='m6 9 6 6 6-6'/></svg>";}
+function iconDesign(){return "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><path d='m12 3 1.8 4.2L18 9l-4.2 1.8L12 15l-1.8-4.2L6 9l4.2-1.8Z'/><path d='m19 15 .9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9Z'/></svg>";}
+function iconEye(){return "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><path d='M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z'/><circle cx='12' cy='12' r='3'/></svg>";}
+function iconCopy(){return "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><rect x='8' y='8' width='12' height='12' rx='2'/><path d='M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2'/></svg>";}
 </script>
 </body>
 </html>
