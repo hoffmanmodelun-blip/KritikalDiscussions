@@ -400,6 +400,24 @@
   </div>
 </div>
 
+<!-- ============ ARTICLE TITLE MODAL ============ -->
+<div class="overlay hide" id="articleTitleModal">
+  <div class="modal" style="max-width:500px;">
+    <div class="head"><h2>Edit article title</h2><button class="x" data-close="articleTitleModal">&times;</button></div>
+    <div class="body">
+      <div class="field">
+        <label>Article title</label>
+        <div class="help">This updates the title on both the Starter Guide list and the article itself.</div>
+        <input type="text" id="articleTitleText" />
+      </div>
+    </div>
+    <div class="foot">
+      <button class="btn ghost" data-close="articleTitleModal">Cancel</button>
+      <button class="btn primary" id="saveArticleTitle">Save article title</button>
+    </div>
+  </div>
+</div>
+
 <!-- ============ IMAGE DESCRIPTION MODAL ============ -->
 <div class="overlay hide" id="altModal">
   <div class="modal" style="max-width:460px;">
@@ -466,7 +484,7 @@
         </div>
         <div>
           <h3>3 · Change text</h3>
-          <p>Click any heading or paragraph and just type. Click somewhere else when you're done.</p>
+          <p>Click any heading or paragraph and just type. Click somewhere else when you're done. For a Starter Guide title, click its article card and choose <strong>Edit article title</strong>; the list and article page update together.</p>
         </div>
         <div>
           <h3>4 · Swap a photo</h3>
@@ -912,6 +930,48 @@ function pageTitle(page){
   const h = page && page.querySelector("h1,.page-title");
   return h ? h.textContent.trim().replace(/[.]+$/,"") : "Untitled page";
 }
+function articleTitleParts(el){
+  if(!el || !el.closest) return null;
+  let row=el.closest(".article-row");
+  let page=el.matches("h1,.page-title") ? el.closest("section.page[id^='page-guide-']") : null;
+  if(row && !page){
+    const slug=row.dataset.link;
+    if(slug) page=state.doc.getElementById("page-"+slug);
+  }
+  if(page && !row){
+    const slug=page.id.replace(/^page-/,"");
+    row=state.doc.querySelector('.article-row[data-link="'+CSS.escape(slug)+'"]');
+  }
+  const rowHeading=row&&row.querySelector("h3");
+  const pageHeading=page&&page.querySelector("h1,.page-title");
+  return rowHeading||pageHeading ? {row,page,rowHeading,pageHeading} : null;
+}
+function syncArticleTitle(el,title){
+  const parts=articleTitleParts(el);
+  if(!parts || !title) return false;
+  if(parts.rowHeading) parts.rowHeading.textContent=title;
+  if(parts.pageHeading) parts.pageHeading.textContent=title;
+  buildPageJump();
+  return true;
+}
+let articleTitleTarget=null;
+function openArticleTitle(el){
+  finishEditing();
+  const parts=articleTitleParts(el);
+  if(!parts) return;
+  articleTitleTarget=parts.pageHeading||parts.rowHeading;
+  $("#articleTitleText").value=articleTitleTarget.textContent.trim();
+  open("articleTitleModal");
+  setTimeout(()=>$("#articleTitleText").focus(),30);
+}
+$("#saveArticleTitle").addEventListener("click",()=>{
+  const title=$("#articleTitleText").value.trim();
+  if(!articleTitleTarget || !title){ toast("Add an article title first.","err"); return; }
+  snapshot();
+  syncArticleTitle(articleTitleTarget,title);
+  close("articleTitleModal"); articleTitleTarget=null;
+  toast("Article title updated everywhere.","ok");
+});
 function menuLinksFor(slug){
   return $$('[data-link="'+CSS.escape(slug)+'"]', state.doc).filter(a=>a.closest("#navlinks,footer.site"));
 }
@@ -956,6 +1016,7 @@ $("#savePageSettings").addEventListener("click", ()=>{
   if(collision && collision!==page){ toast("That URL name is already used by another page.","err"); return; }
   snapshot();
   const heading=page.querySelector("h1,.page-title"); if(heading) heading.textContent=title;
+  if(heading) syncArticleTitle(heading,title);
   if(newSlug!==oldSlug){
     page.id="page-"+newSlug;
     $$('[data-link="'+CSS.escape(oldSlug)+'"]',state.doc).forEach(a=>{a.dataset.link=newSlug;a.setAttribute("href","#"+newSlug);});
@@ -1151,6 +1212,8 @@ function finishEditing(){
   if(!el) return;
   el.removeAttribute("contenteditable");
   sanitizeInline(el);
+  const textChanged=state._editStartHTML != null && el.outerHTML !== state._editStartHTML;
+  if(textChanged && el.matches("h1,.page-title")) syncArticleTitle(el,el.textContent.trim());
   if(state._editStartHTML != null && el.outerHTML === state._editStartHTML && state.undo.length){
     state.undo.pop();
     $("#undoBtn").disabled = state.undo.length === 0;
@@ -1225,6 +1288,9 @@ function setCtxFor(el){
   $("#ctxText").style.display = "none";
   $("#ctxChip").textContent = describe(el);
 
+  const article=articleTitleParts(el);
+  if(article) addAction("Edit article title", iconText(), ()=>openArticleTitle(el));
+
   // image actions
   if(el.matches("[data-kd-img]")){
     addAction("Replace photo", iconImg(), ()=> openImagePicker(el));
@@ -1233,7 +1299,7 @@ function setCtxFor(el){
     if(el.matches("img")) addAction("Remove photo", iconTrash(), ()=> removePhoto(el), "danger");
   }
   // control actions
-  else if(el.matches("[data-kd-ctrl]")){
+  else if(el.matches("[data-kd-ctrl]") && !el.matches(".article-row")){
     addAction("Edit link", iconLink(), ()=> openLink(el));
   }
   if(el.matches("[data-kd-text]")){
