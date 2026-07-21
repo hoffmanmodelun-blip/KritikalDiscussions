@@ -264,9 +264,11 @@
   <div class="modal wide">
     <div class="head"><h2>Insert a section</h2><button class="x" data-close="insertModal">&times;</button></div>
     <div class="body">
-      <p class="note" style="margin-bottom:1rem;">Choose a layout. It will be added to the bottom of the page you are viewing, ready for you to replace its text and photos.</p>
+      <p class="note" style="margin-bottom:1rem;">Choose a full section for the bottom of the page, or insert an article text/image block directly after your current selection.</p>
       <div class="tool-grid">
         <button class="tool-card" data-insert-template="text" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h12M4 18h14"/></svg><strong>Text introduction</strong><span>Eyebrow, heading, and lead paragraph.</span></button>
+        <button class="tool-card" data-insert-content="text" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 11h16M4 16h12"/></svg><strong>Text block here</strong><span>Add an editable paragraph immediately after the selected text or image.</span></button>
+        <button class="tool-card" id="articleImagePlaceholderBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m3 16 5-5 4 4 3-3 6 6"/></svg><strong>Article image here</strong><span>Draw a custom image size, then add the photo. Full-size viewing is automatic.</span></button>
         <button class="tool-card" data-insert-template="split" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M12 4v16"/></svg><strong>Text + photo</strong><span>Two-column story or program feature.</span></button>
         <button class="tool-card" data-insert-template="cards" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="5" height="14" rx="1"/><rect x="10" y="5" width="5" height="14" rx="1"/><rect x="17" y="5" width="4" height="14" rx="1"/></svg><strong>Three cards</strong><span>Programs, services, topics, or people.</span></button>
         <button class="tool-card" data-insert-template="stats" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 20V10M12 20V4M19 20v-7"/></svg><strong>Impact statistics</strong><span>Three large facts with supporting labels.</span></button>
@@ -277,6 +279,29 @@
       </div>
     </div>
     <div class="foot"><button class="btn ghost" data-close="insertModal">Cancel</button></div>
+  </div>
+</div>
+
+<!-- ============ CUSTOM ARTICLE IMAGE SIZE MODAL ============ -->
+<div class="overlay hide" id="imagePlaceholderModal">
+  <div class="modal" style="max-width:560px;">
+    <div class="head"><h2>Draw the image size</h2><button class="x" data-close="imagePlaceholderModal">&times;</button></div>
+    <div class="body">
+      <p style="color:var(--ink-soft);font-size:.9rem;margin-bottom:.9rem;">Drag anywhere in the square to draw the image frame. You can fine-tune the exact dimensions below.</p>
+      <div id="imageSizePad" style="position:relative;width:min(100%,360px);aspect-ratio:1;margin:0 auto;border:2px dashed var(--line);border-radius:14px;background:linear-gradient(135deg,var(--bg),var(--brand-tint));touch-action:none;cursor:crosshair;overflow:hidden;">
+        <div id="imageSizeRect" style="position:absolute;border:2px solid var(--brand);background:rgba(0,115,111,.18);border-radius:8px;pointer-events:none;"></div>
+      </div>
+      <p id="imageSizeReadout" style="text-align:center;color:var(--brand);font-weight:700;font-size:.84rem;margin-top:.7rem;"></p>
+      <div class="form-grid" style="margin-top:1rem;">
+        <div class="field"><label>Width (pixels)</label><input type="number" id="imagePlaceholderWidth" min="120" max="900" step="10" value="580" /></div>
+        <div class="field"><label>Height (pixels)</label><input type="number" id="imagePlaceholderHeight" min="80" max="900" step="10" value="360" /></div>
+      </div>
+      <div class="note">The image stays responsive on phones. Visitors can select it to open the original at full size over a dark background.</div>
+    </div>
+    <div class="foot">
+      <button class="btn ghost" data-close="imagePlaceholderModal">Cancel</button>
+      <button class="btn primary" id="insertImagePlaceholder" type="button">Insert image placeholder</button>
+    </div>
   </div>
 </div>
 
@@ -546,7 +571,7 @@
         </div>
         <div>
           <h3>4 · Swap a photo</h3>
-          <p>Click a photo, then <strong>Replace photo</strong> in the bottom bar, and choose an image from your computer. Big images are shrunk automatically so the site stays fast.</p>
+          <p>Click a photo, then <strong>Replace photo</strong> in the bottom bar, and choose an image from your computer. Article images open full size over the same page. Select an image and use <strong>Add text after</strong> whenever you need to continue writing immediately below it.</p>
         </div>
         <div>
           <h3>5 · Fix a link or button</h3>
@@ -562,7 +587,7 @@
         </div>
         <div>
           <h3>8 · Insert designed sections</h3>
-          <p>Use <strong>Insert</strong> for ready-made text, photo, card, statistics, gallery, FAQ, timeline, and call-to-action layouts. They automatically match the website.</p>
+          <p>Use <strong>Insert</strong> for ready-made layouts. <strong>Text block here</strong> inserts a paragraph after your current selection. <strong>Article image here</strong> lets you draw a custom-sized placeholder with your cursor before choosing the image.</p>
         </div>
         <div>
           <h3>9 · Animate and style</h3>
@@ -654,6 +679,10 @@ const SITE_BUILDER_CSS = `
   .kd-text-small{font-size:.9rem !important;}
   .kd-text-display{font-family:var(--display);font-size:clamp(2.6rem,6vw,5rem) !important;line-height:1.08;}
   .kd-color-ink{color:var(--ink) !important;}.kd-color-soft{color:var(--ink-soft) !important;}.kd-color-brand{color:var(--brand) !important;}.kd-color-white{color:#fff !important;}
+  .kd-article-image{width:100%;max-width:min(var(--figure-width,580px),100%);margin:1.65rem auto 2.35rem;}
+  .kd-article-image>a{display:block;border-radius:14px;cursor:zoom-in;}
+  .kd-article-placeholder,.kd-article-media{display:block;width:100% !important;height:var(--kd-image-height,360px) !important;border-radius:14px;border:1px solid var(--line);object-fit:contain;background:var(--surface);}
+  .kd-article-image figcaption{margin-top:.65rem;color:var(--brand);font-size:.78rem;line-height:1.45;font-weight:600;text-align:center;}
   @keyframes kdPageFade{from{opacity:0}to{opacity:1}}
   @keyframes kdPageSlide{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:none}}
   @keyframes kdPageZoom{from{opacity:0;transform:scale(.975)}to{opacity:1;transform:none}}
@@ -867,9 +896,10 @@ function ensureSiteBuilderStyles(){
   if(!style){
     style = state.doc.createElement("style");
     style.id = "kd-site-builder-styles";
-    style.textContent = SITE_BUILDER_CSS;
     state.doc.head.appendChild(style);
   }
+  // keep editor-owned component styles current when an older published file is loaded
+  style.textContent = SITE_BUILDER_CSS;
   return style;
 }
 function currentPage(){
@@ -912,6 +942,90 @@ function insertSectionTemplate(type){
 }
 $$('[data-insert-template]').forEach(b=>b.addEventListener("click", ()=>insertSectionTemplate(b.dataset.insertTemplate)));
 $("#insertBtn").addEventListener("click", ()=>{ if(state.loaded) open("insertModal"); });
+
+function directChildWithin(container,node){
+  let child=node;
+  while(child&&child.parentElement!==container) child=child.parentElement;
+  return child&&child.parentElement===container ? child : null;
+}
+function writingInsertionLocation(target){
+  const page=currentPage();
+  let container=target&&target.closest ? target.closest(".prose") : null;
+  if(!container) container=page&&page.querySelector(".prose");
+  if(!container) container=(target&&target.closest&&target.closest(".wrap"))||(page&&page.querySelector(".section:last-child .wrap"))||(page&&page.querySelector(".wrap"));
+  if(!container) return null;
+  return {container,anchor:directChildWithin(container,target)};
+}
+function placeWritingNode(node,target){
+  const location=writingInsertionLocation(target);
+  if(!location) return false;
+  if(location.anchor) location.anchor.after(node);
+  else location.container.appendChild(node);
+  retagWithin(node);
+  return true;
+}
+function insertTextBlock(target=state.selected){
+  const insertionTarget=target;
+  snapshot();
+  const p=state.doc.createElement("p");
+  p.textContent="New text — click to edit.";
+  if(!placeWritingNode(p,insertionTarget)){ toast("Choose a page section first.","err"); return; }
+  close("insertModal");
+  setMode("edit"); selectElement(p);
+  p.scrollIntoView({behavior:"smooth",block:"center"});
+  toast("Text added directly after the selected content.","ok");
+}
+$$('[data-insert-content="text"]').forEach(b=>b.addEventListener("click",()=>insertTextBlock()));
+
+let imagePlaceholderTarget=null;
+const IMAGE_DRAW_MAX=900;
+function setImagePlaceholderSize(width,height,drawBox){
+  const w=Math.max(120,Math.min(IMAGE_DRAW_MAX,Math.round(width/10)*10));
+  const h=Math.max(80,Math.min(IMAGE_DRAW_MAX,Math.round(height/10)*10));
+  $("#imagePlaceholderWidth").value=w; $("#imagePlaceholderHeight").value=h;
+  $("#imageSizeReadout").textContent=w+" × "+h+" px";
+  if(!drawBox){
+    const pad=$("#imageSizePad"),rect=$("#imageSizeRect"),scale=(pad.clientWidth||360)/IMAGE_DRAW_MAX;
+    rect.style.width=w*scale+"px"; rect.style.height=h*scale+"px";
+    rect.style.left=((pad.clientWidth-w*scale)/2)+"px"; rect.style.top=((pad.clientHeight-h*scale)/2)+"px";
+  }
+}
+$("#articleImagePlaceholderBtn").addEventListener("click",()=>{
+  imagePlaceholderTarget=state.selected;
+  close("insertModal"); open("imagePlaceholderModal");
+  requestAnimationFrame(()=>setImagePlaceholderSize(580,360));
+});
+["imagePlaceholderWidth","imagePlaceholderHeight"].forEach(id=>$("#"+id).addEventListener("change",()=>{
+  setImagePlaceholderSize(parseFloat($("#imagePlaceholderWidth").value)||580,parseFloat($("#imagePlaceholderHeight").value)||360);
+}));
+(function initImageSizeDrawing(){
+  const pad=$("#imageSizePad"),box=$("#imageSizeRect");
+  let drawing=false,startX=0,startY=0,pointerId=null;
+  const point=e=>{const r=pad.getBoundingClientRect();return{x:Math.max(0,Math.min(r.width,e.clientX-r.left)),y:Math.max(0,Math.min(r.height,e.clientY-r.top)),r};};
+  pad.addEventListener("pointerdown",e=>{
+    const p=point(e); drawing=true; pointerId=e.pointerId; startX=p.x; startY=p.y;
+    try{pad.setPointerCapture(pointerId);}catch(_){}
+    box.style.left=startX+"px";box.style.top=startY+"px";box.style.width="0";box.style.height="0";e.preventDefault();
+  });
+  pad.addEventListener("pointermove",e=>{
+    if(!drawing||e.pointerId!==pointerId)return;
+    const p=point(e),left=Math.min(startX,p.x),top=Math.min(startY,p.y),w=Math.abs(p.x-startX),h=Math.abs(p.y-startY);
+    box.style.left=left+"px";box.style.top=top+"px";box.style.width=w+"px";box.style.height=h+"px";
+    setImagePlaceholderSize(w/p.r.width*IMAGE_DRAW_MAX,h/p.r.height*IMAGE_DRAW_MAX,true);e.preventDefault();
+  });
+  const end=e=>{if(!drawing)return;drawing=false;try{pad.releasePointerCapture(pointerId);}catch(_){}pointerId=null;setImagePlaceholderSize(parseFloat($("#imagePlaceholderWidth").value),parseFloat($("#imagePlaceholderHeight").value));};
+  pad.addEventListener("pointerup",end);pad.addEventListener("pointercancel",end);
+})();
+$("#insertImagePlaceholder").addEventListener("click",()=>{
+  const width=parseInt($("#imagePlaceholderWidth").value,10),height=parseInt($("#imagePlaceholderHeight").value,10);
+  if(!width||!height){toast("Draw an image size first.","err");return;}
+  snapshot();ensureSiteBuilderStyles();
+  const figure=createSiteNode(`<figure class="article-figure kd-article-image" style="--figure-width:${width}px;--kd-image-height:${height}px;"><a data-lightbox role="button" tabindex="0"><div class="ph ph-card kd-article-placeholder" role="img" aria-label="Article image placeholder"><span class="ph-tag">Click to add image</span></div></a><figcaption>Image caption · Select the image to open it full size</figcaption></figure>`);
+  if(!placeWritingNode(figure,imagePlaceholderTarget)){toast("Choose a page section first.","err");return;}
+  close("imagePlaceholderModal");setMode("edit");
+  const placeholder=figure.querySelector(".kd-article-placeholder");selectElement(placeholder);figure.scrollIntoView({behavior:"smooth",block:"center"});
+  toast("Image placeholder added at the selected position.","ok");
+});
 
 function moveSection(section, dir){
   if(!section) return;
@@ -1496,6 +1610,7 @@ function setCtxFor(el){
     addAction("Replace photo", iconImg(), ()=> openImagePicker(el));
     if(el.matches("img")) addAction("Reposition / crop", iconMove(), ()=> openCropper(el));
     if(el.matches("img")) addAction("Description", iconText(), ()=> openAlt(el));
+    addAction("Add text after", iconPlus(), ()=>insertTextBlock(el));
     if(el.matches("img")) addAction("Remove photo", iconTrash(), ()=> removePhoto(el), "danger");
   }
   // control actions
@@ -1622,6 +1737,7 @@ function applyImage(el, dataUrl, fileName){
     // convert a placeholder box / avatar into a real <img>, matching sibling photos when possible
     img = state.doc.createElement("img");
     let modelClass = el.matches(".instructor-avatar") ? "instructor-photo" : "";
+    if(!modelClass&&el.matches(".kd-article-placeholder"))modelClass="kd-article-media";
     if(!modelClass&&el.matches(".ph-card"))modelClass="kd-builder-photo";
     if(!modelClass&&el.matches(".ph-portrait"))modelClass="kd-builder-photo kd-builder-portrait";
     if(!modelClass&&el.matches(".ph-wide,.ph-hero"))modelClass="kd-builder-photo kd-builder-wide";
@@ -1637,6 +1753,8 @@ function applyImage(el, dataUrl, fileName){
     el.replaceWith(img);
   }
   img.src = dataUrl;
+  const lightboxLink=img.closest("a[data-lightbox]");
+  if(lightboxLink) lightboxLink.removeAttribute("href");
   img.alt = img.alt || (fileName ? fileName.replace(/\.[^.]+$/,"").replace(/[-_]/g," ") : "");
   img.removeAttribute("srcset");
   selectElement(img);
@@ -1646,6 +1764,7 @@ function removePhoto(el){
   if(!confirm("Remove this photo? You can press Undo to bring it back.")) return;
   snapshot();
   el.src = PLACEHOLDER_IMG; el.alt = "";
+  const lightboxLink=el.closest("a[data-lightbox]"); if(lightboxLink) lightboxLink.removeAttribute("href");
   toast("Photo removed — the slot is now empty.", "ok");
 }
 function toDownscaledDataURL(file, maxDim=1600, quality=0.82){

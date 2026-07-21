@@ -565,10 +565,18 @@
   .prose .article-figure{width:100%; max-width:var(--figure-width,580px); margin:1.65rem auto 2.35rem;}
   .prose .article-figure.is-small{--figure-width:480px;}
   .prose .article-figure.is-wide{--figure-width:680px;}
-  .prose .article-figure a{display:block; border-radius:14px;}
+  .prose .article-figure a{display:block; border-radius:14px; cursor:zoom-in;}
   .prose .article-figure img{display:block; width:100%; height:auto; border:1px solid var(--line); border-radius:14px; box-shadow:0 18px 42px -30px rgba(8,20,18,.45);}
   .prose .article-figure figcaption{margin-top:.65rem; color:var(--brand); font-size:.78rem; line-height:1.45; font-weight:600; text-align:center; letter-spacing:.02em;}
   .prose .article-download{margin-top:1.5rem;}
+  body.lightbox-open{overflow:hidden;}
+  .image-lightbox{position:fixed; inset:0; z-index:200; display:grid; place-items:center; padding:clamp(1rem,3vw,2rem); background:#07100f;}
+  .image-lightbox[hidden]{display:none;}
+  .image-lightbox-inner{position:relative; display:grid; place-items:center; width:100%; height:100%;}
+  .image-lightbox img{display:block; max-width:min(96vw,1600px); max-height:88vh; width:auto; height:auto; object-fit:contain; border-radius:10px; background:#fff; box-shadow:0 28px 80px rgba(0,0,0,.5);}
+  .image-lightbox-caption{position:absolute; left:50%; bottom:.15rem; transform:translateX(-50%); max-width:min(90vw,72ch); color:rgba(255,255,255,.82); font-size:.82rem; text-align:center;}
+  .image-lightbox-close{position:absolute; top:0; right:0; z-index:2; width:44px; height:44px; display:grid; place-items:center; border:1px solid rgba(255,255,255,.3); border-radius:50%; background:rgba(255,255,255,.1); color:#fff; font-size:1.8rem; line-height:1; cursor:pointer;}
+  .image-lightbox-close:hover{background:rgba(255,255,255,.2);}
   .card-cut{
     background:#fff; border:1px solid var(--line); border-radius:14px;
     padding:clamp(1rem,3vw,1.45rem); box-shadow:0 18px 42px -30px rgba(8,20,18,.45);
@@ -1492,7 +1500,7 @@
           <p class="eg">For example, an extreme burden would be: “The affirmative must achieve global peace and do the resolution in order to win this round.”</p>
           <p>Observations matter because they can make the threshold for winning easier or harder. They also provide clear <strong>judge instruction</strong> in later rebuttals by explaining how the judge should evaluate arguments and responses.</p>
           <figure class="article-figure">
-            <a href="Site%20Assets/Starter%20Guide/Philosophy%20Frameworks/observation-example.png" target="_blank" rel="noopener">
+            <a href="Site%20Assets/Starter%20Guide/Philosophy%20Frameworks/observation-example.png" data-lightbox>
               <img src="Site%20Assets/Starter%20Guide/Philosophy%20Frameworks/observation-example.png" alt="Example observation explaining that debaters need only prove that the resolution is comparatively better or worse than the status quo." loading="lazy">
             </a>
             <figcaption>Observation example · Select the image to open it full size</figcaption>
@@ -1506,7 +1514,7 @@
           <h3>Stage A · Start with consequences</h3>
           <p>A common ontological claim is that people use a <strong>consequentialist</strong> mindset when deciding whether an action is ethical. In simple terms, an action is judged by whether its consequences create more good than harm.</p>
           <figure class="article-figure is-small">
-            <a href="Site%20Assets/Starter%20Guide/Philosophy%20Frameworks/utility-justification.png" target="_blank" rel="noopener">
+            <a href="Site%20Assets/Starter%20Guide/Philosophy%20Frameworks/utility-justification.png" data-lightbox>
               <img src="Site%20Assets/Starter%20Guide/Philosophy%20Frameworks/utility-justification.png" alt="Example philosophical justification arguing that consequences determine whether actions are right or wrong." loading="lazy">
             </a>
             <figcaption>Utility justification · Select the image to open it full size</figcaption>
@@ -1515,7 +1523,7 @@
           <h3>Stage B · Move from individuals to policymakers</h3>
           <p>If consequences matter, the next question is how a government should compare competing harms and benefits across many people. Policymakers cannot perfectly predict every individual outcome, so the framework needs a public decision rule.</p>
           <figure class="article-figure is-wide">
-            <a href="Site%20Assets/Starter%20Guide/Philosophy%20Frameworks/policymaker-utility.png" target="_blank" rel="noopener">
+            <a href="Site%20Assets/Starter%20Guide/Philosophy%20Frameworks/policymaker-utility.png" data-lightbox>
               <img src="Site%20Assets/Starter%20Guide/Philosophy%20Frameworks/policymaker-utility.png" alt="Example justification arguing that policymakers should act to maximize aggregate utility." loading="lazy">
             </a>
             <figcaption>Policymaker justification · Select the image to open it full size</figcaption>
@@ -1530,7 +1538,7 @@
           <h3>Explain which consequences matter most</h3>
           <p><strong>Impact calculus</strong> tells the judge how to prioritize competing consequences. Should material suffering outweigh rights violations? Are some government constraints absolute? Can consequences be predicted reliably? These questions may appear here or within the philosophical justifications. One common argument is that human extinction outweighs every other impact.</p>
           <figure class="article-figure">
-            <a href="Site%20Assets/Starter%20Guide/Philosophy%20Frameworks/extinction-impact-calculus.png" target="_blank" rel="noopener">
+            <a href="Site%20Assets/Starter%20Guide/Philosophy%20Frameworks/extinction-impact-calculus.png" data-lightbox>
               <img src="Site%20Assets/Starter%20Guide/Philosophy%20Frameworks/extinction-impact-calculus.png" alt="Example impact calculus arguing that extinction outweighs all other impacts." loading="lazy">
             </a>
             <figcaption>Impact-calculus example · Select the image to open it full size</figcaption>
@@ -1540,7 +1548,7 @@
           <h3>Connect the framework to the resolution</h3>
           <p><strong>Contentions</strong> are resolution-specific reasons your philosophical framework affirms or negates the topic. On the March-April topic of U.S. non-intervention, for example, utilitarian affirmative debaters commonly argued that military interventions fuel anti-American resentment and increase the risk of retaliatory terrorism.</p>
           <figure class="article-figure is-wide">
-            <a href="Site%20Assets/Starter%20Guide/Philosophy%20Frameworks/terrorism-contention.png" target="_blank" rel="noopener">
+            <a href="Site%20Assets/Starter%20Guide/Philosophy%20Frameworks/terrorism-contention.png" data-lightbox>
               <img src="Site%20Assets/Starter%20Guide/Philosophy%20Frameworks/terrorism-contention.png" alt="Example contention arguing that U.S. military intervention increases the risk of terrorism." loading="lazy">
             </a>
             <figcaption>Contention example · Select the image to open it full size</figcaption>
@@ -1595,6 +1603,14 @@
   </section>
 
 </main>
+
+<div class="image-lightbox" id="imageLightbox" role="dialog" aria-modal="true" aria-label="Full-size article image" hidden>
+  <div class="image-lightbox-inner">
+    <button class="image-lightbox-close" id="imageLightboxClose" type="button" aria-label="Close full-size image">&times;</button>
+    <img id="imageLightboxImage" src="" alt="">
+    <p class="image-lightbox-caption" id="imageLightboxCaption"></p>
+  </div>
+</div>
 
 <!-- ===========================================================================
      FOOTER
@@ -1762,6 +1778,46 @@
   const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 12);
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
+
+  // article images open above the current page instead of leaving it
+  const imageLightbox = document.getElementById('imageLightbox');
+  const imageLightboxImage = document.getElementById('imageLightboxImage');
+  const imageLightboxCaption = document.getElementById('imageLightboxCaption');
+  const imageLightboxClose = document.getElementById('imageLightboxClose');
+  let lightboxReturnFocus = null;
+
+  function closeImageLightbox(){
+    if (imageLightbox.hidden) return;
+    imageLightbox.hidden = true;
+    document.body.classList.remove('lightbox-open');
+    imageLightboxImage.removeAttribute('src');
+    if (lightboxReturnFocus) lightboxReturnFocus.focus();
+    lightboxReturnFocus = null;
+  }
+
+  document.addEventListener('click', (e) => {
+    const trigger = e.target.closest('a[data-lightbox]');
+    if (!trigger || !trigger.querySelector('img')) return;
+    e.preventDefault();
+    const thumbnail = trigger.querySelector('img');
+    const caption = trigger.closest('figure')?.querySelector('figcaption');
+    lightboxReturnFocus = trigger;
+    imageLightboxImage.src = trigger.href || thumbnail.currentSrc || thumbnail.src;
+    imageLightboxImage.alt = thumbnail.alt || '';
+    imageLightboxCaption.textContent = caption ? caption.textContent.replace(/\s*·\s*Select the image to open it full size\s*$/i, '') : '';
+    imageLightbox.hidden = false;
+    document.body.classList.add('lightbox-open');
+    imageLightboxClose.focus();
+  });
+  imageLightboxClose.addEventListener('click', closeImageLightbox);
+  imageLightbox.addEventListener('click', (e) => {
+    if (e.target === imageLightbox || e.target.classList.contains('image-lightbox-inner')) closeImageLightbox();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !imageLightbox.hidden){ closeImageLightbox(); return; }
+    const trigger = e.target.closest?.('a[data-lightbox]:not([href])');
+    if (trigger && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); trigger.click(); }
+  });
 
   // year + initial page from URL hash
   document.getElementById('year').textContent = new Date().getFullYear();
