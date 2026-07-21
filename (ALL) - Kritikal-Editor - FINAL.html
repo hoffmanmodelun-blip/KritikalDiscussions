@@ -432,6 +432,50 @@
   </div>
 </div>
 
+<!-- ============ INLINE TEXT LINK MODAL ============ -->
+<div class="overlay hide" id="inlineLinkModal">
+  <div class="modal" style="max-width:500px;">
+    <div class="head"><h2>Insert or edit hyperlink</h2><button class="x" data-close="inlineLinkModal">&times;</button></div>
+    <div class="body">
+      <div class="field">
+        <label>Linked text</label>
+        <input type="text" id="inlineLinkText" />
+      </div>
+      <div class="field">
+        <label>Web address</label>
+        <div class="help">Use a full address such as <code>https://example.com</code>, an email address beginning with <code>mailto:</code>, or an internal address beginning with <code>#</code>.</div>
+        <input type="text" id="inlineLinkHref" placeholder="https://…" />
+      </div>
+      <label class="check-row"><input type="checkbox" id="inlineLinkNewTab" checked /> Open in a new tab</label>
+    </div>
+    <div class="foot">
+      <button class="btn danger" id="removeInlineLink" type="button">Remove hyperlink</button>
+      <button class="btn ghost" data-close="inlineLinkModal">Cancel</button>
+      <button class="btn primary" id="saveInlineLink" type="button">Save hyperlink</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ FONT SIZE MODAL ============ -->
+<div class="overlay hide" id="fontSizeModal">
+  <div class="modal" style="max-width:460px;">
+    <div class="head"><h2>Change font size</h2><button class="x" data-close="fontSizeModal">&times;</button></div>
+    <div class="body">
+      <div class="field">
+        <label>Font size in pixels</label>
+        <div class="help" id="fontSizeHelp">Select specific words before opening this tool to resize only those words. With no selection, it changes the whole text block.</div>
+        <input type="number" id="fontSizeValue" min="8" max="120" step="1" inputmode="numeric" />
+      </div>
+      <div class="note">Common sizes: 14–16 for small text, 17–20 for body text, 24–36 for subheadings, and 40–72 for major headings.</div>
+    </div>
+    <div class="foot">
+      <button class="btn ghost" id="resetFontSize" type="button">Use design default</button>
+      <button class="btn ghost" data-close="fontSizeModal">Cancel</button>
+      <button class="btn primary" id="saveFontSize" type="button">Apply font size</button>
+    </div>
+  </div>
+</div>
+
 <!-- ============ IMAGE DESCRIPTION MODAL ============ -->
 <div class="overlay hide" id="altModal">
   <div class="modal" style="max-width:460px;">
@@ -498,7 +542,7 @@
         </div>
         <div>
           <h3>3 · Change text</h3>
-          <p>Click any heading or paragraph and just type. Click somewhere else when you're done. For a Starter Guide card, click it and choose <strong>Edit article card</strong> to change its number, blue label/byline, title, and description. The title on the article page updates too.</p>
+          <p>Click any heading or paragraph and just type. Select words and use <strong>Hyperlink</strong> or <strong>Font size</strong> in the bottom bar; with no words selected, Font size changes the whole text block. For a Starter Guide card, choose <strong>Edit article card</strong> to change its number, blue label/byline, title, and description. The title on the article page updates too.</p>
         </div>
         <div>
           <h3>4 · Swap a photo</h3>
@@ -1262,7 +1306,12 @@ function sanitizeInline(el){
     // strip risky attributes
     Array.from(node.attributes).forEach(a=>{
       const n = a.name.toLowerCase();
-      if(n.startsWith("on") || n==="style") node.removeAttribute(a.name);
+      if(n.startsWith("on")) node.removeAttribute(a.name);
+      if(n==="style"){
+        const fontSize=node.tagName==="SPAN" ? node.style.fontSize : "";
+        node.removeAttribute("style");
+        if(/^\d+(?:\.\d+)?(?:px|rem|em|%)$/.test(fontSize)) node.style.fontSize=fontSize;
+      }
       if(node.tagName==="A" && n==="href" && /^\s*javascript:/i.test(a.value)) node.removeAttribute(a.name);
     });
   });
@@ -1276,6 +1325,131 @@ function formatInline(command){
   }
   try{state.doc.execCommand(command,false,null);el.focus();}catch(_){toast("That text format is not available in this browser.","err");}
 }
+
+function selectionNodeElement(sel){
+  const node=sel&&sel.anchorNode;
+  return node ? (node.nodeType===1 ? node : node.parentElement) : null;
+}
+function captureTextRange(el,wholeWhenCollapsed){
+  const sel=state.win.getSelection();
+  let range=null,valid=false;
+  if(sel&&sel.rangeCount){
+    const candidate=sel.getRangeAt(0);
+    const common=candidate.commonAncestorContainer.nodeType===1 ? candidate.commonAncestorContainer : candidate.commonAncestorContainer.parentElement;
+    if(common&&(common===el||el.contains(common))){ range=candidate.cloneRange(); valid=true; }
+  }
+  if(!range){
+    range=state.doc.createRange(); range.selectNodeContents(el);
+    if(!wholeWhenCollapsed) range.collapse(false);
+  }
+  let whole=!valid;
+  if(wholeWhenCollapsed&&range.collapsed){ range.selectNodeContents(el); whole=true; }
+  return {range,whole,hadSelection:valid&&!range.collapsed,selectionElement:selectionNodeElement(sel)};
+}
+
+let inlineLinkState=null;
+function openInlineLink(el){
+  const captured=captureTextRange(el,false);
+  let existing=captured.selectionElement&&captured.selectionElement.closest("a");
+  if(existing&&!el.contains(existing)) existing=null;
+  if(existing){ captured.range.selectNodeContents(existing); captured.hadSelection=true; }
+  inlineLinkState={el,range:captured.range,existing};
+  $("#inlineLinkText").value=existing ? existing.textContent : (captured.hadSelection ? captured.range.toString() : "");
+  $("#inlineLinkHref").value=existing ? (existing.getAttribute("href")||"") : "";
+  $("#inlineLinkNewTab").checked=existing ? existing.getAttribute("target")==="_blank" : true;
+  $("#removeInlineLink").style.display=existing ? "" : "none";
+  open("inlineLinkModal");
+  setTimeout(()=>$(captured.hadSelection?"#inlineLinkHref":"#inlineLinkText").focus(),30);
+}
+$("#saveInlineLink").addEventListener("click",()=>{
+  if(!inlineLinkState) return;
+  const text=$("#inlineLinkText").value.trim(),href=$("#inlineLinkHref").value.trim();
+  if(!text||!href){ toast("Add both linked text and a web address.","err"); return; }
+  if(/^\s*(?:javascript|data):/i.test(href)){ toast("That link type is not allowed.","err"); return; }
+  snapshot();
+  let link=inlineLinkState.existing;
+  if(link&&link.isConnected){
+    link.textContent=text;
+  }else{
+    link=state.doc.createElement("a");
+    if(inlineLinkState.range.toString()===text){ link.appendChild(inlineLinkState.range.extractContents()); }
+    else { inlineLinkState.range.deleteContents(); link.textContent=text; }
+    inlineLinkState.range.insertNode(link);
+  }
+  link.setAttribute("href",href);
+  if($("#inlineLinkNewTab").checked){ link.setAttribute("target","_blank"); link.setAttribute("rel","noopener"); }
+  else { link.removeAttribute("target"); link.removeAttribute("rel"); }
+  close("inlineLinkModal"); inlineLinkState=null;
+  toast("Hyperlink saved.","ok");
+});
+$("#removeInlineLink").addEventListener("click",()=>{
+  const link=inlineLinkState&&inlineLinkState.existing;
+  if(!link||!link.isConnected) return;
+  snapshot();
+  const parent=link.parentNode;
+  while(link.firstChild) parent.insertBefore(link.firstChild,link);
+  link.remove();
+  close("inlineLinkModal"); inlineLinkState=null;
+  toast("Hyperlink removed.","ok");
+});
+
+let fontSizeState=null;
+function openFontSize(el){
+  const sel=state.win.getSelection();
+  const selectionEl=selectionNodeElement(sel);
+  let sizeSpan=selectionEl&&selectionEl.closest("span");
+  if(sizeSpan&&(!el.contains(sizeSpan)||!sizeSpan.style.fontSize)) sizeSpan=null;
+  const captured=captureTextRange(el,!sizeSpan);
+  if(sizeSpan&&captured.hadSelection&&captured.range.toString()!==sizeSpan.textContent) sizeSpan=null;
+  if(sizeSpan&&captured.range.collapsed){ captured.range.selectNodeContents(sizeSpan); captured.whole=false; }
+  fontSizeState={el,range:captured.range,whole:captured.whole,sizeSpan};
+  const measured=parseFloat(state.win.getComputedStyle(sizeSpan||el).fontSize)||16;
+  $("#fontSizeValue").value=Math.round(measured*10)/10;
+  $("#fontSizeHelp").textContent=captured.whole
+    ? "No words were selected, so this will change the whole text block."
+    : "Only the selected words will change size.";
+  $("#resetFontSize").disabled=!captured.whole&&!sizeSpan;
+  open("fontSizeModal");
+  setTimeout(()=>$("#fontSizeValue").focus(),30);
+}
+function unwrapIfEmptySpan(span){
+  if(!span||!span.isConnected||span.attributes.length) return;
+  const parent=span.parentNode;
+  while(span.firstChild) parent.insertBefore(span.firstChild,span);
+  span.remove();
+}
+$("#saveFontSize").addEventListener("click",()=>{
+  if(!fontSizeState) return;
+  const px=parseFloat($("#fontSizeValue").value);
+  if(!Number.isFinite(px)||px<8||px>120){ toast("Choose a font size from 8 to 120 pixels.","err"); return; }
+  snapshot();
+  if(fontSizeState.whole){
+    TEXT_SIZE_CLASSES.forEach(c=>fontSizeState.el.classList.remove(c));
+    fontSizeState.el.style.fontSize=px+"px";
+  }else if(fontSizeState.sizeSpan&&fontSizeState.sizeSpan.isConnected){
+    fontSizeState.sizeSpan.style.fontSize=px+"px";
+  }else{
+    const span=state.doc.createElement("span"); span.style.fontSize=px+"px";
+    span.appendChild(fontSizeState.range.extractContents());
+    fontSizeState.range.insertNode(span);
+  }
+  close("fontSizeModal"); fontSizeState=null;
+  toast("Font size updated.","ok");
+});
+$("#resetFontSize").addEventListener("click",()=>{
+  if(!fontSizeState) return;
+  snapshot();
+  if(fontSizeState.whole){
+    fontSizeState.el.style.removeProperty("font-size");
+    TEXT_SIZE_CLASSES.forEach(c=>fontSizeState.el.classList.remove(c));
+  }else if(fontSizeState.sizeSpan){
+    fontSizeState.sizeSpan.style.removeProperty("font-size");
+    if(!fontSizeState.sizeSpan.getAttribute("style")) fontSizeState.sizeSpan.removeAttribute("style");
+    unwrapIfEmptySpan(fontSizeState.sizeSpan);
+  }
+  close("fontSizeModal"); fontSizeState=null;
+  toast("Default font size restored.","ok");
+});
 
 /* ---- SELECTION + CONTEXT BAR ---- */
 function selectElement(el, quiet){
@@ -1332,6 +1506,8 @@ function setCtxFor(el){
     addAction("Bold", "<strong aria-hidden='true'>B</strong>", ()=>formatInline("bold"));
     addAction("Italic", "<em aria-hidden='true'>I</em>", ()=>formatInline("italic"));
     addAction("Underline", "<u aria-hidden='true'>U</u>", ()=>formatInline("underline"));
+    addAction("Hyperlink", iconLink(), ()=>openInlineLink(el));
+    addAction("Font size", iconText(), ()=>openFontSize(el));
   }
 
   // structural actions for repeatable items
