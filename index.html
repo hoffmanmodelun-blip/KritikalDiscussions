@@ -683,12 +683,12 @@
 
     <ul class="nav-links" id="navlinks">
       <li><a href="#home" data-link="home" class="">Home</a></li>
-      <li><a href="#team" data-link="team" class="active">Our Team</a></li>
+      <li><a href="#team" data-link="team" class="">Our Team</a></li>
       <li><a href="#camp" data-link="camp" class="">Debate Camp</a></li>
       <!-- SHELVED NAV ITEM: Kritikal Project is temporarily hidden; restore this link when the page is active again.
       <li><a href="#project" data-link="project">Kritikal Project</a></li>
       -->
-      <li><a href="#resources" data-link="resources" class="">Resources</a></li>
+      <li><a href="#resources" data-link="resources" class="active">Resources</a></li>
       <li><a href="#contact" data-link="contact" class="">Contact</a></li>
     </ul>
 
@@ -1260,7 +1260,7 @@
           <a class="article-row reveal d1" data-link="guide-argumentation" href="#guide-argumentation">
             <span class="idx">01</span>
             <span class="meta">
-              <span class="kicker">Fundamentals · Neel Aparanji</span>
+              <span class="kicker">Debate 101 · Neel Aparanji</span>
               <h3>A Guide to Basic Argumentation</h3>
               <p>The building blocks every debater needs — claims, warrants, and impacts, the six ways to answer any argument, evidence comparison, and impact calculus.</p>
             </span>
@@ -1269,7 +1269,7 @@
           <a class="article-row reveal d2" data-link="guide-philosophy-frameworks" href="#guide-philosophy-frameworks">
             <span class="idx">02</span>
             <span class="meta">
-              <span class="kicker">Philosophy · Justin Xia</span>
+              <span class="kicker">Debate 101 · Justin Xia</span>
               <h3>Introduction to Lay and Traditional Cases and Philosophy Debate</h3>
               <p>Learn how values, observations, philosophical justifications, impact calculus, and contentions fit together in a traditional LD case.</p>
             </span>
@@ -1494,14 +1494,14 @@
           <figure class="article-figure">
             <img src="Site%20Assets/Starter%20Guide/Philosophy%20Frameworks/extinction-impact-calculus.png" alt="Example impact calculus arguing that extinction outweighs all other impacts.">
           </figure>
-          <p>Fifth is the <strong>contention</strong> level arguments that you make. These are resolution-based reasons why your philosophical theory either affirms or negates the topic. On the March-April topic of U.S. non-intervention, a common affirmative argument run by utilitarian-style debaters was preventing terrorism. Specifically, U.S. interventions abroad led to hate from middle eastern countries, which would launch counter attacks driven by religious fanaticism and vengeance that would kill more American citizens.</p>
+          <p class="">Fifth is the <strong>contention</strong> level arguments that you make. These are resolution-based reasons why your philosophical theory either affirms or negates the topic. On the March-April topic of U.S. non-intervention, a common affirmative argument run by utilitarian-style debaters was preventing terrorism. Specifically, U.S. interventions abroad led to hate from middle eastern countries, which would launch counter attacks driven by religious fanaticism and vengeance that would kill more American citizens.</p>
           <figure class="article-figure">
-            <img src="Site%20Assets/Starter%20Guide/Philosophy%20Frameworks/terrorism-contention.png" alt="Example contention arguing that U.S. military intervention increases the risk of terrorism.">
+            <img src="Site%20Assets/Starter%20Guide/Philosophy%20Frameworks/terrorism-contention.png" alt="Example contention arguing that U.S. military intervention increases the risk of terrorism." class="">
           </figure>
 
           <h2>Conclusion</h2>
-          <p>Learning how the structure of Lay and Traditional Cases and their philosophical justifications is a massive step in the development of your debate skills. Without these fundamental understandings of the activity, it becomes harder to make progress, and more importantly, win! However, this article is only a brief introduction to lay and traditional debate and philosophy, and the structure I presented here is dynamic and not rigid. Many debaters opt to completely forgo creating an Impact calculus and put it under their philosophical justifications section of their framework. Sometimes, they may not read any observations at all! Most of the time, the value criterion is placed before the philosophical justifications too; I’ve only placed the value criterion below the philosophical justifications because it is a more logical order to explain the progression of different philosophical premises and their conclusions. Remember, debate is hard and processing this much information is hard. Make sure to take it slow, reread this a few times, and try to spot this pattern in more cases without explicit guidance. For additional help, download the full demonstration case showing all five of these aspects. Hopefully, this clears up any confusion you may have about lay debate. Good luck, and most importantly, stay Kritikal!</p>
-          <p class="article-download"><a class="btn btn-ghost" href="Site%20Assets/Starter%20Guide/Philosophy%20Frameworks/Lay-Traditional-Case.docx" download>Download the demo case <span class="arr">↓</span></a></p>
+          <p class="">Learning how the structure of Lay and Traditional Cases and their philosophical justifications is a massive step in the development of your debate skills. Without these fundamental understandings of the activity, it becomes harder to make progress, and more importantly, win! However, this article is only a brief introduction to lay and traditional debate and philosophy, and the structure I presented here is dynamic and not rigid. Many debaters opt to completely forgo creating an Impact calculus and put it under their philosophical justifications section of their framework. Sometimes, they may not read any observations at all! Most of the time, the value criterion is placed before the philosophical justifications too; I’ve only placed the value criterion below the philosophical justifications because it is a more logical order to explain the progression of different philosophical premises and their conclusions. Remember, debate is hard and processing this much information is hard. Make sure to take it slow, reread this a few times, and try to spot this pattern in more cases without explicit guidance. For additional help, download the full demonstration case showing all five of these aspects. Hopefully, this clears up any confusion you may have about lay debate. Good luck, and most importantly, stay Kritikal!</p>
+          <p class="article-download"><a class="btn btn-ghost" href="Site%20Assets/Starter%20Guide/Philosophy%20Frameworks/Lay-Traditional-Case.docx" download="">Download the demo case <span class="arr">↓</span></a></p>
         </div>
       </div>
     </div>
@@ -1719,6 +1719,7 @@
   const initial = (location.hash || '#home').slice(1);
   if (!go(initial)) go('home');
 </script>
+
 
 
 
