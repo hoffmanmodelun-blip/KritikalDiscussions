@@ -400,20 +400,34 @@
   </div>
 </div>
 
-<!-- ============ ARTICLE TITLE MODAL ============ -->
-<div class="overlay hide" id="articleTitleModal">
-  <div class="modal" style="max-width:500px;">
-    <div class="head"><h2>Edit article title</h2><button class="x" data-close="articleTitleModal">&times;</button></div>
+<!-- ============ ARTICLE CARD MODAL ============ -->
+<div class="overlay hide" id="articleCardModal">
+  <div class="modal" style="max-width:560px;">
+    <div class="head"><h2>Edit article card</h2><button class="x" data-close="articleCardModal">&times;</button></div>
     <div class="body">
+      <div class="form-grid" id="articleCardDetails">
+        <div class="field">
+          <label>Article number</label>
+          <input type="text" id="articleNumberText" placeholder="02" />
+        </div>
+        <div class="field">
+          <label>Blue label / byline</label>
+          <input type="text" id="articleKickerText" placeholder="Philosophy · Justin Xia" />
+        </div>
+      </div>
       <div class="field">
         <label>Article title</label>
         <div class="help">This updates the title on both the Starter Guide list and the article itself.</div>
         <input type="text" id="articleTitleText" />
       </div>
+      <div class="field" id="articleDescriptionField">
+        <label>Card description</label>
+        <textarea id="articleDescriptionText"></textarea>
+      </div>
     </div>
     <div class="foot">
-      <button class="btn ghost" data-close="articleTitleModal">Cancel</button>
-      <button class="btn primary" id="saveArticleTitle">Save article title</button>
+      <button class="btn ghost" data-close="articleCardModal">Cancel</button>
+      <button class="btn primary" id="saveArticleCard">Save article card</button>
     </div>
   </div>
 </div>
@@ -484,7 +498,7 @@
         </div>
         <div>
           <h3>3 · Change text</h3>
-          <p>Click any heading or paragraph and just type. Click somewhere else when you're done. For a Starter Guide title, click its article card and choose <strong>Edit article title</strong>; the list and article page update together.</p>
+          <p>Click any heading or paragraph and just type. Click somewhere else when you're done. For a Starter Guide card, click it and choose <strong>Edit article card</strong> to change its number, blue label/byline, title, and description. The title on the article page updates too.</p>
         </div>
         <div>
           <h3>4 · Swap a photo</h3>
@@ -954,23 +968,35 @@ function syncArticleTitle(el,title){
   buildPageJump();
   return true;
 }
-let articleTitleTarget=null;
-function openArticleTitle(el){
+let articleCardTarget=null;
+function openArticleCard(el){
   finishEditing();
   const parts=articleTitleParts(el);
   if(!parts) return;
-  articleTitleTarget=parts.pageHeading||parts.rowHeading;
-  $("#articleTitleText").value=articleTitleTarget.textContent.trim();
-  open("articleTitleModal");
+  articleCardTarget=parts;
+  const row=parts.row;
+  $("#articleNumberText").value=row&&row.querySelector(".idx") ? row.querySelector(".idx").textContent.trim() : "";
+  $("#articleKickerText").value=row&&row.querySelector(".kicker") ? row.querySelector(".kicker").textContent.trim() : "";
+  $("#articleTitleText").value=(parts.pageHeading||parts.rowHeading).textContent.trim();
+  $("#articleDescriptionText").value=row&&row.querySelector(".meta > p") ? row.querySelector(".meta > p").textContent.trim() : "";
+  $("#articleCardDetails").style.display=row ? "" : "none";
+  $("#articleDescriptionField").style.display=row ? "" : "none";
+  open("articleCardModal");
   setTimeout(()=>$("#articleTitleText").focus(),30);
 }
-$("#saveArticleTitle").addEventListener("click",()=>{
+$("#saveArticleCard").addEventListener("click",()=>{
   const title=$("#articleTitleText").value.trim();
-  if(!articleTitleTarget || !title){ toast("Add an article title first.","err"); return; }
+  if(!articleCardTarget || !title){ toast("Add an article title first.","err"); return; }
   snapshot();
-  syncArticleTitle(articleTitleTarget,title);
-  close("articleTitleModal"); articleTitleTarget=null;
-  toast("Article title updated everywhere.","ok");
+  const row=articleCardTarget.row;
+  if(row){
+    const number=row.querySelector(".idx"); if(number) number.textContent=$("#articleNumberText").value.trim();
+    const kicker=row.querySelector(".kicker"); if(kicker) kicker.textContent=$("#articleKickerText").value.trim();
+    const description=row.querySelector(".meta > p"); if(description) description.textContent=$("#articleDescriptionText").value.trim();
+  }
+  syncArticleTitle(articleCardTarget.pageHeading||articleCardTarget.rowHeading,title);
+  close("articleCardModal"); articleCardTarget=null;
+  toast("Article card updated everywhere.","ok");
 });
 function menuLinksFor(slug){
   return $$('[data-link="'+CSS.escape(slug)+'"]', state.doc).filter(a=>a.closest("#navlinks,footer.site"));
@@ -1289,7 +1315,7 @@ function setCtxFor(el){
   $("#ctxChip").textContent = describe(el);
 
   const article=articleTitleParts(el);
-  if(article) addAction("Edit article title", iconText(), ()=>openArticleTitle(el));
+  if(article) addAction("Edit article card", iconText(), ()=>openArticleCard(el));
 
   // image actions
   if(el.matches("[data-kd-img]")){
