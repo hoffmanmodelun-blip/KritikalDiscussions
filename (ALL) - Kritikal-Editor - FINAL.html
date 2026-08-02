@@ -98,6 +98,39 @@
   }
   .ctx-select:hover,.ctx-select:focus{border-color:var(--brand);outline:none;}
   .ctx-divider{width:1px;height:28px;background:var(--line);margin:0 .1rem;flex:none;}
+  .ctx-menu{position:relative;display:inline-flex;}
+  .ctx-menu-pop{
+    position:absolute;left:0;bottom:calc(100% + .55rem);z-index:90;display:none;
+    min-width:220px;padding:.4rem;background:var(--surface);border:1px solid var(--line);
+    border-radius:12px;box-shadow:var(--shadow);
+  }
+  .ctx-menu:hover .ctx-menu-pop,.ctx-menu:focus-within .ctx-menu-pop{display:grid;gap:.2rem;}
+  .ctx-menu-pop .btn{width:100%;justify-content:flex-start;border-color:transparent;}
+  .ctx-menu-pop .btn:hover{background:var(--brand-tint);transform:none;}
+  .design-preview-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));gap:.55rem;}
+  .design-preview-card{
+    border:1px solid var(--line);border-radius:11px;background:var(--surface);padding:.55rem;
+    color:var(--ink);font:600 .75rem var(--body);text-align:left;overflow:hidden;
+  }
+  .design-preview-card:hover,.design-preview-card.on{border-color:var(--brand);background:var(--brand-tint);}
+  .design-preview-card.on{box-shadow:inset 0 0 0 1px var(--brand);}
+  .design-preview-stage{height:58px;border-radius:8px;background:linear-gradient(135deg,var(--bg),#fff);display:grid;place-items:center;overflow:hidden;margin-bottom:.4rem;}
+  .design-preview-demo{width:68%;height:27px;border-radius:6px;background:var(--brand);box-shadow:0 7px 16px -10px var(--brand-deep);}
+  .design-preview-card:hover .design-preview-demo{animation-duration:.8s;animation-timing-function:cubic-bezier(.22,.61,.36,1);animation-fill-mode:both;animation-iteration-count:infinite;}
+  .design-preview-card[data-motion-preview="fade-up"]:hover .design-preview-demo,.design-preview-card[data-transition-preview="default"]:hover .design-preview-demo{animation-name:miniFadeUp;}
+  .design-preview-card[data-motion-preview="fade"]:hover .design-preview-demo,.design-preview-card[data-transition-preview="fade"]:hover .design-preview-demo{animation-name:miniFade;}
+  .design-preview-card[data-motion-preview="slide-left"]:hover .design-preview-demo{animation-name:miniSlideLeft;}
+  .design-preview-card[data-motion-preview="slide-right"]:hover .design-preview-demo,.design-preview-card[data-transition-preview="slide"]:hover .design-preview-demo{animation-name:miniSlideRight;}
+  .design-preview-card[data-motion-preview="zoom"]:hover .design-preview-demo,.design-preview-card[data-transition-preview="zoom"]:hover .design-preview-demo{animation-name:miniZoom;}
+  .design-preview-card[data-motion-preview="pop"]:hover .design-preview-demo{animation-name:miniPop;}
+  .design-preview-card[data-motion-preview="blur"]:hover .design-preview-demo{animation-name:miniBlur;}
+  @keyframes miniFadeUp{from{opacity:.1;transform:translateY(20px)}to{opacity:1;transform:none}}
+  @keyframes miniFade{from{opacity:.05}to{opacity:1}}
+  @keyframes miniSlideLeft{from{opacity:.1;transform:translateX(-34px)}to{opacity:1;transform:none}}
+  @keyframes miniSlideRight{from{opacity:.1;transform:translateX(34px)}to{opacity:1;transform:none}}
+  @keyframes miniZoom{from{opacity:.2;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
+  @keyframes miniPop{0%{opacity:.1;transform:scale(.45)}70%{opacity:1;transform:scale(1.12)}100%{transform:scale(1)}}
+  @keyframes miniBlur{from{opacity:.1;filter:blur(7px);transform:translateY(7px)}to{opacity:1;filter:blur(0);transform:none}}
   .btn.danger{color:var(--danger);}
   .btn.danger:hover{border-color:var(--danger);background:#fdecea;}
   .ctx-hint{font-size:.84rem;color:var(--ink-soft);}
@@ -163,7 +196,9 @@
     .ctx-what{margin-bottom:.4rem;}
     .ctx-actions{display:flex;flex-wrap:nowrap !important;margin-left:0;width:max-content;}
     .ctx-select{max-width:132px;}
+    .ctx-menu-pop{position:fixed;left:.5rem;right:.5rem;bottom:70px;min-width:0;}
   }
+  @media (prefers-reduced-motion:reduce){.design-preview-card:hover .design-preview-demo{animation:none;}}
 </style>
 </head>
 <body>
@@ -332,7 +367,27 @@
         <div class="field"><label>Visibility</label><select id="designVisibility"><option value="show">Shown on site</option><option value="hide">Hidden but kept in editor</option></select></div>
         <div class="field"><label>Page transition</label><select id="pageTransition"><option value="default">Soft rise</option><option value="fade">Fade</option><option value="slide">Slide in</option><option value="zoom">Gentle zoom</option><option value="none">None</option></select></div>
       </div>
-      <div class="note">Animations respect visitors who prefer reduced motion. Hidden content remains faintly visible while editing so it can always be restored.</div>
+      <div class="divider"></div>
+      <p class="section-label">Hover to preview entrance animations · Click to choose</p>
+      <div class="design-preview-grid" id="motionPreviewGrid">
+        <button class="design-preview-card" type="button" data-motion-preview="none"><span class="design-preview-stage"><span class="design-preview-demo"></span></span>None</button>
+        <button class="design-preview-card" type="button" data-motion-preview="fade-up"><span class="design-preview-stage"><span class="design-preview-demo"></span></span>Fade up</button>
+        <button class="design-preview-card" type="button" data-motion-preview="fade"><span class="design-preview-stage"><span class="design-preview-demo"></span></span>Fade</button>
+        <button class="design-preview-card" type="button" data-motion-preview="slide-left"><span class="design-preview-stage"><span class="design-preview-demo"></span></span>Slide left</button>
+        <button class="design-preview-card" type="button" data-motion-preview="slide-right"><span class="design-preview-stage"><span class="design-preview-demo"></span></span>Slide right</button>
+        <button class="design-preview-card" type="button" data-motion-preview="zoom"><span class="design-preview-stage"><span class="design-preview-demo"></span></span>Gentle zoom</button>
+        <button class="design-preview-card" type="button" data-motion-preview="pop"><span class="design-preview-stage"><span class="design-preview-demo"></span></span>Pop in</button>
+        <button class="design-preview-card" type="button" data-motion-preview="blur"><span class="design-preview-stage"><span class="design-preview-demo"></span></span>Focus in</button>
+      </div>
+      <p class="section-label" style="margin-top:1rem;">Hover to preview page transitions · Click to choose</p>
+      <div class="design-preview-grid" id="transitionPreviewGrid">
+        <button class="design-preview-card" type="button" data-transition-preview="default"><span class="design-preview-stage"><span class="design-preview-demo"></span></span>Soft rise</button>
+        <button class="design-preview-card" type="button" data-transition-preview="fade"><span class="design-preview-stage"><span class="design-preview-demo"></span></span>Fade</button>
+        <button class="design-preview-card" type="button" data-transition-preview="slide"><span class="design-preview-stage"><span class="design-preview-demo"></span></span>Slide in</button>
+        <button class="design-preview-card" type="button" data-transition-preview="zoom"><span class="design-preview-stage"><span class="design-preview-demo"></span></span>Gentle zoom</button>
+        <button class="design-preview-card" type="button" data-transition-preview="none"><span class="design-preview-stage"><span class="design-preview-demo"></span></span>None</button>
+      </div>
+      <div class="note" style="margin-top:1rem;">Animations respect visitors who prefer reduced motion. Hidden content remains faintly visible while editing so it can always be restored.</div>
     </div>
     <div class="foot"><button class="btn ghost" id="previewMotion" type="button">Preview animation</button><button class="btn ghost" data-close="designModal">Cancel</button><button class="btn primary" id="applyDesign" type="button">Apply design</button></div>
   </div>
@@ -503,7 +558,7 @@
       <div class="note">Common sizes: 14–16 for small text, 17–20 for body text, 24–36 for subheadings, and 40–72 for major headings.</div>
     </div>
     <div class="foot">
-      <button class="btn ghost" id="resetFontSize" type="button">Use design default</button>
+      <button class="btn ghost" id="resetFontSize" type="button">Use website text size</button>
       <button class="btn ghost" data-close="fontSizeModal">Cancel</button>
       <button class="btn primary" id="saveFontSize" type="button">Apply font size</button>
     </div>
@@ -576,7 +631,7 @@
         </div>
         <div>
           <h3>3 · Change text</h3>
-          <p>Click any heading or paragraph and just type. The bottom ribbon works like a compact word processor: choose paragraph or heading styles, font, size, text color, highlight, and alignment, or use bold, italic, underline, and hyperlinks. Select words to format only those words; with no selection, formatting changes the whole text block. Use <strong>Add heading below</strong> or <strong>Add paragraph below</strong> to add text inside a card. For a Starter Guide card, choose <strong>Edit article card</strong> to change its number, blue label/byline, title, and description. The title on the article page updates too.</p>
+          <p>Click any heading or paragraph and just type. The bottom ribbon works like a compact word processor: choose paragraph or heading styles, font family, text size, text color, highlight, and alignment, or use bold, italic, underline, and hyperlinks. Hover over <strong>More text tools</strong> for strikethrough, subscript, superscript, clear formatting, and controls that add a heading or paragraph inside a card. Select words to format only those words; with no selection, formatting changes the whole text block. For a Starter Guide card, choose <strong>Edit article card</strong> to change its number, blue label/byline, title, and description. The title on the article page updates too.</p>
         </div>
         <div>
           <h3>4 · Swap a photo</h3>
@@ -588,7 +643,7 @@
         </div>
         <div>
           <h3>6 · Add or remove a person / card</h3>
-          <p>Click a team member, instructor, or card. The bottom bar offers <strong>Add another</strong> (makes an identical copy you can edit), <strong>Remove</strong>, and arrows to reorder. Copies always match the existing design. On the Debate Camp page, select any section and choose <strong>Add instructor here</strong>, or use <strong>Insert → Instructor card here</strong>; this also works for the Public Forum section.</p>
+          <p>Click a team member, instructor, or card. The bottom bar offers <strong>Add another</strong>, <strong>Remove</strong>, and arrows to reorder. To move a complete instructor card between groups, choose <strong>Copy instructor</strong>, select the PF or other destination heading, and choose <strong>Paste copied instructor here</strong>. The image, role, name, biography, and framing are copied together. You can also choose <strong>Add blank instructor here</strong> or use <strong>Insert → Instructor card here</strong>.</p>
         </div>
         <div>
           <h3>7 · Made a mistake?</h3>
@@ -600,7 +655,7 @@
         </div>
         <div>
           <h3>9 · Animate and style</h3>
-          <p>Select something and open <strong>Design</strong>. Choose an entrance effect, timing, alignment, background, visibility, or page transition. Use Preview animation to test it.</p>
+          <p>Select something and open <strong>Design</strong>. Hover over the animated miniatures to see every entrance effect and page transition, then click a miniature to choose it. You can also change timing, alignment, background, visibility, and text styling before applying the design.</p>
         </div>
         <div>
           <h3>10 · Create and manage pages</h3>
@@ -640,6 +695,7 @@ const state = {
   selected: null,        // currently selected element (in iframe)
   designTarget: null,    // element currently being styled
   activeEditable: null,  // element currently contentEditable
+  instructorClipboard: "", // copied instructor card for moving between camp groups
   undo: [],              // snapshots of <body> innerHTML
   tabState: [],          // remembered hidden/active states to restore on export
   baseUrl: "https://kritikaldiscussions.com/",
@@ -1289,8 +1345,17 @@ function syncDesignForm(){
   $("#designBackground").value=!section?"keep":section.classList.contains("cta-band")?"brand":section.classList.contains("tint")?"tint":section.classList.contains("alt")?"alt":"default";
   $("#designVisibility").value=target.classList.contains("kd-site-hidden")?"hide":"show";
   $("#pageTransition").value=pageTransitionName(page);
+  syncDesignPreviewButtons();
+}
+function syncDesignPreviewButtons(){
+  $$('[data-motion-preview]').forEach(b=>b.classList.toggle("on",b.dataset.motionPreview===$("#motionPreset").value));
+  $$('[data-transition-preview]').forEach(b=>b.classList.toggle("on",b.dataset.transitionPreview===$("#pageTransition").value));
 }
 $("#designScope").addEventListener("change",syncDesignForm);
+$("#motionPreset").addEventListener("change",syncDesignPreviewButtons);
+$("#pageTransition").addEventListener("change",syncDesignPreviewButtons);
+$$('[data-motion-preview]').forEach(b=>b.addEventListener("click",()=>{$("#motionPreset").value=b.dataset.motionPreview;syncDesignPreviewButtons();}));
+$$('[data-transition-preview]').forEach(b=>b.addEventListener("click",()=>{$("#pageTransition").value=b.dataset.transitionPreview;syncDesignPreviewButtons();}));
 $("#designBtn").addEventListener("click",openDesign);
 
 function applyDesignSettings(closeAfter=true){
@@ -1702,44 +1767,50 @@ function setCtxFor(el){
       ["p","Paragraph"],["h1","Heading 1"],["h2","Heading 2"],["h3","Heading 3"],["h4","Heading 4"],["h5","Heading 5"],["eyebrow","Eyebrow"],["role","Role / label"]
     ],currentTextStyle(el),value=>changeTextBlockStyle(el,value));
     addSelect("Font",[
-      ["","Site default"],["var(--body)","Hanken Grotesk"],["var(--display)","Fraunces"],["Arial, sans-serif","Arial"],["Georgia, serif","Georgia"],["'Times New Roman', serif","Times New Roman"],["Verdana, sans-serif","Verdana"]
-    ],"",value=>applyTextProperty(el,"font-family",value,"inherit","Font"));
+      ["","Font family"],["reset","Use website font"],["var(--body)","Hanken Grotesk"],["var(--display)","Fraunces"],["Arial, sans-serif","Arial"],["Georgia, serif","Georgia"],["'Times New Roman', serif","Times New Roman"],["Verdana, sans-serif","Verdana"]
+    ],"",value=>applyTextProperty(el,"font-family",value==="reset"?"":value,"inherit","Font"));
     addSelect("Size",[
-      ["","Default size"],["12px","12 px"],["14px","14 px"],["16px","16 px"],["18px","18 px"],["20px","20 px"],["24px","24 px"],["28px","28 px"],["32px","32 px"],["36px","36 px"],["48px","48 px"],["64px","64 px"],["custom","Custom…"]
-    ],"",value=>value==="custom"?openFontSize(el):applyTextProperty(el,"font-size",value,"inherit","Font size"));
+      ["","Text size"],["reset","Use website text size"],["12px","12 px"],["14px","14 px"],["16px","16 px"],["18px","18 px"],["20px","20 px"],["24px","24 px"],["28px","28 px"],["32px","32 px"],["36px","36 px"],["48px","48 px"],["64px","64 px"],["custom","Enter a custom size…"]
+    ],"",value=>value==="custom"?openFontSize(el):applyTextProperty(el,"font-size",value==="reset"?"":value,"inherit","Font size"));
     addSelect("Text color",[
-      ["","Default color"],["var(--ink)","Dark ink"],["var(--ink-soft)","Soft gray"],["var(--brand)","Brand teal"],["#000000","Black"],["#ffffff","White"],["#b42318","Red"],["#175cd3","Blue"],["#067647","Green"],["#9333ea","Purple"]
-    ],"",value=>applyTextProperty(el,"color",value,"inherit","Text color"));
+      ["","Text color"],["reset","Use website text color"],["var(--ink)","Dark ink"],["var(--ink-soft)","Soft gray"],["var(--brand)","Brand teal"],["#000000","Black"],["#ffffff","White"],["#b42318","Red"],["#175cd3","Blue"],["#067647","Green"],["#9333ea","Purple"]
+    ],"",value=>applyTextProperty(el,"color",value==="reset"?"":value,"inherit","Text color"));
     addSelect("Highlight",[
-      ["","No highlight"],["#fff3a3","Yellow highlight"],["#d9f6ef","Teal highlight"],["#dbeafe","Blue highlight"],["#fce7f3","Pink highlight"],["#e9d5ff","Purple highlight"]
-    ],"",value=>applyTextProperty(el,"background-color",value,"transparent","Highlight"));
+      ["","Text highlight"],["remove","Remove highlight"],["#fff3a3","Yellow highlight"],["#d9f6ef","Teal highlight"],["#dbeafe","Blue highlight"],["#fce7f3","Pink highlight"],["#e9d5ff","Purple highlight"]
+    ],"",value=>applyTextProperty(el,"background-color",value==="remove"?"":value,"transparent","Highlight"));
     addSelect("Alignment",[
-      ["default","Default align"],["left","Align left"],["center","Align center"],["right","Align right"],["justify","Justify"]
-    ],el.style.textAlign||"default",value=>applyTextAlignment(el,value));
+      ["","Text alignment"],["website","Use website alignment"],["left","Align left"],["center","Align center"],["right","Align right"],["justify","Justify"]
+    ],"",value=>applyTextAlignment(el,value==="website"?"default":value));
     addCtxDivider();
     addAction("Bold", "<strong aria-hidden='true'>B</strong>", ()=>formatInline("bold"));
     addAction("Italic", "<em aria-hidden='true'>I</em>", ()=>formatInline("italic"));
     addAction("Underline", "<u aria-hidden='true'>U</u>", ()=>formatInline("underline"));
-    addAction("Strike", "<s aria-hidden='true'>S</s>", ()=>formatInline("strikeThrough"));
-    addAction("Subscript", "<span aria-hidden='true'>X<sub>2</sub></span>", ()=>formatInline("subscript"));
-    addAction("Superscript", "<span aria-hidden='true'>X<sup>2</sup></span>", ()=>formatInline("superscript"));
-    addAction("Clear formatting", iconText(), ()=>formatInline("removeFormat"));
     addAction("Hyperlink", iconLink(), ()=>openInlineLink(el));
-    addAction("Add heading below", iconPlus(), ()=>insertTextAfter(el,"h3"));
-    addAction("Add paragraph below", iconPlus(), ()=>insertTextAfter(el,"p"));
+    addHoverMenu("More text tools",[
+      ["Strikethrough","<s aria-hidden='true'>S</s>",()=>formatInline("strikeThrough")],
+      ["Subscript","<span aria-hidden='true'>X<sub>2</sub></span>",()=>formatInline("subscript")],
+      ["Superscript","<span aria-hidden='true'>X<sup>2</sup></span>",()=>formatInline("superscript")],
+      ["Clear selected formatting",iconText(),()=>formatInline("removeFormat")],
+      ["Add heading below",iconPlus(),()=>insertTextAfter(el,"h3")],
+      ["Add paragraph below",iconPlus(),()=>insertTextAfter(el,"p")]
+    ]);
   }
 
   // structural actions for repeatable items
   const item = repeatableItem(el);
   if(item){
     const noun = itemLabel(item);
+    if(noun==="instructor") addAction("Copy instructor", iconCopy(), ()=>copyInstructor(item));
     addAction("Add another "+noun, iconPlus(), ()=> addItem(item));
     addAction("Move up", iconUp(), ()=> moveItem(item,-1));
     addAction("Move down", iconDown(), ()=> moveItem(item,1));
     addAction("Remove "+noun, iconTrash(), ()=> removeItem(item), "danger");
   }
 
-  if(el.closest("#page-camp")) addAction("Add instructor here", iconPlus(), ()=>addInstructorNear(el));
+  if(el.closest("#page-camp")){
+    if(state.instructorClipboard)addAction("Paste copied instructor here",iconCopy(),()=>pasteInstructorNear(el));
+    addAction("Add blank instructor here", iconPlus(), ()=>addInstructorNear(el));
+  }
 
   addAction("Design", iconDesign(), ()=>{ state.selected=el; openDesign(); });
   addAction(el.classList.contains("kd-site-hidden")?"Show":"Hide", iconEye(), ()=>toggleVisibility(el));
@@ -1771,6 +1842,17 @@ function addSelect(label,options,value,onChange){
 function addCtxDivider(){
   const divider=document.createElement("span");divider.className="ctx-divider";divider.setAttribute("aria-hidden","true");
   $("#ctxActions").appendChild(divider);
+}
+function addHoverMenu(label,entries){
+  const menu=document.createElement("div");menu.className="ctx-menu";
+  const trigger=document.createElement("button");trigger.type="button";trigger.className="btn ghost";
+  trigger.innerHTML=iconText()+"<span>"+label+" ▾</span>";trigger.setAttribute("aria-haspopup","menu");
+  const pop=document.createElement("div");pop.className="ctx-menu-pop";pop.setAttribute("role","menu");
+  entries.forEach(([entryLabel,icon,fn])=>{
+    const button=document.createElement("button");button.type="button";button.className="btn ghost";
+    button.innerHTML=icon+"<span>"+entryLabel+"</span>";button.onclick=fn;button.setAttribute("role","menuitem");pop.appendChild(button);
+  });
+  menu.append(trigger,pop);$("#ctxActions").appendChild(menu);
 }
 
 /* ---- REPEATABLE ITEM DETECTION ---- */
@@ -1840,10 +1922,7 @@ function retagWithin(node){
   $$(BLOCK_SEL,node).forEach(el=>el.setAttribute("data-kd-text","1"));
 }
 
-function addInstructorNear(target){
-  if(!target||!target.closest("#page-camp")){toast("Choose a section on the Debate Camp page first.","err");return;}
-  finishEditing();
-  snapshot();ensureSiteBuilderStyles();
+function instructorGridNear(target){
   let grid=target.closest(".instructor-grid");
   if(!grid){
     const heading=target.closest(".section-head");
@@ -1863,6 +1942,12 @@ function addInstructorNear(target){
       }
     }
   }
+  return grid;
+}
+function addInstructorNear(target){
+  if(!target||!target.closest("#page-camp")){toast("Choose a section on the Debate Camp page first.","err");return;}
+  finishEditing();snapshot();ensureSiteBuilderStyles();
+  const grid=instructorGridNear(target);
   const card=createSiteNode(`<article class="instructor-card reveal in">
     <img class="instructor-photo" src="${PLACEHOLDER_IMG}" alt="" loading="lazy">
     <div class="instructor-body"><p class="role">Debate Instructor</p><h3>New instructor</h3><p>New biography — click to edit.</p></div>
@@ -1870,6 +1955,31 @@ function addInstructorNear(target){
   grid.appendChild(card);retagWithin(card);selectElement(card);
   card.scrollIntoView({behavior:"smooth",block:"center"});
   toast("Instructor added — replace the photo and edit the text.","ok");
+}
+function copyInstructor(item){
+  if(!item||!item.matches(".instructor-card,.archive-card"))return;
+  finishEditing();
+  const clone=item.cloneNode(true);
+  clone.classList.remove("kd-sel");
+  $$(".kd-sel",clone).forEach(n=>n.classList.remove("kd-sel"));
+  $$('[contenteditable]',clone).forEach(n=>n.removeAttribute("contenteditable"));
+  $$('[data-kd-text],[data-kd-img],[data-kd-ctrl]',clone).forEach(n=>{
+    n.removeAttribute("data-kd-text");n.removeAttribute("data-kd-img");n.removeAttribute("data-kd-ctrl");
+  });
+  state.instructorClipboard=clone.outerHTML;
+  if(state.selected&&state.selected.isConnected)setCtxFor(state.selected);
+  toast("Instructor copied. Select the PF or other camp section and choose Paste copied instructor here.","ok");
+}
+function pasteInstructorNear(target){
+  if(!state.instructorClipboard){toast("Copy an instructor first.","err");return;}
+  if(!target||!target.closest("#page-camp")){toast("Choose the destination on the Debate Camp page first.","err");return;}
+  finishEditing();snapshot();ensureSiteBuilderStyles();
+  const grid=instructorGridNear(target);
+  const card=createSiteNode(state.instructorClipboard);
+  card.removeAttribute("id");$$("[id]",card).forEach(n=>n.removeAttribute("id"));
+  card.classList.add("reveal","in");grid.appendChild(card);retagWithin(card);selectElement(card);
+  card.scrollIntoView({behavior:"smooth",block:"center"});
+  toast("Copied instructor pasted here with the same image, name, role, and biography.","ok");
 }
 
 /* ---- IMAGES ---- */
