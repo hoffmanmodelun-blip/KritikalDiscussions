@@ -710,9 +710,9 @@
     </a>
 
     <ul class="nav-links" id="navlinks">
-      <li><a href="#home" data-link="home" class="active">Home</a></li>
+      <li><a href="#home" data-link="home" class="">Home</a></li>
       <li><a href="#team" data-link="team" class="">Our Team</a></li>
-      <li><a href="#camp" data-link="camp" class="">Debate Camp</a></li>
+      <li><a href="#camp" data-link="camp" class="active">Debate Camp</a></li>
       <!-- SHELVED NAV ITEM: Kritikal Project is temporarily hidden; restore this link when the page is active again.
       <li><a href="#project" data-link="project">Kritikal Project</a></li>
       -->
@@ -945,7 +945,7 @@
             <div class="schedule-head">
               <p class="eyebrow">Final 2026 Schedule</p>
               <h3>Evening Schedule</h3>
-              <p>For Varsity, JV Lab 3, Novice LD, and Public Forum. All times are Eastern.</p>
+              <p class="">For Varsity, JV Lab 3, Novice LD, and Public Forum. All times are in Eastern Daylight Time (EDT) or equivalent (UTC -4).</p>
             </div>
             <table class="schedule-table final-schedule" aria-label="2026 evening schedule for Varsity, JV Lab 3, Novice LD, and Public Forum">
               <thead>
@@ -1002,8 +1002,8 @@
           <div class="schedule-card">
             <div class="schedule-head">
               <p class="eyebrow">Final 2026 Schedule</p>
-              <h3>International &amp; JV Lab 4 Schedule</h3>
-              <p>All times are Eastern.</p>
+              <h3 class="">Morning Schedule.</h3>
+              <p class="">&nbsp;International &amp; JV Lab 4 Schedule. All times are in Eastern Daylight Time (EDT) or equivalent (UTC -4).</p>
             </div>
             <table class="schedule-table final-schedule" aria-label="2026 International and JV Lab 4 schedule">
               <thead>
@@ -1919,6 +1919,7 @@
   const initial = (location.hash || '#home').slice(1);
   if (!go(initial)) go('home');
 </script>
+
 
 
 
