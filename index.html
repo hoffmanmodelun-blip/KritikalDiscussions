@@ -327,7 +327,7 @@
   .camp-stat strong{display:block; margin-top:.25rem; color:var(--ink); line-height:1.25;}
   .schedule-card{
     margin-top:3rem; background:var(--surface); border:1px solid var(--line);
-    border-radius:18px; overflow:hidden;
+    border-radius:18px; overflow-x:auto; overflow-y:hidden;
   }
   .schedule-card .schedule-head{padding:1.35rem 1.5rem; border-bottom:1px solid var(--line);}
   .schedule-card .schedule-head h3{font-size:1.35rem;}
@@ -344,15 +344,15 @@
   }
   .schedule-table tr:first-child th,
   .schedule-table tr:first-child td{border-top:0;}
-  .final-schedule th{width:24%; vertical-align:top;}
-  .final-schedule td{width:76%; padding:.45rem 1rem; font-weight:400;}
+  .schedule-table.final-schedule{min-width:1050px; table-layout:fixed;}
+  .final-schedule th{width:20%; text-align:center; white-space:normal;}
+  .final-schedule td{width:20%; padding:.45rem 1rem; font-weight:400; vertical-align:top;}
   .schedule-event{
-    display:flex; justify-content:space-between; gap:1rem;
     padding:.55rem 0; border-bottom:1px solid var(--line);
   }
   .schedule-event:last-child{border-bottom:0;}
   .schedule-event strong{font-weight:700;}
-  .schedule-event time{color:var(--ink-soft); text-align:right; white-space:nowrap;}
+  .schedule-event time{display:block; margin-top:.2rem; color:var(--ink-soft);}
   .schedule-note{
     padding:1rem 1.5rem; border-top:1px solid var(--line);
     font-size:.95rem; color:var(--ink-soft);
@@ -641,12 +641,6 @@
   }
 
   @media (max-width:640px){
-    .final-schedule{min-width:0;}
-    .final-schedule th,
-    .final-schedule td{display:block; width:100%;}
-    .final-schedule th{white-space:normal;}
-    .schedule-event{display:block;}
-    .schedule-event time{display:block; margin-top:.2rem; text-align:left; white-space:normal;}
     .story-split{grid-template-columns:1fr;}
   }
 
@@ -952,9 +946,17 @@
               <p>For Varsity, JV Lab 3, Novice LD, and Public Forum. All times are Eastern.</p>
             </div>
             <table class="schedule-table final-schedule" aria-label="2026 evening schedule for Varsity, JV Lab 3, Novice LD, and Public Forum">
+              <thead>
+                <tr>
+                  <th scope="col">Sunday, August 2</th>
+                  <th scope="col">Monday, August 3</th>
+                  <th scope="col">Tuesday, August 4</th>
+                  <th scope="col">Wednesday, August 5</th>
+                  <th scope="col">Thursday, August 6</th>
+                </tr>
+              </thead>
               <tbody>
                 <tr>
-                  <th scope="row">Sunday, August 2</th>
                   <td>
                     <div class="schedule-event"><strong>Introduction (All instructors)</strong><time>6:00 PM - 6:30 PM</time></div>
                     <div class="schedule-event"><strong>Lab Session</strong><time>6:30 PM - 7:30 PM</time></div>
@@ -963,9 +965,6 @@
                     <div class="schedule-event"><strong>Break</strong><time>8:45 PM - 9:00 PM</time></div>
                     <div class="schedule-event"><strong>Electives (Optional)</strong><time>9:00 PM - 10:00 PM</time></div>
                   </td>
-                </tr>
-                <tr>
-                  <th scope="row">Monday, August 3</th>
                   <td>
                     <div class="schedule-event"><strong>Lab or Demo Debate</strong><time>6:00 PM - 7:30 PM</time></div>
                     <div class="schedule-event"><strong>Break</strong><time>7:30 PM - 8:00 PM</time></div>
@@ -973,9 +972,6 @@
                     <div class="schedule-event"><strong>Break</strong><time>8:45 PM - 9:00 PM</time></div>
                     <div class="schedule-event"><strong>Practice Rounds / Office Hours (Optional)</strong><time>9:00 PM - 10:00 PM</time></div>
                   </td>
-                </tr>
-                <tr>
-                  <th scope="row">Tuesday, August 4</th>
                   <td>
                     <div class="schedule-event"><strong>Lab Session</strong><time>6:00 PM - 7:30 PM</time></div>
                     <div class="schedule-event"><strong>Break</strong><time>7:30 PM - 8:00 PM</time></div>
@@ -983,9 +979,6 @@
                     <div class="schedule-event"><strong>Break</strong><time>8:45 PM - 9:00 PM</time></div>
                     <div class="schedule-event"><strong>Practice Rounds / Office Hours (Optional)</strong><time>9:00 PM - 10:00 PM</time></div>
                   </td>
-                </tr>
-                <tr>
-                  <th scope="row">Wednesday, August 5</th>
                   <td>
                     <div class="schedule-event"><strong>Lab Session</strong><time>6:00 PM - 7:30 PM</time></div>
                     <div class="schedule-event"><strong>Break</strong><time>7:30 PM - 8:00 PM</time></div>
@@ -993,9 +986,6 @@
                     <div class="schedule-event"><strong>Break</strong><time>8:45 PM - 9:00 PM</time></div>
                     <div class="schedule-event"><strong>Electives (Optional)</strong><time>9:00 PM - 10:00 PM</time></div>
                   </td>
-                </tr>
-                <tr>
-                  <th scope="row">Thursday, August 6</th>
                   <td>
                     <div class="schedule-event"><strong>Lab Session</strong><time>6:00 PM - 7:30 PM</time></div>
                     <div class="schedule-event"><strong>Break</strong><time>7:30 PM - 8:00 PM</time></div>
@@ -1014,9 +1004,17 @@
               <p>All times are Eastern.</p>
             </div>
             <table class="schedule-table final-schedule" aria-label="2026 International and JV Lab 4 schedule">
+              <thead>
+                <tr>
+                  <th scope="col">Sunday, August 2</th>
+                  <th scope="col">Monday, August 3</th>
+                  <th scope="col">Tuesday, August 4</th>
+                  <th scope="col">Wednesday, August 5</th>
+                  <th scope="col">Thursday, August 6</th>
+                </tr>
+              </thead>
               <tbody>
                 <tr>
-                  <th scope="row">Sunday, August 2</th>
                   <td>
                     <div class="schedule-event"><strong>Introduction (All instructors)</strong><time>9:00 AM - 9:30 AM</time></div>
                     <div class="schedule-event"><strong>Lab Session</strong><time>9:30 AM - 10:30 AM</time></div>
@@ -1024,36 +1022,24 @@
                     <div class="schedule-event"><strong>Lab Session</strong><time>11:00 AM - 12:00 PM</time></div>
                     <div class="schedule-event"><strong>Office Hours</strong><time>12:00 PM - 1:00 PM</time></div>
                   </td>
-                </tr>
-                <tr>
-                  <th scope="row">Monday, August 3</th>
                   <td>
                     <div class="schedule-event"><strong>Lab Session</strong><time>9:00 AM - 10:30 AM</time></div>
                     <div class="schedule-event"><strong>Break</strong><time>10:30 AM - 11:00 AM</time></div>
                     <div class="schedule-event"><strong>Novice Demo Debate</strong><time>11:00 AM - 12:00 PM</time></div>
                     <div class="schedule-event"><strong>Office Hours</strong><time>12:00 PM - 1:00 PM</time></div>
                   </td>
-                </tr>
-                <tr>
-                  <th scope="row">Tuesday, August 4</th>
                   <td>
                     <div class="schedule-event"><strong>Break</strong><time>10:30 AM - 11:00 AM</time></div>
                     <div class="schedule-event"><strong>Lab Session</strong><time>11:00 AM - 12:00 PM</time></div>
                     <div class="schedule-event"><strong>Practice Rounds (Optional)</strong><time>12:00 PM - 1:00 PM</time></div>
                     <div class="schedule-event"><strong>Lab Session</strong><time>6:00 PM - 7:30 PM</time></div>
                   </td>
-                </tr>
-                <tr>
-                  <th scope="row">Wednesday, August 5</th>
                   <td>
                     <div class="schedule-event"><strong>Lab Session</strong><time>9:00 AM - 10:30 AM</time></div>
                     <div class="schedule-event"><strong>Break</strong><time>10:30 AM - 11:00 AM</time></div>
                     <div class="schedule-event"><strong>Lab Session</strong><time>11:00 AM - 12:00 PM</time></div>
                     <div class="schedule-event"><strong>Office Hours</strong><time>12:00 PM - 1:00 PM</time></div>
                   </td>
-                </tr>
-                <tr>
-                  <th scope="row">Thursday, August 6</th>
                   <td>
                     <div class="schedule-event"><strong>Round One</strong><time>8:00 AM - 9:30 AM</time></div>
                     <div class="schedule-event"><strong>Round Two</strong><time>10:00 AM - 11:30 AM</time></div>
