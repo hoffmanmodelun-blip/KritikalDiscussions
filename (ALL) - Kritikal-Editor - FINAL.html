@@ -91,6 +91,13 @@
   .ctx-what .chip{font-weight:700;color:var(--brand);background:var(--brand-tint);border-radius:100px;padding:.22rem .65rem;font-size:.78rem;white-space:nowrap;}
   .ctx-actions{display:flex;align-items:center;gap:.45rem;flex-wrap:wrap;margin-left:auto;}
   .ctx-actions .btn{padding:.45rem .7rem;font-size:.83rem;}
+  .ctx-select{
+    min-height:34px;max-width:155px;border:1px solid var(--line);border-radius:9px;
+    padding:.38rem 1.8rem .38rem .58rem;background:var(--surface);color:var(--ink);
+    font:600 .8rem var(--body);cursor:pointer;
+  }
+  .ctx-select:hover,.ctx-select:focus{border-color:var(--brand);outline:none;}
+  .ctx-divider{width:1px;height:28px;background:var(--line);margin:0 .1rem;flex:none;}
   .btn.danger{color:var(--danger);}
   .btn.danger:hover{border-color:var(--danger);background:#fdecea;}
   .ctx-hint{font-size:.84rem;color:var(--ink-soft);}
@@ -155,6 +162,7 @@
     .ctxbar{display:block;overflow-x:auto;max-height:112px;}
     .ctx-what{margin-bottom:.4rem;}
     .ctx-actions{display:flex;flex-wrap:nowrap !important;margin-left:0;width:max-content;}
+    .ctx-select{max-width:132px;}
   }
 </style>
 </head>
@@ -271,6 +279,7 @@
         <button class="tool-card" id="articleImagePlaceholderBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m3 16 5-5 4 4 3-3 6 6"/></svg><strong>Article image here</strong><span>Draw a custom image size, then add the photo. Full-size viewing is automatic.</span></button>
         <button class="tool-card" data-insert-template="split" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M12 4v16"/></svg><strong>Text + photo</strong><span>Two-column story or program feature.</span></button>
         <button class="tool-card" data-insert-template="cards" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="5" height="14" rx="1"/><rect x="10" y="5" width="5" height="14" rx="1"/><rect x="17" y="5" width="4" height="14" rx="1"/></svg><strong>Three cards</strong><span>Programs, services, topics, or people.</span></button>
+        <button class="tool-card" id="insertInstructorBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/><path d="M19 5v6M16 8h6"/></svg><strong>Instructor card here</strong><span>Add an instructor to any selected Debate Camp section, including Public Forum.</span></button>
         <button class="tool-card" data-insert-template="stats" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 20V10M12 20V4M19 20v-7"/></svg><strong>Impact statistics</strong><span>Three large facts with supporting labels.</span></button>
         <button class="tool-card" data-insert-template="gallery" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="m3 16 5-5 4 4 3-3 6 6"/></svg><strong>Photo gallery</strong><span>Three consistent image slots with captions.</span></button>
         <button class="tool-card" data-insert-template="faq" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.7 2.7 0 1 1 4.2 2.3c-1 .6-1.7 1.1-1.7 2.2M12 17h.01"/></svg><strong>FAQ</strong><span>Expandable questions and answers.</span></button>
@@ -567,7 +576,7 @@
         </div>
         <div>
           <h3>3 · Change text</h3>
-          <p>Click any heading or paragraph and just type. Select words and use <strong>Hyperlink</strong> or <strong>Font size</strong> in the bottom bar; with no words selected, Font size changes the whole text block. For a Starter Guide card, choose <strong>Edit article card</strong> to change its number, blue label/byline, title, and description. The title on the article page updates too.</p>
+          <p>Click any heading or paragraph and just type. The bottom ribbon works like a compact word processor: choose paragraph or heading styles, font, size, text color, highlight, and alignment, or use bold, italic, underline, and hyperlinks. Select words to format only those words; with no selection, formatting changes the whole text block. Use <strong>Add heading below</strong> or <strong>Add paragraph below</strong> to add text inside a card. For a Starter Guide card, choose <strong>Edit article card</strong> to change its number, blue label/byline, title, and description. The title on the article page updates too.</p>
         </div>
         <div>
           <h3>4 · Swap a photo</h3>
@@ -579,7 +588,7 @@
         </div>
         <div>
           <h3>6 · Add or remove a person / card</h3>
-          <p>Click a team member, instructor, or card. The bottom bar offers <strong>Add another</strong> (makes an identical copy you can edit), <strong>Remove</strong>, and arrows to reorder. Copies always match the existing design.</p>
+          <p>Click a team member, instructor, or card. The bottom bar offers <strong>Add another</strong> (makes an identical copy you can edit), <strong>Remove</strong>, and arrows to reorder. Copies always match the existing design. On the Debate Camp page, select any section and choose <strong>Add instructor here</strong>, or use <strong>Insert → Instructor card here</strong>; this also works for the Public Forum section.</p>
         </div>
         <div>
           <h3>7 · Made a mistake?</h3>
@@ -942,6 +951,9 @@ function insertSectionTemplate(type){
 }
 $$('[data-insert-template]').forEach(b=>b.addEventListener("click", ()=>insertSectionTemplate(b.dataset.insertTemplate)));
 $("#insertBtn").addEventListener("click", ()=>{ if(state.loaded) open("insertModal"); });
+$("#insertInstructorBtn").addEventListener("click",()=>{
+  close("insertModal");addInstructorNear(state.selected||currentPage());
+});
 
 function directChildWithin(container,node){
   let child=node;
@@ -1407,7 +1419,7 @@ function finishEditing(){
 }
 function sanitizeInline(el){
   // keep a small whitelist of inline tags; strip everything dangerous
-  const allowed = {"STRONG":1,"EM":1,"B":1,"I":1,"U":1,"BR":1,"SPAN":1,"A":1,"SUP":1,"SUB":1};
+  const allowed = {"STRONG":1,"EM":1,"B":1,"I":1,"U":1,"S":1,"STRIKE":1,"BR":1,"SPAN":1,"A":1,"SUP":1,"SUB":1};
   $$("*", el).forEach(node=>{
     if(node.tagName==="SCRIPT"||node.tagName==="STYLE"){ node.remove(); return; }
     if(!allowed[node.tagName]){
@@ -1422,9 +1434,17 @@ function sanitizeInline(el){
       const n = a.name.toLowerCase();
       if(n.startsWith("on")) node.removeAttribute(a.name);
       if(n==="style"){
-        const fontSize=node.tagName==="SPAN" ? node.style.fontSize : "";
+        const safeStyle=node.tagName==="SPAN" ? {
+          fontSize:node.style.fontSize,
+          fontFamily:node.style.fontFamily,
+          color:node.style.color,
+          backgroundColor:node.style.backgroundColor
+        } : {};
         node.removeAttribute("style");
-        if(/^\d+(?:\.\d+)?(?:px|rem|em|%)$/.test(fontSize)) node.style.fontSize=fontSize;
+        if(/^\d+(?:\.\d+)?(?:px|rem|em|%)$/.test(safeStyle.fontSize||"")) node.style.fontSize=safeStyle.fontSize;
+        if(safeStyle.fontFamily&&safeStyle.fontFamily.length<160) node.style.fontFamily=safeStyle.fontFamily;
+        if(safeStyle.color&&safeStyle.color.length<80) node.style.color=safeStyle.color;
+        if(safeStyle.backgroundColor&&safeStyle.backgroundColor.length<80) node.style.backgroundColor=safeStyle.backgroundColor;
       }
       if(node.tagName==="A" && n==="href" && /^\s*javascript:/i.test(a.value)) node.removeAttribute(a.name);
     });
@@ -1565,6 +1585,66 @@ $("#resetFontSize").addEventListener("click",()=>{
   toast("Default font size restored.","ok");
 });
 
+const TEXT_ROLE_CLASSES=["eyebrow","role","label","kicker","byline","lead","display"];
+function applyTextProperty(el,property,value,defaultValue,label){
+  if(!el||!el.matches("[data-kd-text]"))return;
+  const captured=captureTextRange(el,true);
+  snapshot();
+  if(captured.whole){
+    if(value==="")el.style.removeProperty(property);
+    else el.style.setProperty(property,value);
+  }else{
+    const span=state.doc.createElement("span");
+    span.style.setProperty(property,value||defaultValue);
+    span.appendChild(captured.range.extractContents());
+    captured.range.insertNode(span);
+  }
+  sanitizeInline(el);el.focus();
+  toast(label+" updated.","ok");
+}
+function applyTextAlignment(el,value){
+  if(!el||!value)return;
+  snapshot();
+  if(value==="default")el.style.removeProperty("text-align");
+  else el.style.textAlign=value;
+  toast("Alignment updated.","ok");
+}
+function currentTextStyle(el){
+  if(el.classList.contains("eyebrow"))return "eyebrow";
+  if(el.classList.contains("role"))return "role";
+  return /^H[1-5]$/.test(el.tagName)?el.tagName.toLowerCase():"p";
+}
+function changeTextBlockStyle(el,style){
+  if(!el||!style)return;
+  finishEditing();snapshot();
+  const tag=/^h[1-5]$/.test(style)?style:"p";
+  let next=el;
+  if(el.tagName.toLowerCase()!==tag){
+    next=state.doc.createElement(tag);
+    Array.from(el.attributes).forEach(a=>next.setAttribute(a.name,a.value));
+    while(el.firstChild)next.appendChild(el.firstChild);
+    el.replaceWith(next);
+  }
+  next.classList.remove("kd-sel",...TEXT_ROLE_CLASSES);
+  if(style==="eyebrow"||style==="role")next.classList.add(style);
+  retagWithin(next);selectElement(next);
+  toast("Text style changed.","ok");
+}
+function insertTextAfter(el,tag){
+  if(!el)return;
+  finishEditing();snapshot();
+  const node=state.doc.createElement(tag);
+  node.textContent=tag==="p"?"New paragraph — click to edit.":"New heading";
+  let container=el.closest(".instructor-body,.person-body,.card,.archive-card");
+  let anchor=container?directChildWithin(container,el):el;
+  if(anchor&&anchor.parentElement)anchor.after(node);
+  else if(container)container.appendChild(node);
+  else {toast("Choose text inside a content box first.","err");return;}
+  retagWithin(node);selectElement(node);
+  node.scrollIntoView({behavior:"smooth",block:"center"});
+  toast(tag==="p"?"Paragraph added.":"Heading added.","ok");
+}
+
 /* ---- SELECTION + CONTEXT BAR ---- */
 function selectElement(el, quiet){
   clearSelection(true);
@@ -1618,11 +1698,35 @@ function setCtxFor(el){
     addAction("Edit link", iconLink(), ()=> openLink(el));
   }
   if(el.matches("[data-kd-text]")){
+    addSelect("Text style",[
+      ["p","Paragraph"],["h1","Heading 1"],["h2","Heading 2"],["h3","Heading 3"],["h4","Heading 4"],["h5","Heading 5"],["eyebrow","Eyebrow"],["role","Role / label"]
+    ],currentTextStyle(el),value=>changeTextBlockStyle(el,value));
+    addSelect("Font",[
+      ["","Site default"],["var(--body)","Hanken Grotesk"],["var(--display)","Fraunces"],["Arial, sans-serif","Arial"],["Georgia, serif","Georgia"],["'Times New Roman', serif","Times New Roman"],["Verdana, sans-serif","Verdana"]
+    ],"",value=>applyTextProperty(el,"font-family",value,"inherit","Font"));
+    addSelect("Size",[
+      ["","Default size"],["12px","12 px"],["14px","14 px"],["16px","16 px"],["18px","18 px"],["20px","20 px"],["24px","24 px"],["28px","28 px"],["32px","32 px"],["36px","36 px"],["48px","48 px"],["64px","64 px"],["custom","Custom…"]
+    ],"",value=>value==="custom"?openFontSize(el):applyTextProperty(el,"font-size",value,"inherit","Font size"));
+    addSelect("Text color",[
+      ["","Default color"],["var(--ink)","Dark ink"],["var(--ink-soft)","Soft gray"],["var(--brand)","Brand teal"],["#000000","Black"],["#ffffff","White"],["#b42318","Red"],["#175cd3","Blue"],["#067647","Green"],["#9333ea","Purple"]
+    ],"",value=>applyTextProperty(el,"color",value,"inherit","Text color"));
+    addSelect("Highlight",[
+      ["","No highlight"],["#fff3a3","Yellow highlight"],["#d9f6ef","Teal highlight"],["#dbeafe","Blue highlight"],["#fce7f3","Pink highlight"],["#e9d5ff","Purple highlight"]
+    ],"",value=>applyTextProperty(el,"background-color",value,"transparent","Highlight"));
+    addSelect("Alignment",[
+      ["default","Default align"],["left","Align left"],["center","Align center"],["right","Align right"],["justify","Justify"]
+    ],el.style.textAlign||"default",value=>applyTextAlignment(el,value));
+    addCtxDivider();
     addAction("Bold", "<strong aria-hidden='true'>B</strong>", ()=>formatInline("bold"));
     addAction("Italic", "<em aria-hidden='true'>I</em>", ()=>formatInline("italic"));
     addAction("Underline", "<u aria-hidden='true'>U</u>", ()=>formatInline("underline"));
+    addAction("Strike", "<s aria-hidden='true'>S</s>", ()=>formatInline("strikeThrough"));
+    addAction("Subscript", "<span aria-hidden='true'>X<sub>2</sub></span>", ()=>formatInline("subscript"));
+    addAction("Superscript", "<span aria-hidden='true'>X<sup>2</sup></span>", ()=>formatInline("superscript"));
+    addAction("Clear formatting", iconText(), ()=>formatInline("removeFormat"));
     addAction("Hyperlink", iconLink(), ()=>openInlineLink(el));
-    addAction("Font size", iconText(), ()=>openFontSize(el));
+    addAction("Add heading below", iconPlus(), ()=>insertTextAfter(el,"h3"));
+    addAction("Add paragraph below", iconPlus(), ()=>insertTextAfter(el,"p"));
   }
 
   // structural actions for repeatable items
@@ -1634,6 +1738,8 @@ function setCtxFor(el){
     addAction("Move down", iconDown(), ()=> moveItem(item,1));
     addAction("Remove "+noun, iconTrash(), ()=> removeItem(item), "danger");
   }
+
+  if(el.closest("#page-camp")) addAction("Add instructor here", iconPlus(), ()=>addInstructorNear(el));
 
   addAction("Design", iconDesign(), ()=>{ state.selected=el; openDesign(); });
   addAction(el.classList.contains("kd-site-hidden")?"Show":"Hide", iconEye(), ()=>toggleVisibility(el));
@@ -1651,6 +1757,20 @@ function addAction(label, icon, fn, kind){
   b.innerHTML = icon + "<span>"+label+"</span>";
   b.onclick = fn;
   $("#ctxActions").appendChild(b);
+}
+function addSelect(label,options,value,onChange){
+  const select=document.createElement("select");
+  select.className="ctx-select";select.title=label;select.setAttribute("aria-label",label);
+  options.forEach(([optionValue,optionLabel])=>{
+    const option=document.createElement("option");option.value=optionValue;option.textContent=optionLabel;select.appendChild(option);
+  });
+  select.value=value;
+  select.onchange=()=>{const chosen=select.value;onChange(chosen);select.value=value;};
+  $("#ctxActions").appendChild(select);
+}
+function addCtxDivider(){
+  const divider=document.createElement("span");divider.className="ctx-divider";divider.setAttribute("aria-hidden","true");
+  $("#ctxActions").appendChild(divider);
 }
 
 /* ---- REPEATABLE ITEM DETECTION ---- */
@@ -1697,7 +1817,15 @@ function resetClone(node){
   $$("h1,h2,h3,h4", node).forEach(h=> h.textContent = "New title");
   $$("p", node).forEach(p=>{ if(p.children.length===0) p.textContent = "New text — click to edit."; });
   // reset photos to a clear placeholder so they don't duplicate the original
-  $$("img", node).forEach(im=>{ im.src = PLACEHOLDER_IMG; im.removeAttribute("srcset"); im.alt = ""; });
+  $$("img", node).forEach(im=>{
+    im.src = PLACEHOLDER_IMG;
+    im.removeAttribute("srcset");
+    im.removeAttribute("data-kd-orig");
+    im.removeAttribute("data-kd-crop");
+    im.style.removeProperty("object-position");
+    im.className=(im.className||"").replace(/\bcrop-[^\s]+/g,"").replace(/\s+/g," ").trim();
+    im.alt = "";
+  });
   // letter avatars
   $$(".instructor-avatar", node).forEach(a=> a.textContent = "··");
   node.classList.add("reveal","in");
@@ -1710,6 +1838,38 @@ function retagWithin(node){
   $$(CONTROL_SEL,node).forEach(el=>el.setAttribute("data-kd-ctrl","1"));
   if(node.matches(BLOCK_SEL)) node.setAttribute("data-kd-text","1");
   $$(BLOCK_SEL,node).forEach(el=>el.setAttribute("data-kd-text","1"));
+}
+
+function addInstructorNear(target){
+  if(!target||!target.closest("#page-camp")){toast("Choose a section on the Debate Camp page first.","err");return;}
+  finishEditing();
+  snapshot();ensureSiteBuilderStyles();
+  let grid=target.closest(".instructor-grid");
+  if(!grid){
+    const heading=target.closest(".section-head");
+    if(heading&&heading.nextElementSibling&&heading.nextElementSibling.matches(".instructor-grid")){
+      grid=heading.nextElementSibling;
+    }else{
+      grid=state.doc.createElement("div");grid.className="instructor-grid";
+      if(heading){heading.after(grid);}
+      else{
+        const anchor=target.closest(".curriculum-panel,.camp-intro,.schedule-card,.camp-summary");
+        const campPage=target.closest("#page-camp");
+        const panel=target.closest("[data-camp-panel]")||campPage.querySelector('[data-camp-panel="2026"]')||campPage;
+        const newHeading=createSiteNode('<div class="section-head"><div><p class="eyebrow">Instructors</p><h2>Meet the instructors.</h2></div></div>');
+        if(anchor){anchor.after(newHeading,grid);}
+        else {panel.appendChild(newHeading);panel.appendChild(grid);}
+        retagWithin(newHeading);
+      }
+    }
+  }
+  const card=createSiteNode(`<article class="instructor-card reveal in">
+    <img class="instructor-photo" src="${PLACEHOLDER_IMG}" alt="" loading="lazy">
+    <div class="instructor-body"><p class="role">Debate Instructor</p><h3>New instructor</h3><p>New biography — click to edit.</p></div>
+  </article>`);
+  grid.appendChild(card);retagWithin(card);selectElement(card);
+  card.scrollIntoView({behavior:"smooth",block:"center"});
+  toast("Instructor added — replace the photo and edit the text.","ok");
 }
 
 /* ---- IMAGES ---- */
@@ -1752,6 +1912,12 @@ function applyImage(el, dataUrl, fileName){
     img.setAttribute("data-kd-img","1");
     el.replaceWith(img);
   }
+  // A replacement is a new photo. Never reuse framing metadata from the
+  // previous image (especially on an instructor card cloned from another).
+  img.removeAttribute("data-kd-orig");
+  img.removeAttribute("data-kd-crop");
+  img.style.removeProperty("object-position");
+  img.className=(img.className||"").replace(/\bcrop-[^\s]+/g,"").replace(/\s+/g," ").trim();
   img.src = dataUrl;
   const lightboxLink=img.closest("a[data-lightbox]");
   if(lightboxLink) lightboxLink.removeAttribute("href");
@@ -1844,10 +2010,21 @@ function openAlt(el){ altTarget = el; $("#altText").value = el.alt||""; open("al
 /* ---- REPOSITION / CROP (drag + zoom; baked into the photo so it looks identical live) ---- */
 let cropTarget=null, cropState=null;
 const CROP_ZMAX=3;
-function openCropper(el){ cropTarget=el; open("cropModal"); requestAnimationFrame(()=> setupCropper(el)); }
+function clearCropPreview(){
+  const cimg=$("#cropImg");
+  if(cimg){
+    cimg.onload=null;cimg.onerror=null;cimg.removeAttribute("src");
+    cimg.style.width="";cimg.style.height="";cimg.style.transform="";
+  }
+}
+function openCropper(el){
+  cropTarget=el;cropState=null;clearCropPreview();
+  open("cropModal");requestAnimationFrame(()=>setupCropper(el));
+}
 function cropSourceOf(el){ return (el.dataset && el.dataset.kdOrig) ? el.dataset.kdOrig : (el.currentSrc || el.src || ""); }
 function setupCropper(el){
   const frame=$("#cropFrame"), cimg=$("#cropImg"), msg=$("#cropMsg"), zoom=$("#cropZoom");
+  clearCropPreview();
   msg.style.display="none"; $("#cropSave").disabled=false; $("#cropReset").disabled=false; zoom.disabled=false;
   // match the real frame's aspect ratio so the framing reproduces exactly on the live site
   const rect = el.getBoundingClientRect();
@@ -1861,20 +2038,22 @@ function setupCropper(el){
   // restore prior framing if this photo was cropped before
   let start={z:1,fx:0.5,fy:0.5};
   try{ if(el.dataset && el.dataset.kdCrop) start=Object.assign(start, JSON.parse(el.dataset.kdCrop)); }catch(_){}
-  cropState={fw,fh,aspect,bg,z:start.z,fx:start.fx,fy:start.fy,zMin:1,ready:false,nw:0,nh:0,s0:1,imgW:0,imgH:0,ox:0,oy:0,tx:0,ty:0};
+  const thisState={fw,fh,aspect,bg,z:start.z,fx:start.fx,fy:start.fy,zMin:1,ready:false,nw:0,nh:0,s0:1,imgW:0,imgH:0,ox:0,oy:0,tx:0,ty:0};
+  cropState=thisState;
   const src = cropSourceOf(el);
   if(!src){ cropFail("Add a photo first, then reposition it."); return; }
   cimg.onload=()=>{
+    if(cropTarget!==el||cropState!==thisState)return;
     const nw=cimg.naturalWidth, nh=cimg.naturalHeight;
     if(!nw||!nh){ cropFail("This photo can't be previewed yet."); return; }
     const s0=Math.max(fw/nw, fh/nh);            // cover scale in the preview
     const zMin=Math.min(fw/nw, fh/nh)/s0;       // <=1 : lets you zoom out to show the whole photo
-    Object.assign(cropState,{nw,nh,s0,zMin,ready:true});
-    cropState.z=Math.min(CROP_ZMAX, Math.max(zMin, cropState.z||1));
-    zoom.value=Math.round((cropState.z - zMin)/(CROP_ZMAX - zMin)*100);
+    Object.assign(thisState,{nw,nh,s0,zMin,ready:true});
+    thisState.z=Math.min(CROP_ZMAX, Math.max(zMin, thisState.z||1));
+    zoom.value=Math.round((thisState.z - zMin)/(CROP_ZMAX - zMin)*100);
     recomputeCrop(true);
   };
-  cimg.onerror=()=> cropFail("Add or replace this photo first, then reposition it.");
+  cimg.onerror=()=>{if(cropTarget===el&&cropState===thisState)cropFail("Add or replace this photo first, then reposition it.");};
   cimg.src=src;
 }
 function cropFail(text){
@@ -2081,7 +2260,7 @@ $("#publishBtn").addEventListener("click", ()=>{
 
   if(ghReady){
     // one-click is set up: publish straight to the file, no download dance
-    body += "<p style='color:var(--ink-soft);'>This updates <code>"+fname+"</code> on the live site directly — no download, no duplicate files. It should be live about a minute after you publish.</p>";
+    body += "<p style='color:var(--ink-soft);'>This rechecks the latest GitHub version, stops safely if someone else published, and then updates <code>"+fname+"</code> directly — no download or duplicate files. It should be live about a minute after you publish.</p>";
     $("#publishBody").innerHTML = body;
 
     const pub = document.createElement("button");
@@ -2234,7 +2413,10 @@ $$(".overlay").forEach(o=> o.addEventListener("mousedown", e=>{ if(e.target===o)
 document.addEventListener("keydown", e=>{ if(e.key==="Escape") $$(".overlay:not(.hide)").forEach(o=>close(o.id)); });
 $("#helpBtn").addEventListener("click", ()=>open("helpModal"));
 function open(id){ $("#"+id).classList.remove("hide"); }
-function close(id){ $("#"+id).classList.add("hide"); }
+function close(id){
+  $("#"+id).classList.add("hide");
+  if(id==="cropModal"){clearCropPreview();cropTarget=null;cropState=null;}
+}
 
 function toast(msg, kind){
   const wrap = $("#toasts");
