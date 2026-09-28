@@ -643,7 +643,7 @@
         </div>
         <div>
           <h3>6 · Add or remove a person / card</h3>
-          <p>Click a team member, instructor, card, or section, then drag the green <strong>Drag instructor</strong>, <strong>Drag card</strong>, or <strong>Drag section</strong> handle that appears on it. Drop instructors directly into LD, PF, or another instructor group; compatible cards and content can be reordered the same way. The gold line shows the exact destination. Copy and paste remains available when you want to duplicate rather than move something.</p>
+          <p>Click a team member, instructor, card, or section, then drag the green <strong>Drag instructor</strong>, <strong>Drag card</strong>, or <strong>Drag section</strong> handle that appears on it. Drop instructors directly into LD, PF, or another instructor group; compatible cards and content can be reordered the same way. Click text to use <strong>Drag text block</strong> within its content box; click the empty space in a card to move the whole card. The gold line shows the exact destination. Copy and paste remains available when you want to duplicate rather than move something.</p>
         </div>
         <div>
           <h3>7 · Made a mistake?</h3>
@@ -1878,6 +1878,7 @@ function addHoverMenu(label,entries){
 function dragRootFor(el){
   if(!el||!el.isConnected)return null;
   if(el.matches(REPEATABLE_SEL.join(","))||el.matches(".section"))return el;
+  if(el.matches("[data-kd-text]"))return el;
   return repeatableItem(el)||el;
 }
 function dragLabel(el){
@@ -1907,7 +1908,9 @@ function updateDragHandle(){
   const handle=state.dragHandle;
   if(!handle||!handle.isConnected)return;
   const source=dragRootFor(state.selected);
-  if(state.mode!=="edit"||!source||state.dragSource){handle.style.display="none";return;}
+  // Keep the native drag source rendered until dragend; hiding it cancels the drag.
+  if(state.dragSource)return;
+  if(state.mode!=="edit"||!source){handle.style.display="none";return;}
   handle.textContent="⋮⋮  Drag "+dragLabel(source);
   handle.style.display="flex";
   const r=source.getBoundingClientRect();
@@ -1923,9 +1926,12 @@ function clearDropMarker(){
 }
 function beforeDropPoint(e,target){
   const r=target.getBoundingClientRect();
-  const dx=(e.clientX-(r.left+r.width/2))/Math.max(r.width,1);
-  const dy=(e.clientY-(r.top+r.height/2))/Math.max(r.height,1);
-  return Math.abs(dx)>Math.abs(dy) ? dx<0 : dy<0;
+  const horizontal=target.matches(REPEATABLE_SEL.join(","))&&Array.from(target.parentElement.children).some(sibling=>{
+    if(sibling===target)return false;
+    const other=sibling.getBoundingClientRect();
+    return other.width>0&&other.height>0&&Math.abs(other.top+other.height/2-r.top-r.height/2)<Math.min(r.height,other.height)/2;
+  });
+  return horizontal ? e.clientX<r.left+r.width/2 : e.clientY<r.top+r.height/2;
 }
 function instructorDropZone(target,source,e){
   if(!source.closest("#page-camp"))return null;
@@ -1960,7 +1966,7 @@ function onDragStart(e){
   if(state.mode!=="edit"||!source){e.preventDefault();return;}
   finishEditing();state.dragSource=source;source.classList.add("kd-dragging");
   e.dataTransfer.effectAllowed="move";e.dataTransfer.setData("text/plain","kritikal-editor-move");
-  state.dragHandle.style.display="none";
+  state.dragHandle.style.pointerEvents="none";
 }
 function onDragOver(e){
   if(!state.dragSource)return;
@@ -1989,6 +1995,7 @@ function finishDragging(){
   clearDropMarker();
   if(state.dragSource)state.dragSource.classList.remove("kd-dragging");
   state.dragSource=null;
+  if(state.dragHandle)state.dragHandle.style.pointerEvents="";
   updateDragHandle();
 }
 
