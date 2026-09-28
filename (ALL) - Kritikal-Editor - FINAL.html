@@ -631,7 +631,7 @@
         </div>
         <div>
           <h3>3 · Change text</h3>
-          <p>Click any heading or paragraph and just type. The bottom ribbon works like a compact word processor: choose paragraph or heading styles, font family, text size, text color, highlight, and alignment, or use bold, italic, underline, and hyperlinks. Hover over <strong>More text tools</strong> for strikethrough, subscript, superscript, clear formatting, and controls that add a heading or paragraph inside a card. Select words to format only those words; with no selection, formatting changes the whole text block. For a Starter Guide card, choose <strong>Edit article card</strong> to change its number, blue label/byline, title, and description. The title on the article page updates too.</p>
+          <p>Click any heading or paragraph to select it. Double-click it, or choose <strong>Edit text</strong>, to type. The bottom ribbon works like a compact word processor: choose paragraph or heading styles, font family, text size, text color, highlight, and alignment, or use bold, italic, underline, and hyperlinks. Hover over <strong>More text tools</strong> for strikethrough, subscript, superscript, clear formatting, and controls that add a heading or paragraph inside a card. Select words to format only those words; with no selection, formatting changes the whole text block. For a Starter Guide card, choose <strong>Edit article card</strong> to change its number, blue label/byline, title, and description. The title on the article page updates too.</p>
         </div>
         <div>
           <h3>4 · Swap a photo</h3>
@@ -643,7 +643,7 @@
         </div>
         <div>
           <h3>6 · Add or remove a person / card</h3>
-          <p>Click a team member, instructor, card, or section, then drag the green <strong>Drag instructor</strong>, <strong>Drag card</strong>, or <strong>Drag section</strong> handle that appears on it. Drop instructors directly into LD, PF, or another instructor group; compatible cards and content can be reordered the same way. Click text to use <strong>Drag text block</strong> within its content box; click the empty space in a card to move the whole card. The gold line shows the exact destination. Copy and paste remains available when you want to duplicate rather than move something.</p>
+          <p>Click a team member, instructor, card, or section, then drag the green <strong>Drag instructor</strong>, <strong>Drag card</strong>, or <strong>Drag section</strong> handle that appears on it. Drop instructors directly into LD, PF, or another instructor group; compatible cards and content can be reordered the same way. Click text to use <strong>Drag text block</strong> within its content box; click the empty space in a card to move the whole card. Use <strong>Move earlier</strong> or <strong>Move later</strong> in the bottom bar for precise movement without dragging. Navigation links and page buttons work the same way. The gold line shows the exact destination. Copy and paste remains available when you want to duplicate rather than move something.</p>
         </div>
         <div>
           <h3>7 · Made a mistake?</h3>
@@ -1434,7 +1434,7 @@ function setMode(mode){
   if(body) body.classList.toggle("kd-edit", mode==="edit");
   if(mode==="edit"){
     $("#ctxChip").textContent = "Editing";
-    setCtxHint("Click any text, photo, button, or person to change it.");
+    setCtxHint("Click to select and move. Double-click text or choose Edit text to type.");
   }else{
     $("#ctxChip").textContent = "Preview";
     setCtxHint("Looking good? Click <strong>Edit</strong> to make changes, or browse the site like a visitor.");
@@ -1464,7 +1464,12 @@ function onIframeClick(e){
 
   // 3) text block
   const text = t.closest("[data-kd-text]");
-  if(text){ beginTextEdit(text, e); return; }
+  if(text){
+    if(state.activeEditable===text)return;
+    if(e.detail>=2)beginTextEdit(text,e);
+    else selectElement(text);
+    return;
+  }
 
   // blank space inside a card or section selects the whole movable element
   const item = repeatableItem(t);
@@ -1487,7 +1492,7 @@ function beginTextEdit(el, e){
   state.activeEditable = el;
   // place caret where they clicked
   try{
-    const r = state.doc.caretRangeFromPoint(e.clientX, e.clientY);
+    const r = e ? state.doc.caretRangeFromPoint(e.clientX, e.clientY) : null;
     if(r){ const s = state.win.getSelection(); s.removeAllRanges(); s.addRange(r); }
   }catch(_){}
   setCtxFor(el);
@@ -1505,6 +1510,7 @@ function finishEditing(){
   }
   state._editStartHTML = null;
   state.activeEditable = null;
+  if(state.selected===el)setCtxFor(el);
 }
 function sanitizeInline(el){
   // keep a small whitelist of inline tags; strip everything dangerous
@@ -1748,7 +1754,7 @@ function clearSelection(keepEditing){
   if(state.selected){ state.selected.classList.remove("kd-sel"); }
   state.selected = null;
   updateDragHandle();
-  if(state.mode==="edit") setCtxHint("Click any text, photo, button, or person to change it.");
+  if(state.mode==="edit") setCtxHint("Click to select and move. Double-click text or choose Edit text to type.");
 }
 function setCtxHint(html){
   $("#ctxActions").innerHTML = "";
@@ -1773,6 +1779,15 @@ function setCtxFor(el){
   $("#ctxText").style.display = "none";
   $("#ctxChip").textContent = describe(el);
 
+  const movable=dragRootFor(el);
+  if(movable){
+    const earlier=addAction("Move earlier",iconUp(),()=>moveSelected(el,-1));
+    const later=addAction("Move later",iconDown(),()=>moveSelected(el,1));
+    earlier.disabled=!moveNeighbor(movable,-1);
+    later.disabled=!moveNeighbor(movable,1);
+    addCtxDivider();
+  }
+
   const article=articleTitleParts(el);
   if(article) addAction("Edit article card", iconText(), ()=>openArticleCard(el));
 
@@ -1789,6 +1804,10 @@ function setCtxFor(el){
     addAction("Edit link", iconLink(), ()=> openLink(el));
   }
   if(el.matches("[data-kd-text]")){
+    addAction(state.activeEditable===el?"Done editing":"Edit text",iconText(),()=>{
+      if(state.activeEditable===el)finishEditing();else beginTextEdit(el);
+    });
+    if(state.activeEditable===el){
     addSelect("Text style",[
       ["p","Paragraph"],["h1","Heading 1"],["h2","Heading 2"],["h3","Heading 3"],["h4","Heading 4"],["h5","Heading 5"],["eyebrow","Eyebrow"],["role","Role / label"]
     ],currentTextStyle(el),value=>changeTextBlockStyle(el,value));
@@ -1820,6 +1839,7 @@ function setCtxFor(el){
       ["Add heading below",iconPlus(),()=>insertTextAfter(el,"h3")],
       ["Add paragraph below",iconPlus(),()=>insertTextAfter(el,"p")]
     ]);
+    }
   }
 
   // structural actions for repeatable items
@@ -1828,8 +1848,7 @@ function setCtxFor(el){
     const noun = itemLabel(item);
     if(noun==="instructor") addAction("Copy instructor", iconCopy(), ()=>copyInstructor(item));
     addAction("Add another "+noun, iconPlus(), ()=> addItem(item));
-    addAction("Move up", iconUp(), ()=> moveItem(item,-1));
-    addAction("Move down", iconDown(), ()=> moveItem(item,1));
+    if(item!==el)addAction("Select "+noun,iconMove(),()=>selectElement(item));
     addAction("Remove "+noun, iconTrash(), ()=> removeItem(item), "danger");
   }
 
@@ -1842,6 +1861,7 @@ function setCtxFor(el){
   addAction(el.classList.contains("kd-site-hidden")?"Show":"Hide", iconEye(), ()=>toggleVisibility(el));
   const section=sectionOf(el);
   if(section){
+    if(section!==el)addAction("Select section",iconMove(),()=>selectElement(section));
     addAction("Section up", iconUp(), ()=>moveSection(section,-1));
     addAction("Section down", iconDown(), ()=>moveSection(section,1));
     addAction("Duplicate section", iconCopy(), ()=>duplicateSection(section));
@@ -1854,6 +1874,7 @@ function addAction(label, icon, fn, kind){
   b.innerHTML = icon + "<span>"+label+"</span>";
   b.onclick = fn;
   $("#ctxActions").appendChild(b);
+  return b;
 }
 function addSelect(label,options,value,onChange){
   const select=document.createElement("select");
@@ -1883,18 +1904,59 @@ function addHoverMenu(label,entries){
 
 /* ---- DIRECT DRAG + DROP ---- */
 function dragRootFor(el){
-  if(!el||!el.isConnected)return null;
+  if(!el||!el.isConnected||el.closest(".skip,.hamburger,#imageLightbox"))return null;
   if(el.matches(REPEATABLE_SEL.join(","))||el.matches(".section"))return el;
-  if(el.matches("[data-kd-text]"))return el;
-  return repeatableItem(el)||el;
+  if(el.matches("[data-kd-img]")){
+    const figure=el.closest("figure");
+    if(figure)return figure;
+    const link=el.closest("a");
+    if(link)el=link;
+  }
+  if(el.matches("[data-kd-ctrl],a,button")){
+    // Keep menu <li>s and inline-link paragraphs intact when moving their controls.
+    const block=el.closest("li,p");
+    if(block)return block;
+    const parent=el.parentElement;
+    if(parent&&parent.matches("div")&&!parent.id&&!parent.hasAttribute("role")&&
+      !parent.matches(REPEATABLE_SEL.join(",")+",.section,.wrap,.nav-social,.foot-social")&&
+      parent.children.length===1&&!Array.from(parent.childNodes).some(n=>n.nodeType===3&&n.textContent.trim()))return parent;
+  }
+  return el;
 }
 function dragLabel(el){
   if(el.matches(".section"))return "section";
   if(el.matches(REPEATABLE_SEL.join(",")))return itemLabel(el);
+  if(el.matches("li")&&el.querySelector("[data-kd-ctrl]"))return "menu item";
+  if(el.matches("figure"))return "photo";
+  if(el.matches("[data-kd-ctrl]")||el.children.length===1&&el.firstElementChild.matches("[data-kd-ctrl]"))return "button";
   if(el.matches("[data-kd-text]"))return "text block";
   if(el.matches("[data-kd-img]"))return "photo";
-  if(el.matches("[data-kd-ctrl]"))return "button";
   return "element";
+}
+function movableSibling(source,target){
+  if(!target||target===source||target.parentElement!==source.parentElement)return false;
+  if(target.matches("script,style,link,meta,template,.skip,.hamburger,.page,#imageLightbox,[data-camp-panel],[data-curriculum-panel],[hidden]"))return false;
+  if(source.matches("li"))return target.matches("li");
+  if(source.matches("td,th"))return target.matches("td,th");
+  if(source.matches(".section"))return target.matches(".section");
+  if(source.matches(REPEATABLE_SEL.join(",")))return target.matches(REPEATABLE_SEL.join(","))&&itemLabel(source)===itemLabel(target);
+  return true;
+}
+function moveNeighbor(source,direction){
+  let next=direction<0?source.previousElementSibling:source.nextElementSibling;
+  while(next&&!movableSibling(source,next))next=direction<0?next.previousElementSibling:next.nextElementSibling;
+  return next;
+}
+function moveSelected(el,direction){
+  finishEditing();
+  const source=dragRootFor(el);
+  const target=source&&moveNeighbor(source,direction);
+  if(!target)return;
+  snapshot();
+  target.parentNode.insertBefore(source,direction<0?target:target.nextSibling);
+  selectElement(el);
+  source.scrollIntoView({behavior:"smooth",block:"nearest"});
+  toast(dragLabel(source).replace(/^./,c=>c.toUpperCase())+" moved.","ok");
 }
 function setupDragAndDrop(){
   const doc=state.doc;
@@ -1928,8 +1990,10 @@ function updateDragHandle(){
   handle.style.display="flex";
   const r=source.getBoundingClientRect();
   const width=handle.offsetWidth||110;
+  const height=handle.offsetHeight||28;
+  const top=r.top>=height+12?r.top-height-6:r.bottom+6;
   handle.style.left=Math.max(8,Math.min(state.win.innerWidth-width-8,r.right-width)) + "px";
-  handle.style.top=Math.max(8,Math.min(state.win.innerHeight-36,r.top+8)) + "px";
+  handle.style.top=Math.max(8,Math.min(state.win.innerHeight-height-8,top)) + "px";
 }
 function clearDropMarker(){
   if(state.dragMarker){
@@ -1939,7 +2003,7 @@ function clearDropMarker(){
 }
 function horizontalDropTarget(target){
   const r=target.getBoundingClientRect();
-  return target.matches(REPEATABLE_SEL.join(","))&&Array.from(target.parentElement.children).some(sibling=>{
+  return !!target.parentElement&&Array.from(target.parentElement.children).some(sibling=>{
     if(sibling===target)return false;
     const other=sibling.getBoundingClientRect();
     return other.width>0&&other.height>0&&Math.abs(other.top+other.height/2-r.top-r.height/2)<Math.min(r.height,other.height)/2;
@@ -1974,7 +2038,7 @@ function compatibleDropZone(target,source,e){
     return item&&item!==source&&itemLabel(item)===itemLabel(source) ? {el:item,kind:"relative",before:beforeDropPoint(e,item)} : null;
   }
   const sibling=directChildWithin(source.parentElement,target);
-  if(!sibling||sibling===source||!sibling.matches(BLOCK_SEL+","+IMG_SEL+","+CONTROL_SEL))return null;
+  if(!movableSibling(source,sibling))return null;
   return {el:sibling,kind:"relative",before:beforeDropPoint(e,sibling)};
 }
 function onDragPointerDown(e){
@@ -2041,6 +2105,7 @@ function onDragPointerUp(e){
   if(!pointer||e.pointerId!==pointer.id)return;
   e.preventDefault();e.stopPropagation();
   const source=state.dragSource;
+  const selected=state.selected;
   const zone=source?dropZoneAtPoint(e.clientX,e.clientY):null;
   finishDragging();
   if(!source||!zone)return;
@@ -2054,7 +2119,7 @@ function onDragPointerUp(e){
   }else if(zone.kind==="instructor-heading"){
     snapshot();instructorGridNear(zone.el).appendChild(source);
   }
-  selectElement(source);
+  selectElement(selected&&source.contains(selected)?selected:source);
   source.scrollIntoView({behavior:"smooth",block:"nearest"});
   const noun=dragLabel(source);
   toast(noun.replace(/^./,c=>c.toUpperCase())+" moved.","ok");
