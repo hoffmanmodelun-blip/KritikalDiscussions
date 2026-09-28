@@ -704,7 +704,7 @@
      HEADER / NAV
      The brand mark uses the original logo image plus the text wordmark.
      =========================================================================== -->
-<header class="nav scrolled" id="nav">
+<header class="nav" id="nav">
   <div class="wrap nav-inner">
     <a href="#home" data-link="home" aria-label="Kritikal Discussions home">
       <span class="brand">
@@ -716,12 +716,12 @@
     <ul class="nav-links" id="navlinks">
       <li><a href="#home" data-link="home" class="">Home</a></li>
       <li><a href="#team" data-link="team" class="">Our Team</a></li>
-      <li><a href="#camp" data-link="camp" class="active">Debate Camp</a></li>
+      <li><a href="#camp" data-link="camp" class="">Debate Camp</a></li>
       <!-- SHELVED NAV ITEM: Kritikal Project is temporarily hidden; restore this link when the page is active again.
       <li><a href="#project" data-link="project">Kritikal Project</a></li>
       -->
       <li><a href="#resources" data-link="resources" class="">Resources</a></li>
-      <li><a href="#contact" data-link="contact" class="">Contact</a></li>
+      <li><a href="#contact" data-link="contact" class="active">Contact</a></li>
     </ul>
 
     <div class="nav-social">
@@ -1702,7 +1702,7 @@
             <p class="label">Email</p>
             <h3 style="margin:.5rem 0;">Send a message</h3>
             <!-- CONTACT PLACEHOLDER: swap in your real email address below. -->
-            <a href="mailto:hello@kritikaldiscussions.com">hello@kritikaldiscussions.com</a>
+            <a href="mailto:kritikaldiscussions@gmail.com" class="">kritikaldiscussions@gmail.com</a>
           </div>
           <div class="contact-card reveal d3">
             <p class="label">Instagram</p>
@@ -1941,6 +1941,7 @@
   const initial = (location.hash || '#home').slice(1);
   if (!go(initial)) go('home');
 </script>
+
 
 
 
