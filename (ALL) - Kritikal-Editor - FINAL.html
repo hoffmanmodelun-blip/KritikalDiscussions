@@ -699,6 +699,9 @@ const state = {
   dragHandle: null,      // editor-only handle positioned over selected content
   dragSource: null,      // element currently being moved
   dragMarker: null,      // current compatible drop target
+  dragPointer: null,     // captured pointer and pending/active gesture
+  dragScrollFrame: null, // animation frame for edge scrolling
+  dragIgnoreClickUntil: 0,
   undo: [],              // snapshots of <body> innerHTML
   tabState: [],          // remembered hidden/active states to restore on export
   baseUrl: "https://kritikaldiscussions.com/",
@@ -885,10 +888,13 @@ function bootSite(html){
     "body.kd-edit .kd-site-hidden{display:block !important;opacity:.42 !important;outline:2px dashed #B4541E !important;outline-offset:3px;}"+
     "body.kd-edit [data-camp-panel][hidden],body.kd-edit [data-curriculum-panel][hidden]{display:block !important;outline:1px dashed var(--line);outline-offset:6px;}"+
     ".kd-sel{outline:3px solid #00736F !important;outline-offset:2px;border-radius:4px;}"+
-    ".kd-drag-handle{position:fixed;z-index:2147483646;display:none;align-items:center;gap:6px;padding:7px 10px;border:0;border-radius:999px;background:#00736F;color:#fff;font:700 12px/1 Arial,sans-serif;box-shadow:0 7px 20px rgba(0,0,0,.24);cursor:grab;user-select:none;-webkit-user-select:none;}"+
+    ".kd-drag-handle{position:fixed;z-index:2147483646;display:none;align-items:center;gap:6px;padding:7px 10px;border:0;border-radius:999px;background:#00736F;color:#fff;font:700 12px/1 Arial,sans-serif;box-shadow:0 7px 20px rgba(0,0,0,.24);cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;}"+
     ".kd-drag-handle:active{cursor:grabbing;}"+
     ".kd-drop-before{box-shadow:inset 0 5px 0 #E8A317 !important;}"+
     ".kd-drop-after{box-shadow:inset 0 -5px 0 #E8A317 !important;}"+
+    ".kd-drop-left{box-shadow:inset 5px 0 0 #E8A317 !important;}"+
+    ".kd-drop-right{box-shadow:inset -5px 0 0 #E8A317 !important;}"+
+    "html.kd-moving,html.kd-moving *{cursor:grabbing !important;user-select:none !important;-webkit-user-select:none !important;}"+
     ".kd-drop-target{outline:4px dashed #E8A317 !important;outline-offset:5px;}"+
     ".kd-dragging{opacity:.42 !important;}"+
     "[contenteditable=true]{outline:3px solid #00736F !important;outline-offset:2px;background:rgba(0,115,111,.04);}"+
@@ -1418,6 +1424,7 @@ $("#modePreview").addEventListener("click", ()=>setMode("preview"));
 $("#modeEdit").addEventListener("click", ()=>setMode("edit"));
 
 function setMode(mode){
+  finishDragging();
   state.mode = mode;
   finishEditing();
   clearSelection();
@@ -1438,7 +1445,7 @@ function setMode(mode){
 function onIframeClick(e){
   if(state.mode!=="edit") return;          // preview: let the site behave normally
   const t = e.target;
-  if(t.closest(".kd-drag-handle")){ e.preventDefault();e.stopPropagation();return; }
+  if(Date.now()<state.dragIgnoreClickUntil||t.closest(".kd-drag-handle")){ e.preventDefault();e.stopPropagation();return; }
 
   // always stop the site's own navigation / tab handlers while editing
   // (we drive navigation from the toolbar, and unhide tab panels for editing)
@@ -1892,14 +1899,20 @@ function dragLabel(el){
 function setupDragAndDrop(){
   const doc=state.doc;
   const handle=doc.createElement("button");
-  handle.type="button";handle.className="kd-drag-handle";handle.draggable=true;
+  handle.type="button";handle.className="kd-drag-handle";handle.draggable=false;
   handle.title="Drag this element to a highlighted destination";
   handle.setAttribute("aria-label","Drag selected element");
   doc.documentElement.appendChild(handle);state.dragHandle=handle;
-  handle.addEventListener("dragstart",onDragStart);
-  doc.addEventListener("dragover",onDragOver,true);
-  doc.addEventListener("drop",onDrop,true);
-  doc.addEventListener("dragend",finishDragging,true);
+  // Buttons and editable text do not reliably initiate HTML drag-and-drop.
+  // Capture the pointer and hit-test the iframe instead of relying on dragstart.
+  handle.addEventListener("pointerdown",onDragPointerDown);
+  handle.addEventListener("dragstart",e=>e.preventDefault());
+  doc.addEventListener("pointermove",onDragPointerMove,true);
+  doc.addEventListener("pointerup",onDragPointerUp,true);
+  doc.addEventListener("pointercancel",finishDragging,true);
+  handle.addEventListener("lostpointercapture",()=>{if(state.dragPointer)finishDragging();});
+  doc.addEventListener("keydown",e=>{if(e.key==="Escape"&&state.dragPointer){e.preventDefault();finishDragging();}},true);
+  state.win.addEventListener("blur",finishDragging);
   state.win.addEventListener("scroll",updateDragHandle,{passive:true});
   state.win.addEventListener("resize",updateDragHandle,{passive:true});
   updateDragHandle();
@@ -1908,8 +1921,8 @@ function updateDragHandle(){
   const handle=state.dragHandle;
   if(!handle||!handle.isConnected)return;
   const source=dragRootFor(state.selected);
-  // Keep the native drag source rendered until dragend; hiding it cancels the drag.
-  if(state.dragSource)return;
+  // Keep the capture target stationary throughout the pointer gesture.
+  if(state.dragPointer)return;
   if(state.mode!=="edit"||!source){handle.style.display="none";return;}
   handle.textContent="⋮⋮  Drag "+dragLabel(source);
   handle.style.display="flex";
@@ -1920,18 +1933,21 @@ function updateDragHandle(){
 }
 function clearDropMarker(){
   if(state.dragMarker){
-    state.dragMarker.el.classList.remove("kd-drop-before","kd-drop-after","kd-drop-target");
+    state.dragMarker.el.classList.remove("kd-drop-before","kd-drop-after","kd-drop-left","kd-drop-right","kd-drop-target");
     state.dragMarker=null;
   }
 }
-function beforeDropPoint(e,target){
+function horizontalDropTarget(target){
   const r=target.getBoundingClientRect();
-  const horizontal=target.matches(REPEATABLE_SEL.join(","))&&Array.from(target.parentElement.children).some(sibling=>{
+  return target.matches(REPEATABLE_SEL.join(","))&&Array.from(target.parentElement.children).some(sibling=>{
     if(sibling===target)return false;
     const other=sibling.getBoundingClientRect();
     return other.width>0&&other.height>0&&Math.abs(other.top+other.height/2-r.top-r.height/2)<Math.min(r.height,other.height)/2;
   });
-  return horizontal ? e.clientX<r.left+r.width/2 : e.clientY<r.top+r.height/2;
+}
+function beforeDropPoint(e,target){
+  const r=target.getBoundingClientRect();
+  return horizontalDropTarget(target) ? e.clientX<r.left+r.width/2 : e.clientY<r.top+r.height/2;
 }
 function instructorDropZone(target,source,e){
   if(!source.closest("#page-camp"))return null;
@@ -1961,41 +1977,102 @@ function compatibleDropZone(target,source,e){
   if(!sibling||sibling===source||!sibling.matches(BLOCK_SEL+","+IMG_SEL+","+CONTROL_SEL))return null;
   return {el:sibling,kind:"relative",before:beforeDropPoint(e,sibling)};
 }
-function onDragStart(e){
+function onDragPointerDown(e){
   const source=dragRootFor(state.selected);
-  if(state.mode!=="edit"||!source){e.preventDefault();return;}
-  finishEditing();state.dragSource=source;source.classList.add("kd-dragging");
-  e.dataTransfer.effectAllowed="move";e.dataTransfer.setData("text/plain","kritikal-editor-move");
-  state.dragHandle.style.pointerEvents="none";
-}
-function onDragOver(e){
-  if(!state.dragSource)return;
-  e.preventDefault();
-  const zone=compatibleDropZone(e.target,state.dragSource,e);
-  clearDropMarker();
-  if(!zone){e.dataTransfer.dropEffect="none";return;}
-  e.dataTransfer.dropEffect="move";state.dragMarker=zone;
-  zone.el.classList.add(zone.kind==="relative"?(zone.before?"kd-drop-before":"kd-drop-after"):"kd-drop-target");
-}
-function onDrop(e){
-  const source=state.dragSource;
-  if(!source)return;
+  if(e.button!==0||e.isPrimary===false||state.mode!=="edit"||!source)return;
   e.preventDefault();e.stopPropagation();
-  const zone=source&&compatibleDropZone(e.target,source,e);
-  if(!zone){finishDragging();return;}
-  source.classList.remove("kd-dragging");clearDropMarker();snapshot();
-  if(zone.kind==="relative")zone.el.parentNode.insertBefore(source,zone.before?zone.el:zone.el.nextSibling);
-  else if(zone.kind==="inside")zone.el.appendChild(source);
-  else if(zone.kind==="instructor-heading")instructorGridNear(zone.el).appendChild(source);
-  const noun=dragLabel(source);finishDragging();selectElement(source);
-  source.scrollIntoView({behavior:"smooth",block:"center"});
+  finishEditing();
+  state.dragPointer={id:e.pointerId,source,startX:e.clientX,startY:e.clientY,x:e.clientX,y:e.clientY};
+  try{state.dragHandle.setPointerCapture(e.pointerId);}catch(_){}
+}
+function onDragPointerMove(e){
+  const pointer=state.dragPointer;
+  if(!pointer||e.pointerId!==pointer.id)return;
+  e.preventDefault();e.stopPropagation();
+  pointer.x=e.clientX;pointer.y=e.clientY;
+  if(!state.dragSource){
+    if(Math.hypot(pointer.x-pointer.startX,pointer.y-pointer.startY)<5)return;
+    state.dragSource=pointer.source;
+    state.dragSource.classList.add("kd-dragging");
+    state.doc.documentElement.classList.add("kd-moving");
+    // Pointer capture continues delivering events while hit-testing ignores the handle.
+    state.dragHandle.style.pointerEvents="none";
+    state.dragScrollFrame=state.win.requestAnimationFrame(scrollWhileDragging);
+  }
+  showDropZone(dropZoneAtPoint(pointer.x,pointer.y));
+}
+function dropZoneAtPoint(x,y){
+  const target=state.doc.elementFromPoint(x,y),source=state.dragSource;
+  if(!target||!source)return null;
+  const point={clientX:x,clientY:y};
+  const zone=compatibleDropZone(target,source,point);
+  if(zone||target!==source.parentElement)return zone;
+  // The space between blocks is a useful drop target too.
+  let nearest=null,distance=Infinity;
+  Array.from(target.children).forEach(child=>{
+    const candidate=compatibleDropZone(child,source,point);
+    if(!candidate)return;
+    const r=child.getBoundingClientRect();
+    if(!r.width||!r.height)return;
+    const d=Math.hypot(Math.max(r.left-x,0,x-r.right),Math.max(r.top-y,0,y-r.bottom));
+    if(d<distance){distance=d;nearest=candidate;}
+  });
+  return nearest;
+}
+function showDropZone(zone){
+  clearDropMarker();
+  if(!zone)return;
+  state.dragMarker=zone;
+  const side=horizontalDropTarget(zone.el)?(zone.before?"left":"right"):(zone.before?"before":"after");
+  zone.el.classList.add(zone.kind==="relative"?"kd-drop-"+side:"kd-drop-target");
+}
+function scrollWhileDragging(){
+  const pointer=state.dragPointer;
+  if(!pointer||!state.dragSource)return;
+  const height=state.win.innerHeight;
+  if(pointer.x>=0&&pointer.x<=state.win.innerWidth&&pointer.y>=0&&pointer.y<=height){
+    const dy=pointer.y<56?-Math.ceil((56-pointer.y)/3):pointer.y>height-56?Math.ceil((pointer.y-height+56)/3):0;
+    if(dy){state.win.scrollBy(0,dy);showDropZone(dropZoneAtPoint(pointer.x,pointer.y));}
+  }
+  state.dragScrollFrame=state.win.requestAnimationFrame(scrollWhileDragging);
+}
+function onDragPointerUp(e){
+  const pointer=state.dragPointer;
+  if(!pointer||e.pointerId!==pointer.id)return;
+  e.preventDefault();e.stopPropagation();
+  const source=state.dragSource;
+  const zone=source?dropZoneAtPoint(e.clientX,e.clientY):null;
+  finishDragging();
+  if(!source||!zone)return;
+  if(zone.kind==="relative"){
+    const next=zone.before?zone.el:zone.el.nextSibling;
+    if(next===source||(source.parentNode===zone.el.parentNode&&source.nextSibling===next))return;
+    snapshot();zone.el.parentNode.insertBefore(source,next);
+  }else if(zone.kind==="inside"){
+    if(source.parentNode===zone.el&&source===zone.el.lastElementChild)return;
+    snapshot();zone.el.appendChild(source);
+  }else if(zone.kind==="instructor-heading"){
+    snapshot();instructorGridNear(zone.el).appendChild(source);
+  }
+  selectElement(source);
+  source.scrollIntoView({behavior:"smooth",block:"nearest"});
+  const noun=dragLabel(source);
   toast(noun.replace(/^./,c=>c.toUpperCase())+" moved.","ok");
 }
 function finishDragging(){
+  const pointer=state.dragPointer;
+  state.dragPointer=null;
+  if(pointer)state.dragIgnoreClickUntil=Date.now()+250;
+  if(state.dragScrollFrame!=null&&state.win)state.win.cancelAnimationFrame(state.dragScrollFrame);
+  state.dragScrollFrame=null;
   clearDropMarker();
   if(state.dragSource)state.dragSource.classList.remove("kd-dragging");
   state.dragSource=null;
-  if(state.dragHandle)state.dragHandle.style.pointerEvents="";
+  if(state.doc)state.doc.documentElement.classList.remove("kd-moving");
+  if(state.dragHandle){
+    state.dragHandle.style.pointerEvents="";
+    if(pointer){try{state.dragHandle.releasePointerCapture(pointer.id);}catch(_){}}
+  }
   updateDragHandle();
 }
 
